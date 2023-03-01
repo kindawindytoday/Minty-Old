@@ -1,4 +1,5 @@
 #include "includes.h"
+//#include "funcs.cpp"
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 Present oPresent;
@@ -54,11 +55,13 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	// imgui code between newframe and render
 	ImGui::NewFrame();
 
-	ImGui::Begin("Minty");
+	/*ImGui::Begin("Minty");
 	ImGui::Text("Bruh what the heck");
-	if (ImGui::Button("Niggers"));
+	if (ImGui::Button("uid bruh"))
+		func_changeuid();
 	if (ImGui::Button("Balls"));
-	if (ImGui::Button("Bitchez"));
+	if (ImGui::Button("Bitchez"));*/
+	ImGui::ShowDemoWindow();
 
 	ImGui::End();
 	ImGui::Render();
