@@ -1,6 +1,6 @@
 ﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(534,5): warning MSB8028: промежуточный каталог (x64\Debug\) содержит файлы, которые используются совместно с другим проектом (ImGui DirectX 11 Kiero Hook.vcxproj).  Это может привести к ошибкам очистки и перестроения.
-  funcs.cpp
   main.cpp
-  Создание кода...
-  LINK : не найден или не выполнена сборка C:\kwt\Minty\x64\Debug\minty.dll при последней инкрементной компоновке; выполняется полная компоновка
+C:\kwt\Minty\minty\main.cpp(129,32): warning C4390: ";": обнаружен пустой контролируемый оператор; это правильно?
+C:\kwt\Minty\minty\main.cpp(130,29): warning C4390: ";": обнаружен пустой контролируемый оператор; это правильно?
+C:\kwt\Minty\minty\main.cpp(131,31): warning C4390: ";": обнаружен пустой контролируемый оператор; это правильно?
   minty.vcxproj -> C:\kwt\Minty\x64\Debug\minty.dll
