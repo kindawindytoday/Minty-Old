@@ -62,38 +62,22 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			return oPresent(pSwapChain, SyncInterval, Flags);
 	}
 
-	/*ImGui_ImplDX11_NewFrame();
-	ImGui_ImplWin32_NewFrame();*/
-
-	/*ImGuiIO& io = ImGui::GetIO();
-	ImFontConfig font;
-	font.FontDataOwnedByAtlas = false;
-
-	io.Fonts->AddFontFromMemoryTTF((void*)rawData, sizeof(rawData), 18.f, &font);
-	io.Fonts->Build();
-	ImGui_ImplDX11_InvalidateDeviceObjects();*/
-
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 
-	//ImFont* font = io.Fonts->AddFontFromFileTTF("res\\fonts\\mpc.otf", 18.0f);
-	//ImGui::PushFont(font);
-	//io.Fonts->AddFontFromMemoryTTF(&IconFont, sizeof IconFont, 18);
-	//ImFont* Logo = io.Fonts->AddFontFromMemoryTTF(&IconFont, sizeof IconFont, 18);
-	//io.Fonts->Build();
-
-		// imgui code between newframe and render
+	// imgui code between newframe and render
 
 	ImGui::NewFrame();
+
 	ImGui::GetStyle().IndentSpacing = 7.0f;
 	static bool showEditor = false; // Declare showEditor variable
-	ImGui::Begin("My Window");
+	ImGui::Begin("Minty");
 	//ImGui::PushFont(font);
 	ImGui::BeginTabBar("Minty");
 
 	if (ImGui::BeginTabItem("Lua"))
 	{
-		if (ImGui::Button("Change UID"))
+		if (ImGui::Button("Change UID"));
 			//func_changeuid();
 
 		// Content for Lua
