@@ -66,6 +66,9 @@
     <ClCompile Include="lua\funcs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="themes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="kiero\minhook\dll_resources\MinHook.rc">
@@ -140,6 +143,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="lua\lualib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lua\funcs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="themes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
