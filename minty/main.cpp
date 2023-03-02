@@ -1,6 +1,7 @@
 #include "includes.h"
 //#include "lua/funcs.h"
 #include "themes.h"
+#include "res/fonts/font.h"
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 Present oPresent;
@@ -19,12 +20,15 @@ void InitImGui()
 	ImGui_ImplDX11_Init(pDevice, pContext);
 }
 
+
+
 LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 	if (true && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
 		return true;
 
 	return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+
 }
 
 bool init = false;
@@ -45,17 +49,35 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			oWndProc = (WNDPROC)SetWindowLongPtr(window, GWLP_WNDPROC, (LONG_PTR)WndProc);
 			InitImGui();
 			init = true;
+			ImGuiIO& io = ImGui::GetIO();
+			ImFontConfig font;
+			font.FontDataOwnedByAtlas = false;
+
+			io.Fonts->AddFontFromMemoryTTF((void*)rawData, sizeof(rawData), 18.f, &font);
+			io.Fonts->Build();
+			ImGui_ImplDX11_InvalidateDeviceObjects();
 		}
 
 		else
 			return oPresent(pSwapChain, SyncInterval, Flags);
 	}
 
+	/*ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();*/
+
+	/*ImGuiIO& io = ImGui::GetIO();
+	ImFontConfig font;
+	font.FontDataOwnedByAtlas = false;
+
+	io.Fonts->AddFontFromMemoryTTF((void*)rawData, sizeof(rawData), 18.f, &font);
+	io.Fonts->Build();
+	ImGui_ImplDX11_InvalidateDeviceObjects();*/
+
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
-	
-	//ImGuiIO& io = ImGui::GetIO();
+
 	//ImFont* font = io.Fonts->AddFontFromFileTTF("res\\fonts\\mpc.otf", 18.0f);
+	//ImGui::PushFont(font);
 	//io.Fonts->AddFontFromMemoryTTF(&IconFont, sizeof IconFont, 18);
 	//ImFont* Logo = io.Fonts->AddFontFromMemoryTTF(&IconFont, sizeof IconFont, 18);
 	//io.Fonts->Build();
@@ -66,7 +88,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	ImGui::GetStyle().IndentSpacing = 7.0f;
 	static bool showEditor = false; // Declare showEditor variable
 	ImGui::Begin("My Window");
-
+	//ImGui::PushFont(font);
 	ImGui::BeginTabBar("Minty");
 
 	if (ImGui::BeginTabItem("Lua"))

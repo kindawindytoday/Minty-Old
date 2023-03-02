@@ -151,6 +151,9 @@
     <ClInclude Include="themes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="res\fonts\font.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="kiero\minhook\dll_resources\MinHook.def">

@@ -198,6 +198,7 @@
     <ClInclude Include="lua\lua.hpp" />
     <ClInclude Include="lua\luaconf.h" />
     <ClInclude Include="lua\lualib.h" />
+    <ClInclude Include="res\fonts\font.h" />
     <ClInclude Include="themes.h" />
   </ItemGroup>
   <ItemGroup>
