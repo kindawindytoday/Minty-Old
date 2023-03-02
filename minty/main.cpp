@@ -135,6 +135,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		// Content for About
 		ImGui::Text("Minty v69.420");
 		ImGui::Text("ImGui version: %s", ImGui::GetVersion());
+
+                ImGui::Text("Contributors: мятный пряник#0086, Moistcrafter#9172");
 		ImGui::EndTabItem();
 	}
 
