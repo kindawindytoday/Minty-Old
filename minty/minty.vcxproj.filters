@@ -69,6 +69,9 @@
     <ClCompile Include="themes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gilua\luahook.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="kiero\minhook\dll_resources\MinHook.rc">
@@ -152,6 +155,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="res\fonts\font.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gilua\pe.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gilua\scanner.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gilua\util.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gilua\luahook.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

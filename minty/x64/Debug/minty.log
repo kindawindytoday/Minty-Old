@@ -1,10 +1,22 @@
 ﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(534,5): warning MSB8028: промежуточный каталог (x64\Debug\) содержит файлы, которые используются совместно с другим проектом (ImGui DirectX 11 Kiero Hook.vcxproj).  Это может привести к ошибкам очистки и перестроения.
-  funcs.cpp
+  luahook.cpp
   main.cpp
-C:\kwt\Minty\minty\main.cpp(80,35): warning C4390: ";": обнаружен пустой контролируемый оператор; это правильно?
-  Создание кода
-  2 of 1418 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    21 functions had inline decision re-evaluated but remain unchanged
-  Создание кода завершено
-  minty.vcxproj -> C:\kwt\Minty\x64\Debug\minty.dll
+hook.obj : error LNK2005: "int (__cdecl** pp_loadbuffer)(struct lua_State *,char const *,unsigned __int64,char const *)" (?pp_loadbuffer@@3PEAP6AHPEAUlua_State@@PEBD_K1@ZEA) уже определен в luahook.obj
+hook.obj : error LNK2005: "struct HINSTANCE__ * xlua" (?xlua@@3PEAUHINSTANCE__@@EA) уже определен в luahook.obj
+hook.obj : error LNK2005: "void * main_thread" (?main_thread@@3PEAXEA) уже определен в luahook.obj
+hook.obj : error LNK2005: "struct lua_State * gi_L" (?gi_L@@3PEAUlua_State@@EA) уже определен в luahook.obj
+hook.obj : error LNK2005: "int (__cdecl** __cdecl scan_loadbuffer(struct HINSTANCE__ *))(struct lua_State *,char const *,unsigned __int64,char const *)" (?scan_loadbuffer@@YAPEAP6AHPEAUlua_State@@PEBD_K1@ZPEAUHINSTANCE__@@@Z) уже определен в luahook.obj
+hook.obj : error LNK2005: "class std::vector<class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >,class std::allocator<class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > > > __cdecl util::split(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > const &,char)" (?split@util@@YA?AV?$vector@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$allocator@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@2@@std@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@3@D@Z) уже определен в luahook.obj
+hook.obj : error LNK2005: "class std::optional<class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > > __cdecl util::read_whole_file(class std::filesystem::path const &)" (?read_whole_file@util@@YA?AV?$optional@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@std@@AEBVpath@filesystem@3@@Z) уже определен в luahook.obj
+hook.obj : error LNK2005: "class std::optional<class std::filesystem::path> __cdecl util::this_dir(void)" (?this_dir@util@@YA?AV?$optional@Vpath@filesystem@std@@@std@@XZ) уже определен в luahook.obj
+hook.obj : error LNK2005: "struct _IMAGE_SECTION_HEADER * __cdecl util::pe::get_section_by_name(struct HINSTANCE__ *,char const *)" (?get_section_by_name@pe@util@@YAQEAU_IMAGE_SECTION_HEADER@@PEAUHINSTANCE__@@PEBD@Z) уже определен в luahook.obj
+hook.obj : error LNK2005: "unsigned char const * __cdecl util::scanner::find_ref_relative(unsigned char const *,unsigned char const *,unsigned __int64,bool)" (?find_ref_relative@scanner@util@@YAPEBEPEBE0_K_N@Z) уже определен в luahook.obj
+hook.obj : error LNK2005: "unsigned char const * __cdecl util::scanner::find_pat(unsigned char const *,char const *,unsigned char const *,unsigned __int64,bool)" (?find_pat@scanner@util@@YAPEBEPEBEPEBD0_K_N@Z) уже определен в luahook.obj
+hook.obj : error LNK2005: "bool __cdecl util::scanner::cmp_pat(unsigned char const *,char const *,unsigned __int64,unsigned char const *)" (?cmp_pat@scanner@util@@YA_NPEBEPEBD_K0@Z) уже определен в luahook.obj
+kiero.obj : error LNK2001: неразрешенный внешний символ MH_Initialize.
+kiero.obj : error LNK2001: неразрешенный внешний символ MH_CreateHook.
+kiero.obj : error LNK2001: неразрешенный внешний символ MH_EnableHook.
+kiero.obj : error LNK2001: неразрешенный внешний символ MH_DisableHook.
+main.obj : error LNK2001: неразрешенный внешний символ "unsigned long __cdecl start(void *)" (?start@@YAKPEAX@Z).
+main.obj : error LNK2001: неразрешенный внешний символ "void __cdecl load_lua_file(struct lua_State *,char const *)" (?load_lua_file@@YAXPEAUlua_State@@PEBD@Z).
+C:\kwt\Minty\x64\Debug\minty.dll : fatal error LNK1120: неразрешенных внешних элементов: 6

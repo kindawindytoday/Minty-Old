@@ -1,7 +1,8 @@
 #include "includes.h"
-//#include "lua/funcs.h"
+#include "lua/funcs.h"
 #include "themes.h"
 #include "res/fonts/font.h"
+#include "gilua/luahook.h"
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 Present oPresent;
@@ -62,6 +63,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			return oPresent(pSwapChain, SyncInterval, Flags);
 	}
 
+	lua_State* L;
+
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 
@@ -77,8 +80,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 	if (ImGui::BeginTabItem("Lua"))
 	{
-		if (ImGui::Button("Change UID"));
-			//func_changeuid();
+		if (ImGui::Button("Change UID"))
+			load_lua_file(L, func_changeuid);
 
 		// Content for Lua
 		if (ImGui::Checkbox("Lua editor", &showEditor))
@@ -163,13 +166,46 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
 	return TRUE;
 }
 
-BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved)
+//DWORD start(LPVOID)
+//{
+//	AllocConsole();
+//	FILE* pConsoleIn = nullptr;
+//	FILE* pConsoleOut = nullptr;
+//	FILE* pConsoleErr = nullptr;
+//	freopen_s(&pConsoleIn, "CONIN$", "r", stdin);
+//	freopen_s(&pConsoleOut, "CONOUT$", "w", stdout);
+//	freopen_s(&pConsoleErr, "CONOUT$", "w", stderr);
+//
+//	util::log("GILua by azzu\n");
+//
+//	/*auto dir = get_scripts_folder();
+//	if (!dir)
+//		return 0;*/
+//
+//	/*get_gi_L();
+//
+//	auto state = luaL_newstate();*/
+//
+//	// rsapatch breaks input, restore input mode
+//	SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),
+//		ENABLE_INSERT_MODE | ENABLE_EXTENDED_FLAGS |
+//		ENABLE_PROCESSED_INPUT | ENABLE_QUICK_EDIT_MODE |
+//		ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT
+//	);
+//
+//	/*command_loop(state, dir.value());*/
+//
+//	return 0;
+//}
+
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved, HMODULE hMod, DWORD dwReason, LPVOID lpReserved)
 {
 	switch (dwReason)
 	{
 	case DLL_PROCESS_ATTACH:
 		DisableThreadLibraryCalls(hMod);
 		CreateThread(nullptr, 0, MainThread, hMod, 0, nullptr);
+		CloseHandle(CreateThread(NULL, 0, &start, NULL, NULL, NULL));
 		break;
 	case DLL_PROCESS_DETACH:
 		kiero::shutdown();

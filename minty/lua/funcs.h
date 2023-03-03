@@ -2,6 +2,6 @@
 #ifndef FUNCS_H
 #define FUNCS_H
 
-//void func_changeuid();
+const char* func_changeuid = "CS.MoleMole.ActorUtils.ShowMessage(\"Bruh it really works\")";
 
 #endif
