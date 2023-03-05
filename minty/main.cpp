@@ -1,8 +1,12 @@
 #include "includes.h"
-#include "lua/funcs.h"
+//#include "lua/funcs.h"
 #include "themes.h"
 #include "res/fonts/font.h"
-#include "gilua/luahook.h"
+#include "gilua/luaHook.h"
+//#include "lua/luaHook.cpp"
+#include "lua/funcs.hpp"
+#include "imgui/TextEditor.h"
+
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 Present oPresent;
@@ -63,8 +67,6 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			return oPresent(pSwapChain, SyncInterval, Flags);
 	}
 
-	lua_State* L;
-
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 
@@ -77,36 +79,149 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	ImGui::Begin("Minty");
 	//ImGui::PushFont(font);
 	ImGui::BeginTabBar("Minty");
+	//auto gi_LL = luaL_newstate();
 
 	if (ImGui::BeginTabItem("Lua"))
 	{
-		if (ImGui::Button("Change UID"))
-			load_lua_file(L, func_changeuid);
+		if (ImGui::Button("Change UID")) {
+
+			luahookfunc(char_changeuid);
+		}
+
+		if (ImGui::Button("Change Elemental Inf (visual)")) {
+			luahookfunc(char_eleminf);
+		}
+
+		if (ImGui::Button("Spawn Browser")) {
+			luahookfunc(char_browser);
+		}
+
+		if (ImGui::Button("Booba")) {
+			luahookfunc(char_bub);
+		}
 
 		// Content for Lua
 		if (ImGui::Checkbox("Lua editor", &showEditor))
 		{
-			// Checkbox value has changed, do something here
 		}
+		static char inputTextBuffer[256] = "";
+
+		if (ImGui::InputText("##MyInputText", inputTextBuffer, IM_ARRAYSIZE(inputTextBuffer), ImGuiInputTextFlags_None))
+			{
+				const char* prefix = "CS.UnityEngine.GameObject.Find(\"/BetaWatermarkCanvas(Clone)/Panel/TxtUID\"):GetComponent(\"Text\").text = \"";
+				const char* suffix = "\"";
+				std::string inputText(inputTextBuffer);
+				std::string result = std::string(prefix) + inputText + std::string(suffix);
+				luahookfunc(result.c_str());
+			}
+
+			ImGui::SameLine();
+			static bool checkboxValue = true;
+			ImGui::Checkbox("##MyCheckbox", &checkboxValue);
+			ImGui::SameLine();
+			ImGui::Text("UID changer");
+
+			if (!checkboxValue)
+			{
+				ImGui::InputText("##MyInputText", inputTextBuffer, IM_ARRAYSIZE(inputTextBuffer), ImGuiInputTextFlags_ReadOnly);
+			}
 
 		ImGui::EndTabItem();
 	}
 
-	if (showEditor)
+if (showEditor)
+{
+    static TextEditor editor;
+    static bool initialized = false;
+
+    if (!initialized)
+    {
+        // Set the initial code and editor options
+        editor.SetLanguageDefinition(TextEditor::LanguageDefinition::Lua());
+		editor.SetPalette(TextEditor::GetDarkPalette());
+
+        editor.SetTabSize(4);
+        editor.SetShowWhitespaces(false);
+		editor.SetColorizerEnable(true);
+        initialized = true;
+    }
+
+    ImGui::Begin("Lua editor", &showEditor, ImGuiWindowFlags_MenuBar);
+
+	if (ImGui::Button("Run"))
 	{
-
-		ImGui::Begin("Lua editor", &showEditor);
-		if (ImGui::Button("Run"))
+		// Retrieve the text from the TextEditor
+		std::string code = editor.GetText();
+		
+		// Call your function with the code string
+		if (!code.empty())
 		{
+			luahookfunc(code.c_str());
 		}
-		static ImGuiInputTextFlags flags = ImGuiInputTextFlags_AllowTabInput;
-		static char code[1024 * 128] = "";
-
-		ImGui::InputTextMultiline("##code", code, IM_ARRAYSIZE(code),
-			ImVec2(-1.0f, ImGui::GetContentRegionAvail().y - 30.0f), flags);
-
-		ImGui::End();
 	}
+
+	if (ImGui::BeginMenuBar())
+		{
+			if (ImGui::BeginMenu("File"))
+			{
+				if (ImGui::MenuItem("Save"))
+				{
+					auto textToSave = editor.GetText();
+					/// save text....
+				}
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Edit"))
+			{
+				bool ro = editor.IsReadOnly();
+				if (ImGui::MenuItem("Read-only mode", nullptr, &ro))
+					editor.SetReadOnly(ro);
+				ImGui::Separator();
+
+				if (ImGui::MenuItem("Undo", "ALT-Backspace", nullptr, !ro && editor.CanUndo()))
+					editor.Undo();
+				if (ImGui::MenuItem("Redo", "Ctrl-Y", nullptr, !ro && editor.CanRedo()))
+					editor.Redo();
+
+				ImGui::Separator();
+
+				if (ImGui::MenuItem("Copy", "Ctrl-C", nullptr, editor.HasSelection()))
+					editor.Copy();
+				if (ImGui::MenuItem("Cut", "Ctrl-X", nullptr, !ro && editor.HasSelection()))
+					editor.Cut();
+				if (ImGui::MenuItem("Delete", "Del", nullptr, !ro && editor.HasSelection()))
+					editor.Delete();
+				if (ImGui::MenuItem("Paste", "Ctrl-V", nullptr, !ro && ImGui::GetClipboardText() != nullptr))
+					editor.Paste();
+
+				ImGui::Separator();
+
+				if (ImGui::MenuItem("Select all", nullptr, nullptr))
+					editor.SetSelection(TextEditor::Coordinates(), TextEditor::Coordinates(editor.GetTotalLines(), 0));
+
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("View"))
+			{
+				if (ImGui::MenuItem("Dark palette"))
+					editor.SetPalette(TextEditor::GetDarkPalette());
+				if (ImGui::MenuItem("Light palette"))
+					editor.SetPalette(TextEditor::GetLightPalette());
+				if (ImGui::MenuItem("Retro blue palette"))
+					editor.SetPalette(TextEditor::GetRetroBluePalette());
+				ImGui::EndMenu();
+			}
+			ImGui::EndMenuBar();
+		}
+
+    ImGui::SetWindowSize(ImVec2(600, 400));
+
+    // Draw the text editor
+    editor.Render("TextEditor");
+
+    ImGui::End();
+}
 
 	if (ImGui::BeginTabItem("Themes"))
 	{
@@ -136,10 +251,9 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	if (ImGui::BeginTabItem("About"))
 	{
 		// Content for About
-		ImGui::Text("Minty v69.420");
+		ImGui::Text("Minty v0.5");
 		ImGui::Text("ImGui version: %s", ImGui::GetVersion());
-
-                ImGui::Text("Contributors: мятный пряник#0086, Moistcrafter#9172");
+		ImGui::Text("Contributors: мятный пряник#0086, Moistcrafter#9172, yarik#4571, azzu#2731");
 		ImGui::EndTabItem();
 	}
 
@@ -154,6 +268,53 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	return oPresent(pSwapChain, SyncInterval, Flags);
 }
 
+//DWORD WINAPI MainThread(LPVOID lpReserved)
+//{
+//	bool init_hook = false;
+//	do
+//	{
+//		if (kiero::init(kiero::RenderType::D3D11) == kiero::Status::Success)
+//		{
+//			kiero::bind(8, (void**)& oPresent, hkPresent);
+//			init_hook = true;
+//			//initLua();
+//		}
+//	} while (!init_hook);
+//	return TRUE;
+//}
+
+//BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved)
+//{
+//	/*switch (dwReason)
+//	{
+//	case DLL_PROCESS_ATTACH:
+//		DisableThreadLibraryCalls(hMod);
+//		CreateThread(nullptr, 0, MainThread, hMod, 0, nullptr);
+//		initLua();
+//		break;
+//	case DLL_PROCESS_DETACH:
+//		kiero::shutdown();
+//		break;
+//	}
+//	return TRUE;*/
+//	initLua();
+//	return TRUE;
+//}
+//HMODULE hMod = nullptr;
+//DWORD start(LPVOID)
+//{
+//	//create thread initLua
+//	//CreateThread(nullptr, 0, initLua, hMod, 0, nullptr);
+//	CreateThread(nullptr, 0, MainThread, hMod, 0, nullptr);
+//	return 0;
+//}
+//BOOL WINAPI DllMain(HMODULE hMod, DWORD fdwReason, LPVOID lpvReserved)
+//{
+//	hMod = hMod;
+//	if (fdwReason == DLL_PROCESS_ATTACH)
+//		CloseHandle(CreateThread(NULL, 0, &start, NULL, NULL, NULL));
+//	return TRUE;
+//}
 DWORD WINAPI MainThread(LPVOID lpReserved)
 {
 	bool init_hook = false;
@@ -161,57 +322,33 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
 	{
 		if (kiero::init(kiero::RenderType::D3D11) == kiero::Status::Success)
 		{
-			kiero::bind(8, (void**)& oPresent, hkPresent);
+			kiero::bind(8, (void**)&oPresent, hkPresent);
 			init_hook = true;
 		}
 	} while (!init_hook);
 	return TRUE;
 }
-
-//DWORD start(LPVOID)
+//BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved)
 //{
-//	AllocConsole();
-//	FILE* pConsoleIn = nullptr;
-//	FILE* pConsoleOut = nullptr;
-//	FILE* pConsoleErr = nullptr;
-//	freopen_s(&pConsoleIn, "CONIN$", "r", stdin);
-//	freopen_s(&pConsoleOut, "CONOUT$", "w", stdout);
-//	freopen_s(&pConsoleErr, "CONOUT$", "w", stderr);
-//
-//	util::log("GILua by azzu\n");
-//
-//	/*auto dir = get_scripts_folder();
-//	if (!dir)
-//		return 0;*/
-//
-//	/*get_gi_L();
-//
-//	auto state = luaL_newstate();*/
-//
-//	// rsapatch breaks input, restore input mode
-//	SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),
-//		ENABLE_INSERT_MODE | ENABLE_EXTENDED_FLAGS |
-//		ENABLE_PROCESSED_INPUT | ENABLE_QUICK_EDIT_MODE |
-//		ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT
-//	);
-//
-//	/*command_loop(state, dir.value());*/
-//
-//	return 0;
+//	//initLua();
+//	//switch (dwReason)
+//	//{
+//	//case DLL_PROCESS_ATTACH:
+//	//	//DisableThreadLibraryCalls(hMod);
+//	//	CreateThread(nullptr, 0, MainThread, hMod, 0, nullptr);
+//	//	break;
+//	//case DLL_PROCESS_DETACH:
+//	//	kiero::shutdown();
+//	//	break;
+//	//}
+//	//return TRUE;
 //}
 
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved, HMODULE hMod, DWORD dwReason, LPVOID lpReserved)
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
-	switch (dwReason)
-	{
-	case DLL_PROCESS_ATTACH:
-		DisableThreadLibraryCalls(hMod);
-		CreateThread(nullptr, 0, MainThread, hMod, 0, nullptr);
-		CloseHandle(CreateThread(NULL, 0, &start, NULL, NULL, NULL));
-		break;
-	case DLL_PROCESS_DETACH:
-		kiero::shutdown();
-		break;
+	if (fdwReason == DLL_PROCESS_ATTACH) {
+		CloseHandle(CreateThread(NULL, 0, &initLua, NULL, NULL, NULL));
+		CreateThread(NULL, 0, &MainThread, NULL, NULL, NULL);
 	}
 	return TRUE;
 }
