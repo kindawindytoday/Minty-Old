@@ -96,21 +96,27 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		}
 
 		static float boob_size = 1.0f;
-		if (ImGui::Button("Initiate resize")) {
-			boob_size = 1.0f;
-			luahookfunc(char_bub_initiate);
-		}
-		ImGui::SameLine();
+		static bool show_resizer = false;
 		
-		if (ImGui::SliderFloat("Booba scale", &boob_size, 0.0f, 2.0f, "%.3f")) 
+		if (ImGui::Checkbox("booba resizer", &show_resizer))
 		{
-			std::string result = char_bub_resize + std::to_string(boob_size) + "," + std::to_string(boob_size) + "," + std::to_string(boob_size) + ")" ;
-			luahookfunc(result.c_str());
 		}
 
-		if (ImGui::Checkbox("Lua editor", &showEditor))
+		if (show_resizer)
 		{
+			ImGui::SameLine();
+			if (ImGui::Button("Initiate resize")) {
+			boob_size = 1.0f;
+			luahookfunc(char_bub_initiate);
+			}
+			ImGui::SameLine();
+			if (ImGui::SliderFloat("Booba scale", &boob_size, 0.0f, 2.0f, "%.3f"))
+			{
+				std::string result = char_bub_resize + std::to_string(boob_size) + "," + std::to_string(boob_size) + "," + std::to_string(boob_size) + ")";
+				luahookfunc(result.c_str());
+			}
 		}
+
 		static char inputTextBuffer[512] = "";
 
 		ImGui::InputTextWithHint("##input", "Enter custom UID text here...", inputTextBuffer, sizeof(inputTextBuffer));
@@ -120,7 +126,22 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			std::string result = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID"):GetComponent("Text").text = ")MY_DELIMITER" + std::string(inputTextBuffer) + "\"";
 			luahookfunc(result.c_str());
 		}
-
+		static float TimeScale = 1.0f;
+		if (ImGui::SliderFloat("Timescale", &TimeScale, 0.0f, 2.0f, "%.3f")) 
+		{
+			std::string result = "CS.UnityEngine.Time.timeScale = " + std::to_string(TimeScale);
+			luahookfunc(result.c_str());
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Reset")) {
+			std::string result = "CS.UnityEngine.Time.timeScale = 1.0";
+			luahookfunc(result.c_str());
+		}
+		if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_F11)))
+		{
+			std::string result = "CS.UnityEngine.Time.timeScale = 1.0";
+			luahookfunc(result.c_str());
+		}
 
 		ImGui::EndTabItem();
 	}
