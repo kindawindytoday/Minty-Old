@@ -99,8 +99,14 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			luahookfunc(char_eleminf);
 		}
 
-		if (ImGui::Button("Spawn Browser")) {
-			luahookfunc(char_browser);
+		static bool browser_state = false;
+		if (ImGui::Button("Spawn Browser", &browser_state)) {
+			if (browser_state) {
+				luahookfunc(char_browser_on);
+			}
+			else{
+				luahookfunc(char_browser_off);
+			}
 		}
 
 		static float boob_size = 1.0f;
