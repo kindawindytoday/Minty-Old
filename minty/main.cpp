@@ -6,6 +6,11 @@
 //#include "lua/luaHook.cpp"
 #include "lua/funcs.hpp"
 #include "imgui/TextEditor.h"
+#include <functional>
+#include <iostream>
+#include <string>
+#include <vector>
+
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -90,17 +95,17 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	
 	if (ImGui::BeginTabItem("Lua"))
 	{
-		if (ImGui::Button("Change UID")) {
+		/*if (ImGui::Button("Change UID")) {
 
 			luahookfunc(char_changeuid);
-		}
+		}*/
 
 		if (ImGui::Button("Change Elemental Inf (visual)")) {
 			luahookfunc(char_eleminf);
 		}
 
 		static bool browser_state = false;
-		if (ImGui::Button("Spawn Browser", &browser_state)) {
+		if (ImGui::Checkbox("Spawn Browser", &browser_state)) {
 			if (browser_state) {
 				luahookfunc(char_browser_on);
 			}
@@ -108,6 +113,16 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				luahookfunc(char_browser_off);
 			}
 		}
+
+		const char* bui = "CS.MoleMole.ActorUtils.ShowMessage(\"Bruh got molemoled\")";
+		if (ImGui::Button("121312312312"))
+			//const char* bui = "CS.MoleMole.ActorUtils.ShowMessage(\"Bruh got molemoled\")";
+			luahookfunc(bui);
+
+		//test
+
+
+		//test
 
 		static float boob_size = 1.0f;
 		static bool show_resizer = false;
@@ -190,6 +205,98 @@ if (showEditor)
 			luahookfunc(code.c_str());
 		}
 	}
+	ImGui::SameLine();
+
+	static std::vector<std::pair<std::string, std::function<void()>>> buttonFuncs;
+	static char buttonLabel[256] = "";
+	static char buttonFunction[256] = "";
+
+	//if (ImGui::Button("Create New Button")) {
+	//	std::string functionText = editor.GetText(); // get function text from MyInput text field
+	//	std::function<void()> func = []() {};
+	//	try {
+	//		auto bound = std::bind([](const std::string& f) { std::system(f.c_str()); }, functionText);
+	//		func = std::function<void()>(std::move(bound));
+	//	}
+	//	catch (const std::bad_function_call& e) {
+	//		std::cerr << "Error: Invalid function input." << std::endl;
+	//		return E_FAIL;
+	//	}
+	//	buttonFuncs.emplace_back("New Button", func); // add new button with function
+	//}
+
+	//for (const auto& button : buttonFuncs) {
+	//	if (ImGui::Button(button.first.c_str())) {
+	//		button.second();
+	//	}
+	//}
+	/*using ButtonFuncType = std::function<void()>;
+	std::vector<std::pair<std::string, ButtonFuncType>> buttonFuncsReal;
+
+	if (ImGui::Button("Create New Button")) {
+		ImGui::OpenPopup("New Button");
+	}
+
+	if (ImGui::BeginPopup("New Button")) {
+		ImGui::InputText("Label", buttonLabel, 256);
+		if (ImGui::Button("Create")) {
+			std::string functionText = editor.GetText();
+			std::function<void()> func = [functionText]() {
+				try {
+					std::system(functionText.c_str());
+				}
+				catch (const std::exception& e) {
+					std::cerr << "Error: " << e.what() << std::endl;
+				}
+			};
+			buttonFuncsReal.emplace_back(std::string(buttonLabel), func);
+			memset(buttonLabel, 0, sizeof(buttonLabel));
+			ImGui::CloseCurrentPopup();
+			ImGui::EndFrame();
+		}
+		ImGui::EndPopup();
+	}
+
+	ImGui::Begin("Minty");
+	for (const auto& button : buttonFuncsReal) {
+		if (ImGui::Button(button.first.c_str())) {
+			button.second();
+		}
+	}
+	ImGui::End();*/
+
+	if (ImGui::Button("Create New Button")) {
+		ImGui::OpenPopup("New Button");
+	}
+
+	if (ImGui::BeginPopup("New Button")) {
+		ImGui::InputText("Label", buttonLabel, 256);
+		if (ImGui::Button("Create")) {
+			std::function<void()> func = []() {};
+			std::string functionText = editor.GetText();
+			try {
+				auto bound = std::bind([](const std::string& f) { std::system(f.c_str()); }, functionText);
+				func = std::function<void()>(std::move(bound));
+			}
+			catch (const std::bad_function_call& e) {
+				std::cerr << "Error: Invalid function input." << std::endl;
+			}
+			buttonFuncs.emplace_back(std::string(buttonLabel), func);
+			memset(buttonLabel, 0, sizeof(buttonLabel));
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
+	}
+
+	ImGui::Begin("Minty");
+	for (const auto& button : buttonFuncs) {
+		if (ImGui::Button(button.first.c_str())) {
+			button.second();
+		}
+	}
+	ImGui::End();
+
+	//test
 
 	if (ImGui::BeginMenuBar())
 		{
@@ -282,6 +389,7 @@ if (showEditor)
 		// Content for About
 		ImGui::Text("Minty v0.5");
 		ImGui::Text("ImGui version: %s", ImGui::GetVersion());
+		setlocale(LC_ALL, "Russian");
 		ImGui::Text("Contributors: мятный пряник#0086, Moistcrafter#9172, yarik#4571, azzu#2731");
 		ImGui::EndTabItem();
 	}
