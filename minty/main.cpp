@@ -116,7 +116,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				luahookfunc(result.c_str());
 			}
 		}
-
+		
+		if (ImGui::Checkbox("Lua editor", &showEditor))
+		{
+			// Checkbox value has changed, do something here
+		}
 		static char inputTextBuffer[512] = "";
 
 		ImGui::InputTextWithHint("##input", "Enter custom UID text here...", inputTextBuffer, sizeof(inputTextBuffer));
