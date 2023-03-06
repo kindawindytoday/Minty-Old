@@ -74,12 +74,20 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 	ImGui::NewFrame();
 	ImGui::GetStyle().IndentSpacing = 7.0f;
+	static float TimeScale = 1.0f;
 	static bool showEditor = false; 
 	ImGui::Begin("Minty");
 	//ImGui::PushFont(font);
 	ImGui::BeginTabBar("Minty");
 	//auto gi_LL = luaL_newstate();
 
+	if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_F11)))
+	{
+		TimeScale = 1.0f;
+		std::string result = "CS.UnityEngine.Time.timeScale = 1.0";
+		luahookfunc(result.c_str());
+	}
+	
 	if (ImGui::BeginTabItem("Lua"))
 	{
 		if (ImGui::Button("Change UID")) {
@@ -116,7 +124,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				luahookfunc(result.c_str());
 			}
 		}
-		
+
 		if (ImGui::Checkbox("Lua editor", &showEditor))
 		{
 			// Checkbox value has changed, do something here
@@ -130,7 +138,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			std::string result = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID"):GetComponent("Text").text = ")MY_DELIMITER" + std::string(inputTextBuffer) + "\"";
 			luahookfunc(result.c_str());
 		}
-		static float TimeScale = 1.0f;
+		
 		if (ImGui::SliderFloat("Timescale", &TimeScale, 0.0f, 2.0f, "%.3f")) 
 		{
 			std::string result = "CS.UnityEngine.Time.timeScale = " + std::to_string(TimeScale);
@@ -141,11 +149,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			std::string result = "CS.UnityEngine.Time.timeScale = 1.0";
 			luahookfunc(result.c_str());
 		}
-		if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_F11)))
-		{
-			std::string result = "CS.UnityEngine.Time.timeScale = 1.0";
-			luahookfunc(result.c_str());
-		}
+
 
 		ImGui::EndTabItem();
 	}
