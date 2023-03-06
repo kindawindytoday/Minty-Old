@@ -114,16 +114,6 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			}
 		}
 
-		const char* bui = "CS.MoleMole.ActorUtils.ShowMessage(\"Bruh got molemoled\")";
-		if (ImGui::Button("121312312312"))
-			//const char* bui = "CS.MoleMole.ActorUtils.ShowMessage(\"Bruh got molemoled\")";
-			luahookfunc(bui);
-
-		//test
-
-
-		//test
-
 		static float boob_size = 1.0f;
 		static bool show_resizer = false;
 		
@@ -206,64 +196,9 @@ if (showEditor)
 		}
 	}
 	ImGui::SameLine();
-
-	static std::vector<std::pair<std::string, std::function<void()>>> buttonFuncs;
+	//saver to button below.
+	/*static std::vector<std::pair<std::string, std::function<void()>>> buttonFuncs;
 	static char buttonLabel[256] = "";
-	static char buttonFunction[256] = "";
-
-	//if (ImGui::Button("Create New Button")) {
-	//	std::string functionText = editor.GetText(); // get function text from MyInput text field
-	//	std::function<void()> func = []() {};
-	//	try {
-	//		auto bound = std::bind([](const std::string& f) { std::system(f.c_str()); }, functionText);
-	//		func = std::function<void()>(std::move(bound));
-	//	}
-	//	catch (const std::bad_function_call& e) {
-	//		std::cerr << "Error: Invalid function input." << std::endl;
-	//		return E_FAIL;
-	//	}
-	//	buttonFuncs.emplace_back("New Button", func); // add new button with function
-	//}
-
-	//for (const auto& button : buttonFuncs) {
-	//	if (ImGui::Button(button.first.c_str())) {
-	//		button.second();
-	//	}
-	//}
-	/*using ButtonFuncType = std::function<void()>;
-	std::vector<std::pair<std::string, ButtonFuncType>> buttonFuncsReal;
-
-	if (ImGui::Button("Create New Button")) {
-		ImGui::OpenPopup("New Button");
-	}
-
-	if (ImGui::BeginPopup("New Button")) {
-		ImGui::InputText("Label", buttonLabel, 256);
-		if (ImGui::Button("Create")) {
-			std::string functionText = editor.GetText();
-			std::function<void()> func = [functionText]() {
-				try {
-					std::system(functionText.c_str());
-				}
-				catch (const std::exception& e) {
-					std::cerr << "Error: " << e.what() << std::endl;
-				}
-			};
-			buttonFuncsReal.emplace_back(std::string(buttonLabel), func);
-			memset(buttonLabel, 0, sizeof(buttonLabel));
-			ImGui::CloseCurrentPopup();
-			ImGui::EndFrame();
-		}
-		ImGui::EndPopup();
-	}
-
-	ImGui::Begin("Minty");
-	for (const auto& button : buttonFuncsReal) {
-		if (ImGui::Button(button.first.c_str())) {
-			button.second();
-		}
-	}
-	ImGui::End();*/
 
 	if (ImGui::Button("Create New Button")) {
 		ImGui::OpenPopup("New Button");
@@ -282,6 +217,34 @@ if (showEditor)
 				std::cerr << "Error: Invalid function input." << std::endl;
 			}
 			buttonFuncs.emplace_back(std::string(buttonLabel), func);
+			memset(buttonLabel, 0, sizeof(buttonLabel));
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
+	}
+
+	ImGui::Begin("Minty");
+	for (const auto& button : buttonFuncs) {
+		if (ImGui::Button(button.first.c_str())) {
+			button.second();
+		}
+	}
+	ImGui::End();*/
+	static std::vector<std::pair<std::string, std::function<void()>>> buttonFuncs;
+	static char buttonLabel[256] = "";
+
+	if (ImGui::Button("Create New Button")) {
+		ImGui::OpenPopup("New Button");
+	}
+
+	if (ImGui::BeginPopup("New Button")) {
+		ImGui::InputText("Label", buttonLabel, 256);
+		if (ImGui::Button("Create")) {
+			std::string functionText = editor.GetText();
+			std::function<void()> buttonFunc = [functionText]() {
+				luahookfunc(functionText.c_str());
+			};
+			buttonFuncs.emplace_back(std::string(buttonLabel), buttonFunc);
 			memset(buttonLabel, 0, sizeof(buttonLabel));
 			ImGui::CloseCurrentPopup();
 		}
