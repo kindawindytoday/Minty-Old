@@ -75,7 +75,7 @@ CS.UnityEngine.GameObject.Find(\"/BetaWatermarkCanvas(Clone)/Panel/TxtUID\"):Get
 end\
 start()";
 
-const char* char_bub_prefix = R"MY_DELIMITER(
+const char* char_bub_initiate = R"MY_DELIMITER(
 local function findHierarchyPath(child)
 	local path = "/" .. child.name
 	while child.transform.parent ~= nil do
@@ -108,11 +108,7 @@ local function FindOffsetDummy()
 	end
  end
 
-local numbor = )MY_DELIMITER";
-
-const char* char_bub_suffix = R"MY_DELIMITER( 
-
-local targetscale = CS.UnityEngine.Vector3(numbor,numbor,numbor)
+local targetscale = CS.UnityEngine.Vector3(1,1,1)
 local spine2 = "/Bip001/Bip001 Pelvis/Bip001 Spine/Bip001 Spine1/Bip001 Spine2"
 local findboba = CS.UnityEngine.GameObject.Find(FindOffsetDummy() .. spine2 .. "/boba")
 
@@ -131,11 +127,13 @@ local function booba()
             right.transform.parent = bobaOBJ.transform
             left.transform.parent = bobaOBJ.transform
             bobaOBJ.transform.localScale = targetscale
+            CS.MoleMole.ActorUtils.ShowMessage("Initiated")
         else
-            CS.MoleMole.ActorUtils.ShowMessage("no boob found")
+            CS.MoleMole.ActorUtils.ShowMessage("No boob found")
         end
     else
-        bobaOBJ.transform.localScale = targetscale
+        bobaOBJ.transform.localScale = CS.UnityEngine.Vector3(1,1,1)
+        CS.MoleMole.ActorUtils.ShowMessage("Initiated")
     end
  end
 
@@ -146,6 +144,42 @@ end
 booba()
 
 )MY_DELIMITER";
+
+const char* char_bub_resize = R"MY_DELIMITER(
+
+local function findHierarchyPath(child)
+	local path = "/" .. child.name
+	while child.transform.parent ~= nil do
+	   child = child.transform.parent.gameObject
+	   path = "/" .. child.name .. path
+	end
+	return path
+ end
+
+local function FindOffsetDummy()
+	local avatarRoot = CS.UnityEngine.GameObject.Find("/EntityRoot/AvatarRoot")
+	if avatarRoot.transform.childCount == 0 then
+	   return
+	end
+	for i = 0, avatarRoot.transform.childCount - 1 do
+	   local getCurrAvatar = avatarRoot.transform:GetChild(i)
+	   if getCurrAvatar.gameObject.activeInHierarchy then
+		  for j = 0, getCurrAvatar.transform.childCount - 1 do
+			 local getOffsetDummy = getCurrAvatar.transform:GetChild(j)
+			 if getOffsetDummy.name:find("OffsetDummy") then
+				for k = 0, getOffsetDummy.transform.childCount - 1 do
+				   local avatarModel = getOffsetDummy.transform:GetChild(k)
+				   if avatarModel.name:find("Avatar") then
+					  return findHierarchyPath(avatarModel.gameObject)
+				   end
+				end
+			 end
+		  end
+	   end
+	end
+ end
+
+CS.UnityEngine.GameObject.Find(FindOffsetDummy() .. "/Bip001/Bip001 Pelvis/Bip001 Spine/Bip001 Spine1/Bip001 Spine2/boba").transform.localScale = CS.UnityEngine.Vector3()MY_DELIMITER";
 
 void luahookfunc(const char* charLuaScript) {
 

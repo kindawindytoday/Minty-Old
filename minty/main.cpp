@@ -73,9 +73,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	// imgui code between newframe and render
 
 	ImGui::NewFrame();
-
 	ImGui::GetStyle().IndentSpacing = 7.0f;
-	static bool showEditor = false; // Declare showEditor variable
+	static bool showEditor = false; 
 	ImGui::Begin("Minty");
 	//ImGui::PushFont(font);
 	ImGui::BeginTabBar("Minty");
@@ -96,20 +95,17 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			luahookfunc(char_browser);
 		}
 
-		static float boob_size = 1.0f;
-		if (ImGui::SliderFloat("Booba scale", &boob_size, 0.0f, 2.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp)) 
-		{
-			std::string result = char_bub_prefix + std::to_string(boob_size) + char_bub_suffix;
-			luahookfunc(result.c_str());
+		if (ImGui::Button("Initiate resize")) {
+			luahookfunc(char_bub_initiate);
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("Reset")) {
-			boob_size = 1.0f;
-			std::string result = char_bub_prefix + std::to_string(boob_size) + char_bub_suffix;
+		static float boob_size = 1.0f;
+		if (ImGui::SliderFloat("Booba scale", &boob_size, 0.0f, 2.0f, "%.3f")) 
+		{
+			std::string result = char_bub_resize + std::to_string(boob_size) + "," + std::to_string(boob_size) + "," + std::to_string(boob_size) + ")" ;
 			luahookfunc(result.c_str());
 		}
 
-		// Content for Lua
 		if (ImGui::Checkbox("Lua editor", &showEditor))
 		{
 		}
@@ -119,12 +115,10 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 		ImGui::SameLine();
 		if (ImGui::Button("Update custom UID")) {
-		const char* prefix = "CS.UnityEngine.GameObject.Find(\"/BetaWatermarkCanvas(Clone)/Panel/TxtUID\"):GetComponent(\"Text\").text = \"";
-		const char* suffix = "\"";
-		std::string inputText(inputTextBuffer);
-		std::string result = std::string(prefix) + inputText + std::string(suffix);
-		luahookfunc(result.c_str());
+			std::string result = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID"):GetComponent("Text").text = ")MY_DELIMITER" + std::string(inputTextBuffer) + "\"";
+			luahookfunc(result.c_str());
 		}
+
 
 		ImGui::EndTabItem();
 	}

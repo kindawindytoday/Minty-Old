@@ -3,7 +3,8 @@
 C:\Users\aswdf\Desktop\Minty\minty\gilua\luaHook.h(2,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition
 C:\Users\aswdf\Desktop\Minty\minty\gilua\luaHook.h(2,1): message : '_CRT_SECURE_NO_WARNINGS' previously declared on the command line
   Generating code
-  Previous IPDB and IOBJ mismatch, fall back to full compilation.
-  All 4515 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  1 of 4512 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    32 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   minty.vcxproj -> C:\Users\aswdf\Desktop\Minty\x64\Debug\minty.dll
