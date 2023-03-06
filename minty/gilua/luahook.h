@@ -124,6 +124,8 @@ std::optional<std::string> compile(lua_State* L, const char* script)
     auto ret = luaL_loadstring(L, script);
     if (ret != 0)
     {
+        util::log("compilation failed(%i)\n", ret);
+        util::log("%s\n", lua_tolstring(L, 1, NULL));
         lua_pop(L, 1);
         return std::nullopt;
     }

@@ -2,7 +2,7 @@
 
 #include "..\gilua\luaHook.h"
 
-const char* char_changeuid = "CS.UnityEngine.GameObject.Find(\"/BetaWatermarkCanvas(Clone)/Panel/TxtUID\"):GetComponent(\"Text\").text = \"<b><i><color = #11edb1>KINDA WINDY TODAY</color></i></b>\"";
+const char* char_changeuid = "CS.UnityEngine.GameObject.Find(\"/BetaWatermarkCanvas(Clone)/Panel/TxtUID\"):GetComponent(\"Text\").text = \"<b><i><color=#11edb1>KINDA WINDY TODAY</color></i></b>\"";
 
 const char* char_eleminf = "local function normalattack() \
 local effectpool = CS.UnityEngine.GameObject.Find(\"/EffectPool\") \
@@ -75,89 +75,83 @@ CS.UnityEngine.GameObject.Find(\"/BetaWatermarkCanvas(Clone)/Panel/TxtUID\"):Get
 end\
 start()";
 
-const char* char_bub = "local function find_active_char()\
-local avatarroot = CS.UnityEngine.GameObject.Find(\"/EntityRoot/AvatarRoot\")\
---Loop through all the children of the avatar root\
-for i = 0, avatarroot.transform.childCount - 1 do\
-local child = avatarroot.transform:GetChild(i)\
---If the child is active, return it\
-if child.gameObject.activeInHierarchy then\
-return child.gameObject\
-end\
-end\
-end\
-local function find_body(avatar)\
-for i = 0, avatar.transform.childCount - 1 do\
-local transform = avatar.transform:GetChild(i)\
-if transform.name == \"OffsetDummy\" then\
-for j = 0, transform.childCount - 1 do\
-local child = transform : GetChild(j)\
-for k = 0, child.transform.childCount - 1 do\
-local body = child.transform : GetChild(k)\
-if body.name == \"Body\" then\
-return body.gameObject\
-end\
-end\
-end\
-end\
-end\
-end\
-local function booba2()\
-local avatar = find_active_char()\
-CS.MoleMole.ActorUtils.ShowMessage(avatar.name)\
-if avatar then\
-local body = find_body(avatar)\
-local bones = body.transform:GetComponent(typeof(CS.UnityEngine.SkinnedMeshRenderer)).bones\
-local booba = nil\
---Iterate over bones to find boobs\
-for i = 0, bones.Length - 1 do\
-local bone = bones[i]\
-if bone.name == \"Booba\" then  --We already made a boobs container earlier\
-booba = bone\
-break\
-end\
-end\
-if booba == nil then\
---We need to make a boobs container\
-local booba_r = nil\
-local booba_l = nil\
-for i = 0, bones.Length - 1 do\
-local bone = bones[i]\
-if bone.name == \"+Breast L A01\" then\
-booba_l = bone\
-elseif bone.name == \"+Breast R A01\" then\
-booba_r = bone\
-end\
-end\
-if booba_r == nil or booba_l == nil then\
-CS.MoleMole.ActorUtils.ShowMessage(\"404 boob not found\")\
-return\
-end\
-local boob_parent = booba_l.transform.parent  --Should be <avatar> / Bip001 / Bip001 Pelvis / Bip001 Spine / Bip001 Spine1 / Bip001 Spine2 /\
---Make new boobs container\
-booba = CS.UnityEngine.GameObject(\"Booba\")\
-booba.transform.parent = boob_parent.transform\
-booba.transform.localScale = CS.UnityEngine.Vector3(-1, -1, -1)\
-booba.transform.rotation = boob_parent.transform.rotation\
-booba.transform.position = boob_parent.transform.position\
---Reparent boob bones to this container\
-booba_l.transform.parent = booba.transform\
-booba_r.transform.parent = booba.transform\
-end\
-local scaling_mul = 2\
-booba.transform.localScale = CS.UnityEngine.Vector3(scaling_mul, scaling_mul, scaling_mul)\
-end\
-end\
-local function onError(error)\
-CS.UnityEngine.GameObject.Find(\"/BetaWatermarkCanvas(Clone)/Panel/TxtUID\"):GetComponent(\"Text\").text = tostring(error)\
-CS.MoleMole.ActorUtils.ShowMessage(tostring(error))\
-end\
-xpcall(booba2, onError)";
+const char* char_bub_prefix = R"MY_DELIMITER(
+local function findHierarchyPath(child)
+	local path = "/" .. child.name
+	while child.transform.parent ~= nil do
+	   child = child.transform.parent.gameObject
+	   path = "/" .. child.name .. path
+	end
+	return path
+ end
 
+local function FindOffsetDummy()
+	local avatarRoot = CS.UnityEngine.GameObject.Find("/EntityRoot/AvatarRoot")
+	if avatarRoot.transform.childCount == 0 then
+	   return
+	end
+	for i = 0, avatarRoot.transform.childCount - 1 do
+	   local getCurrAvatar = avatarRoot.transform:GetChild(i)
+	   if getCurrAvatar.gameObject.activeInHierarchy then
+		  for j = 0, getCurrAvatar.transform.childCount - 1 do
+			 local getOffsetDummy = getCurrAvatar.transform:GetChild(j)
+			 if getOffsetDummy.name:find("OffsetDummy") then
+				for k = 0, getOffsetDummy.transform.childCount - 1 do
+				   local avatarModel = getOffsetDummy.transform:GetChild(k)
+				   if avatarModel.name:find("Avatar") then
+					  return findHierarchyPath(avatarModel.gameObject)
+				   end
+				end
+			 end
+		  end
+	   end
+	end
+ end
+
+local numbor = )MY_DELIMITER";
+
+const char* char_bub_suffix = R"MY_DELIMITER( 
+
+local targetscale = CS.UnityEngine.Vector3(numbor,numbor,numbor)
+local spine2 = "/Bip001/Bip001 Pelvis/Bip001 Spine/Bip001 Spine1/Bip001 Spine2"
+local findboba = CS.UnityEngine.GameObject.Find(FindOffsetDummy() .. spine2 .. "/boba")
+
+local function booba()
+    
+    local left = CS.UnityEngine.GameObject.Find(FindOffsetDummy() .. spine2 .. "/+Breast L A01")
+    local right = CS.UnityEngine.GameObject.Find(FindOffsetDummy() .. spine2 .. "/+Breast R A01")
+    
+    if findboba == nil then
+        if right ~= nil then
+            bobaOBJ = CS.UnityEngine.GameObject("boba")
+            spineidk = CS.UnityEngine.GameObject.Find(FindOffsetDummy() .. spine2)
+            bobaOBJ.transform.parent = spineidk.transform
+            bobaOBJ.transform.localPosition = CS.UnityEngine.Vector3(0,0,0)
+            bobaOBJ.transform.localRotation = CS.UnityEngine.Quaternion.Euler(0,0,0)
+            right.transform.parent = bobaOBJ.transform
+            left.transform.parent = bobaOBJ.transform
+            bobaOBJ.transform.localScale = targetscale
+        else
+            CS.MoleMole.ActorUtils.ShowMessage("no boob found")
+        end
+    else
+        bobaOBJ.transform.localScale = targetscale
+    end
+ end
+
+ local function onError(error)
+    CS.MoleMole.ActorUtils.ShowMessage(tostring(error))
+end
+
+booba()
+
+)MY_DELIMITER";
 
 void luahookfunc(const char* charLuaScript) {
 
 	auto compiled = compile(gi_LL, charLuaScript);
+    if (!compiled)
+    return;
 	auto copy = new std::string(compiled.value());
 	auto execute = [](ULONG_PTR compiled)
 	{

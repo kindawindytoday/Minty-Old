@@ -96,35 +96,35 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			luahookfunc(char_browser);
 		}
 
-		if (ImGui::Button("Booba")) {
-			luahookfunc(char_bub);
+		static float boob_size = 1.0f;
+		if (ImGui::SliderFloat("Booba scale", &boob_size, 0.0f, 2.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp)) 
+		{
+			std::string result = char_bub_prefix + std::to_string(boob_size) + char_bub_suffix;
+			luahookfunc(result.c_str());
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Reset")) {
+			boob_size = 1.0f;
+			std::string result = char_bub_prefix + std::to_string(boob_size) + char_bub_suffix;
+			luahookfunc(result.c_str());
 		}
 
 		// Content for Lua
 		if (ImGui::Checkbox("Lua editor", &showEditor))
 		{
 		}
-		static char inputTextBuffer[256] = "";
+		static char inputTextBuffer[512] = "";
 
-		if (ImGui::InputText("##MyInputText", inputTextBuffer, IM_ARRAYSIZE(inputTextBuffer), ImGuiInputTextFlags_None))
-			{
-				const char* prefix = "CS.UnityEngine.GameObject.Find(\"/BetaWatermarkCanvas(Clone)/Panel/TxtUID\"):GetComponent(\"Text\").text = \"";
-				const char* suffix = "\"";
-				std::string inputText(inputTextBuffer);
-				std::string result = std::string(prefix) + inputText + std::string(suffix);
-				luahookfunc(result.c_str());
-			}
+		ImGui::InputTextWithHint("##input", "Enter custom UID text here...", inputTextBuffer, sizeof(inputTextBuffer));
 
-			ImGui::SameLine();
-			static bool checkboxValue = true;
-			ImGui::Checkbox("##MyCheckbox", &checkboxValue);
-			ImGui::SameLine();
-			ImGui::Text("UID changer");
-
-			if (!checkboxValue)
-			{
-				ImGui::InputText("##MyInputText", inputTextBuffer, IM_ARRAYSIZE(inputTextBuffer), ImGuiInputTextFlags_ReadOnly);
-			}
+		ImGui::SameLine();
+		if (ImGui::Button("Update custom UID")) {
+		const char* prefix = "CS.UnityEngine.GameObject.Find(\"/BetaWatermarkCanvas(Clone)/Panel/TxtUID\"):GetComponent(\"Text\").text = \"";
+		const char* suffix = "\"";
+		std::string inputText(inputTextBuffer);
+		std::string result = std::string(prefix) + inputText + std::string(suffix);
+		luahookfunc(result.c_str());
+		}
 
 		ImGui::EndTabItem();
 	}
@@ -214,8 +214,6 @@ if (showEditor)
 			}
 			ImGui::EndMenuBar();
 		}
-
-    ImGui::SetWindowSize(ImVec2(600, 400));
 
     // Draw the text editor
     editor.Render("TextEditor");
