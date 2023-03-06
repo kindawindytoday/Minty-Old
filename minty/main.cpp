@@ -79,6 +79,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 	ImGui::NewFrame();
 	ImGui::GetStyle().IndentSpacing = 7.0f;
+	static bool isopened = true;
 	static float TimeScale = 1.0f;
 	static bool showEditor = false; 
 	ImGui::Begin("Minty");
@@ -91,6 +92,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		TimeScale = 1.0f;
 		std::string result = "CS.UnityEngine.Time.timeScale = 1.0";
 		luahookfunc(result.c_str());
+	}
+
+	if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_F12)))
+	{
+		isopened = !isopened;
 	}
 	
 	if (ImGui::BeginTabItem("Lua"))
