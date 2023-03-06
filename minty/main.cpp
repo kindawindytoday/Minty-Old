@@ -95,11 +95,13 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			luahookfunc(char_browser);
 		}
 
+		static float boob_size = 1.0f;
 		if (ImGui::Button("Initiate resize")) {
+			boob_size = 1.0f;
 			luahookfunc(char_bub_initiate);
 		}
 		ImGui::SameLine();
-		static float boob_size = 1.0f;
+		
 		if (ImGui::SliderFloat("Booba scale", &boob_size, 0.0f, 2.0f, "%.3f")) 
 		{
 			std::string result = char_bub_resize + std::to_string(boob_size) + "," + std::to_string(boob_size) + "," + std::to_string(boob_size) + ")" ;
