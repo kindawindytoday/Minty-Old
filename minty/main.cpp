@@ -97,7 +97,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		if (ImGui::BeginTabItem("Lua"))
 		{
 			static bool browser_state = false; 
-			if (ImGui::Checkbox("Spawn Browser", &browser_state)) {
+			if (ImGui::Checkbox("Browser", &browser_state)) {
 				if (browser_state) {
 					luahookfunc(char_browser_on);
 				}
@@ -108,7 +108,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 			static bool show_resizer = false;
 			static float boob_size = 1.0f;
-			if (ImGui::Checkbox("booba resizer", &show_resizer)){}
+			if (ImGui::Checkbox("Booba resizer", &show_resizer)){}
 
 			if (show_resizer)
 			{
@@ -206,11 +206,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			static std::vector<std::pair<std::string, std::function<void()>>> buttonFuncs;
 			static char buttonLabel[256] = "";
 
-			if (ImGui::Button("Create New Button")) {
-				ImGui::OpenPopup("New Button");
+			if (ImGui::Button("Create new button")) {
+				ImGui::OpenPopup("New button");
 			}
 
-			if (ImGui::BeginPopup("New Button")) {
+			if (ImGui::BeginPopup("New button")) {
 				ImGui::InputText("Label", buttonLabel, 256);
 				if (ImGui::Button("Create")) {
 					std::string functionText = editor.GetText();
@@ -238,7 +238,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			{
 				if (ImGui::BeginMenu("File"))
 				{
-					if (ImGui::MenuItem("Save as button"))
+					if (ImGui::MenuItem("Save as button (WIP, not functional)"))
 					{
 
 					}
