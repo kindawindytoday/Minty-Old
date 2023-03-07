@@ -60,11 +60,24 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			InitImGui();
 			init = true;
 			ImGuiIO& io = ImGui::GetIO();
-			ImFontConfig font;
-			font.FontDataOwnedByAtlas = false;
+			ImFontConfig fontmenu;
+			fontmenu.FontDataOwnedByAtlas = false;
+			/*ImFontConfig fontcoding;
+			fontcoding.FontDataOwnedByAtlas = false;*/
 
-			io.Fonts->AddFontFromMemoryTTF((void*)rawData, sizeof(rawData), 18.f, &font);
+			io.Fonts->AddFontFromMemoryTTF((void*)rawData, sizeof(rawData), 18.f, &fontmenu);
 			io.Fonts->Build();
+
+			//ImFont* jetbr = io.Fonts->AddFontFromMemoryTTF((void*)jetbrains, sizeof(jetbrains), 18.f, &fontcoding);
+			//io.Fonts->Build();
+
+			ImGui_ImplDX11_InvalidateDeviceObjects();
+
+			ImFontConfig fontcoding;
+			fontcoding.FontDataOwnedByAtlas = false;
+			ImGui::GetIO().Fonts->AddFontFromMemoryTTF((void*)jetbrains, sizeof(jetbrains), 18.f, &fontcoding);
+			//ImGui::GetIO().Fonts->Build();
+
 			ImGui_ImplDX11_InvalidateDeviceObjects();
 		}
 
@@ -72,30 +85,27 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			return oPresent(pSwapChain, SyncInterval, Flags);
 	}
 
-	static bool isopened = true;
-	if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_F12)))
-	{
-		isopened = !isopened;
-	}
+		//ImFontConfig fontmenu;
+		//fontmenu.FontDataOwnedByAtlas = false;
+		////ImFont* mpcfont = 
+		//ImGui::GetIO().Fonts->AddFontFromMemoryTTF((void*)rawData, sizeof(rawData), 18.f, &fontmenu);
+
+		/*ImFontConfig fontcoding;
+		fontcoding.FontDataOwnedByAtlas = false;
+		ImFont* jetbr = ImGui::GetIO().Fonts->AddFontFromMemoryTTF((void*)jetbrains, sizeof(jetbrains), 18.f, &fontcoding);
+		ImGui::GetIO().Fonts->Build();*/
 	
-	//whole imgui menu code in this if(isopened) -- nvm not wokin
-	if (isopened) 
-	{
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 
 		// imgui code between newframe and render
 
 		ImGui::NewFrame();
-		ImGui::GetStyle().IndentSpacing = 7.0f;
+		ImGui::GetStyle().IndentSpacing = 16.0f;
+		setlocale(LC_ALL, "C");
 		static float TimeScale = 1.0f;
 		static bool showEditor = false;
-
-		if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_F12)))
-		{
-			isopened = !isopened;
-		}
-
+		
 		if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_F11)))
 		{
 			TimeScale = 1.0f;
@@ -104,47 +114,28 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		}
 
 		ImGui::Begin("Minty");
-		//ImGui::PushFont(font);
 		ImGui::BeginTabBar("Minty");
-		//auto gi_LL = luaL_newstate();
-
-
-		/*if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_F12)))
-		{
-			isopened = !isopened;
-		}*/
 
 		if (ImGui::BeginTabItem("Lua"))
 		{
-			/*if (ImGui::Button("Change UID")) {
-
-				luahookfunc(char_changeuid);
-			}*/
-
-			/*if (ImGui::Button("Change Elemental Inf (visual)")) {
-				luahookfunc(char_eleminf);
-			}*/
-
-			/*static bool browser_state = false; ------ wip
-			if (ImGui::Checkbox("Spawn Browser", &browser_state)) {
+			static bool browser_state = false; 
+			if (ImGui::Checkbox("Browser", &browser_state)) {
 				if (browser_state) {
 					luahookfunc(char_browser_on);
 				}
 				else {
 					luahookfunc(char_browser_off);
 				}
-			}*/
-
-			static float boob_size = 1.0f;
-			static bool show_resizer = false;
-
-			if (ImGui::Checkbox("booba resizer", &show_resizer))
-			{
 			}
+
+			static bool show_resizer = false;
+			static float boob_size = 1.0f;
+			if (ImGui::Checkbox("Booba resizer", &show_resizer)){}
 
 			if (show_resizer)
 			{
-				ImGui::SameLine();
+				ImGui::Indent();
+
 				if (ImGui::Button("Initiate resize")) {
 					boob_size = 1.0f;
 					luahookfunc(char_bub_initiate);
@@ -155,12 +146,31 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					std::string result = char_bub_resize + std::to_string(boob_size) + "," + std::to_string(boob_size) + "," + std::to_string(boob_size) + ")";
 					luahookfunc(result.c_str());
 				}
+				ImGui::Unindent();
 			}
 
-			if (ImGui::Checkbox("Lua editor", &showEditor))
-			{
-				// Checkbox value has changed, do something here
-			}
+			// static bool map_fog = false;
+			// if (ImGui::Checkbox("Remove map fog",  &map_fog)){}
+			// static bool remove_openarea_fog = false;
+			// static bool remove_guidearea_fog = false;
+			// if (map_fog)
+			// {
+			// 	ImGui::Indent();
+
+			// 	if (ImGui::Checkbox("Remove OpenArea fog", &remove_openarea_fog)) {
+			// 		std::string result = char_openarea_fog + std::to_string(remove_openarea_fog) + ")";
+			// 		luahookfunc(result.c_str());
+			// 	}
+			// 	if (ImGui::Checkbox("Remove GuideArea fog", &remove_guidearea_fog)) {
+			// 		std::string result = char_guidearea_fog + std::to_string(remove_guidearea_fog) + ")";
+			// 		luahookfunc(result.c_str());
+			// 	}
+
+			// 	ImGui::Unindent();
+			// }
+
+			if (ImGui::Checkbox("Lua editor", &showEditor)){}
+
 			static char inputTextBuffer[512] = "";
 
 			ImGui::InputTextWithHint("##input", "Enter custom UID text here...", inputTextBuffer, sizeof(inputTextBuffer));
@@ -177,11 +187,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				luahookfunc(result.c_str());
 			}
 			ImGui::SameLine();
-			if (ImGui::Button("Reset")) {
+			if (ImGui::Button("Reset (F11)")) {
+				TimeScale = 1.0f;
 				std::string result = "CS.UnityEngine.Time.timeScale = 1.0";
 				luahookfunc(result.c_str());
 			}
-
 
 			ImGui::EndTabItem();
 		}
@@ -193,23 +203,27 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 			if (!initialized)
 			{
-				// Set the initial code and editor options
 				editor.SetLanguageDefinition(TextEditor::LanguageDefinition::Lua());
 				editor.SetPalette(TextEditor::GetDarkPalette());
 
 				editor.SetTabSize(4);
 				editor.SetShowWhitespaces(false);
 				editor.SetColorizerEnable(true);
+
+				/*ImFontConfig jetbr;
+				jetbr.FontDataOwnedByAtlas = false;*/
+				
+				/*io.Fonts->AddFontFromMemoryTTF((void*)jetbrains, sizeof(jetbrains), 18.f, &font); --- all fonts defining should be defined before new frames
+				io.Fonts->Build();*/
+
 				initialized = true;
 			}
 			ImGui::Begin("Lua editor", &showEditor, ImGuiWindowFlags_MenuBar);
-
+			ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 			if (ImGui::Button("Run"))
 			{
-				// Retrieve the text from the TextEditor
 				std::string code = editor.GetText();
 
-				// Call your function with the code string
 				if (!code.empty())
 				{
 					luahookfunc(code.c_str());
@@ -221,11 +235,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			static std::vector<std::pair<std::string, std::function<void()>>> buttonFuncs;
 			static char buttonLabel[256] = "";
 
-			if (ImGui::Button("Create New Button")) {
-				ImGui::OpenPopup("New Button");
+			if (ImGui::Button("Create new button")) {
+				ImGui::OpenPopup("New button");
 			}
 
-			if (ImGui::BeginPopup("New Button")) {
+			if (ImGui::BeginPopup("New button")) {
 				ImGui::InputText("Label", buttonLabel, 256);
 				if (ImGui::Button("Create")) {
 					std::string functionText = editor.GetText();
@@ -253,12 +267,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			{
 				if (ImGui::BeginMenu("File"))
 				{
-					/*if (ImGui::MenuItem("Save")) ------ wip
+					if (ImGui::MenuItem("Save as button (WIP, not functional)"))
 					{
-						auto textToSave = editor.GetText();
-						/// save text....
+
 					}
-					ImGui::EndMenu();*/
+					ImGui::EndMenu();
 				}
 				if (ImGui::BeginMenu("Edit"))
 				{
@@ -304,8 +317,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				ImGui::EndMenuBar();
 			}
 
+
+			//ImGui::PushFont(jetbr);
 			// Draw the text editor
 			editor.Render("TextEditor");
+			ImGui::PopFont();
 
 			ImGui::End();
 		}
@@ -340,7 +356,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			// Content for About
 			ImGui::Text("Minty v0.5");
 			ImGui::Text("ImGui version: %s", ImGui::GetVersion());
-			setlocale(LC_ALL, "Russian");
+			
 			ImGui::Text("Contributors: мятный пряник#0086, Moistcrafter#9172, yarik#4571, azzu#2731");
 			ImGui::Text("");
 			ImGui::Text("KWT Team Discord (click)");
@@ -360,12 +376,12 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		ImGui::End();
 		ImGui::EndFrame();
 		ImGui::Render();
-	}
+
 	//end of imgui code
 	pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	return oPresent(pSwapChain, SyncInterval, Flags);
-}
+	}
 
 //DWORD WINAPI MainThread(LPVOID lpReserved)
 //{
