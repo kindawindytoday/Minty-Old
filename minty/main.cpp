@@ -140,7 +140,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					luahookfunc(char_bub_initiate);
 				}
 				ImGui::SameLine();
-				if (ImGui::SliderFloat("Booba scale", &boob_size, 0.0f, 2.0f, "%.3f"))
+				if (ImGui::SliderFloat("Booba scale", &boob_size, 0.0f, 4.0f, "%.3f"))
 				{
 					std::string result = char_bub_resize + std::to_string(boob_size) + "," + std::to_string(boob_size) + "," + std::to_string(boob_size) + ")";
 					luahookfunc(result.c_str());

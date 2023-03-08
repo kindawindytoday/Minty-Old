@@ -121,16 +121,14 @@ local function FindOffsetDummy()
 local targetscale = CS.UnityEngine.Vector3(1,1,1)
 local spine2 = "/Bip001/Bip001 Pelvis/Bip001 Spine/Bip001 Spine1/Bip001 Spine2"
 local findboba = CS.UnityEngine.GameObject.Find(FindOffsetDummy() .. spine2 .. "/boba")
+local left = CS.UnityEngine.GameObject.Find(FindOffsetDummy() .. spine2 .. "/+Breast L A01")
+local right = CS.UnityEngine.GameObject.Find(FindOffsetDummy() .. spine2 .. "/+Breast R A01")
 
-local function booba()
-    
-    local left = CS.UnityEngine.GameObject.Find(FindOffsetDummy() .. spine2 .. "/+Breast L A01")
-    local right = CS.UnityEngine.GameObject.Find(FindOffsetDummy() .. spine2 .. "/+Breast R A01")
-    
-    if findboba == nil then
-        if right ~= nil then
-            bobaOBJ = CS.UnityEngine.GameObject("boba")
+local function booba()    
+    if CS.UnityEngine.GameObject.Find(FindOffsetDummy() .. spine2 .. "/boba") == nil then
+        if right and left ~= nil then
             spineidk = CS.UnityEngine.GameObject.Find(FindOffsetDummy() .. spine2)
+            bobaOBJ = CS.UnityEngine.GameObject("boba")
             bobaOBJ.transform.parent = spineidk.transform
             bobaOBJ.transform.localPosition = CS.UnityEngine.Vector3(0,0,0)
             bobaOBJ.transform.localRotation = CS.UnityEngine.Quaternion.Euler(0,0,0)
@@ -151,8 +149,7 @@ local function booba()
     CS.MoleMole.ActorUtils.ShowMessage(tostring(error))
 end
 
-booba()
-
+xpcall(booba, onError)
 )MY_DELIMITER";
 
 const char* char_bub_resize = R"MY_DELIMITER(
