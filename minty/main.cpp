@@ -10,6 +10,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "imgui/L2DFileDialog.h"
 
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -270,6 +271,28 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					if (ImGui::MenuItem("Save as button (WIP, not functional)"))
 					{
 
+					}
+
+					static char filename[1024] = "";
+					static std::string file_contents = "";
+					if (ImGui::MenuItem("Load .lua file"))
+					{
+						static char path3[500] = "";
+						static char* file_dialog_buffer = nullptr;
+						ImGui::TextUnformatted("Choose a file");
+						ImGui::SetNextItemWidth(380);
+						ImGui::InputText("##path3", path3, sizeof(path3));
+						ImGui::SameLine();
+						if (ImGui::Button("Browse##path3")) {
+							file_dialog_buffer = path3;
+							FileDialog::file_dialog_open = true;
+							FileDialog::file_dialog_open_type = FileDialog::FileDialogType::OpenFile;
+						}
+
+						if (FileDialog::file_dialog_open) {
+							FileDialog::ShowFileDialog(&FileDialog::file_dialog_open, file_dialog_buffer, sizeof(file_dialog_buffer), FileDialog::file_dialog_open_type);
+						}
+					
 					}
 					ImGui::EndMenu();
 				}

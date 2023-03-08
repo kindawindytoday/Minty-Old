@@ -31,6 +31,7 @@ int xluaL_loadbuffer_hook(lua_State* L, const char* chunk, size_t sz, const char
 {
     gi_L = L;
     util::log("xluaL_loadbuffer_hook called");
+    util::logdialog("Succesfully hooked. Happy hacking!");
     main_thread = OpenThread(THREAD_ALL_ACCESS, false, GetCurrentThreadId());
     xlua = GetModuleHandleW(L"xlua");
     *pp_loadbuffer = (pfn_loadbuffer)GetProcAddress(xlua, "xluaL_loadbuffer");
@@ -94,7 +95,7 @@ std::optional<fs::path> get_scripts_folder()
 }
 pfn_loadbuffer* scan_loadbuffer(HMODULE ua)
 {
-    util::log("Scanning... ");
+    util::log("Hooking... ");
     auto il2cpp = util::pe::get_section_by_name(ua, "il2cpp");
     auto rdata = util::pe::get_section_by_name(ua, ".rdata");
 
@@ -150,7 +151,7 @@ void get_gi_L()
     pp_loadbuffer = scan_loadbuffer(ua);
     *pp_loadbuffer = xluaL_loadbuffer_hook;
 
-    util::log("Waiting for Lua...\n");
+    //util::log("Waiting for Lua...\n");
 
     while (!gi_L)
         Sleep(50);
@@ -165,7 +166,7 @@ DWORD initLua(LPVOID) {
     freopen("CONOUT$", "w", stdout);
     freopen("CONOUT$", "w", stderr);
     
-	util::log("Initializing Lua\n");
+	util::log("Starting\n");
     //auto dir = get_scripts_folder();
 
     get_gi_L();
