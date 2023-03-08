@@ -66,7 +66,9 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			/*ImFontConfig fontcoding;
 			fontcoding.FontDataOwnedByAtlas = false;*/
 
-			io.Fonts->AddFontFromMemoryTTF((void*)rawData, sizeof(rawData), 18.f, &fontmenu);
+			ImWchar ranges[] = { 0x0020, 0x00FF, 0x0100, 0x024F, 0x0370, 0x03FF, 0x0400, 0x04FF, 0x3040, 0x309F, 0x30A0, 0x30FF, 0x4E00, 0x9FBF, 0xAC00, 0xD7AF, 0xFF00, 0xFFEF, 0 };
+
+			io.Fonts->AddFontFromMemoryTTF((void*)rawData, sizeof(rawData), 18.f, &fontmenu, ranges);
 			io.Fonts->Build();
 
 			//ImFont* jetbr = io.Fonts->AddFontFromMemoryTTF((void*)jetbrains, sizeof(jetbrains), 18.f, &fontcoding);
@@ -76,7 +78,9 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 			ImFontConfig fontcoding;
 			fontcoding.FontDataOwnedByAtlas = false;
-			ImGui::GetIO().Fonts->AddFontFromMemoryTTF((void*)jetbrains, sizeof(jetbrains), 18.f, &fontcoding);
+			ImGui::GetIO().Fonts->AddFontFromMemoryTTF((void*)jetbrains, sizeof(jetbrains), 18.f, &fontcoding, ranges);
+			io.Fonts->Build();
+
 			//ImGui::GetIO().Fonts->Build();
 
 			ImGui_ImplDX11_InvalidateDeviceObjects();
@@ -85,16 +89,6 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		else
 			return oPresent(pSwapChain, SyncInterval, Flags);
 	}
-
-		//ImFontConfig fontmenu;
-		//fontmenu.FontDataOwnedByAtlas = false;
-		////ImFont* mpcfont = 
-		//ImGui::GetIO().Fonts->AddFontFromMemoryTTF((void*)rawData, sizeof(rawData), 18.f, &fontmenu);
-
-		/*ImFontConfig fontcoding;
-		fontcoding.FontDataOwnedByAtlas = false;
-		ImFont* jetbr = ImGui::GetIO().Fonts->AddFontFromMemoryTTF((void*)jetbrains, sizeof(jetbrains), 18.f, &fontcoding);
-		ImGui::GetIO().Fonts->Build();*/
 	
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
@@ -106,7 +100,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		setlocale(LC_ALL, "C");
 		static float TimeScale = 1.0f;
 		static bool showEditor = false;
+		static int fontIndex_menu = 0;
+		static int fontIndex_code = 1;
 		
+		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[fontIndex_menu]);
+
 		if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_F11)))
 		{
 			TimeScale = 1.0f;
@@ -150,26 +148,6 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				ImGui::Unindent();
 			}
 
-			// static bool map_fog = false;
-			// if (ImGui::Checkbox("Remove map fog",  &map_fog)){}
-			// static bool remove_openarea_fog = false;
-			// static bool remove_guidearea_fog = false;
-			// if (map_fog)
-			// {
-			// 	ImGui::Indent();
-
-			// 	if (ImGui::Checkbox("Remove OpenArea fog", &remove_openarea_fog)) {
-			// 		std::string result = char_openarea_fog + std::to_string(remove_openarea_fog) + ")";
-			// 		luahookfunc(result.c_str());
-			// 	}
-			// 	if (ImGui::Checkbox("Remove GuideArea fog", &remove_guidearea_fog)) {
-			// 		std::string result = char_guidearea_fog + std::to_string(remove_guidearea_fog) + ")";
-			// 		luahookfunc(result.c_str());
-			// 	}
-
-			// 	ImGui::Unindent();
-			// }
-
 			if (ImGui::Checkbox("Lua editor", &showEditor)){}
 
 			static char inputTextBuffer[512] = "";
@@ -211,16 +189,10 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				editor.SetShowWhitespaces(false);
 				editor.SetColorizerEnable(true);
 
-				/*ImFontConfig jetbr;
-				jetbr.FontDataOwnedByAtlas = false;*/
-				
-				/*io.Fonts->AddFontFromMemoryTTF((void*)jetbrains, sizeof(jetbrains), 18.f, &font); --- all fonts defining should be defined before new frames
-				io.Fonts->Build();*/
-
 				initialized = true;
 			}
 			ImGui::Begin("Lua editor", &showEditor, ImGuiWindowFlags_MenuBar);
-			ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+
 			if (ImGui::Button("Run"))
 			{
 				std::string code = editor.GetText();
@@ -340,11 +312,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				ImGui::EndMenuBar();
 			}
 
-
-			//ImGui::PushFont(jetbr);
-			// Draw the text editor
 			editor.Render("TextEditor");
-			ImGui::PopFont();
 
 			ImGui::End();
 		}
@@ -354,21 +322,29 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			// Content for themes
 			ImGui::Text("Test..");
 
-			static int selectedRadioButton = 0;
+			static int themeIndex = 0;
 
-			if (ImGui::RadioButton("Default", &selectedRadioButton, 0))
+			if (ImGui::RadioButton("Default", &themeIndex, 0))
+			{ImGui::StyleColorsDark();}
+
+			if (ImGui::RadioButton("Dark theme", &themeIndex, 1))
+			{dark_theme();}
+
+			if (ImGui::RadioButton("Minty Red", &themeIndex, 2))
+			{minty_red_theme();}
+
+			ImGui::Separator();
+			ImGui::Text("Menu font");
+
+			static int fontSelectionIndex = 0;
+			if (ImGui::RadioButton("Myriad pro", &fontSelectionIndex, 0))
 			{
-				ImGui::StyleColorsDark();
+				fontIndex_menu = 0;
 			}
 
-			if (ImGui::RadioButton("Dark theme", &selectedRadioButton, 1))
+			if (ImGui::RadioButton("Jetbrains Mono", &fontSelectionIndex, 1))
 			{
-				dark_theme();
-			}
-
-			if (ImGui::RadioButton("Minty Red", &selectedRadioButton, 2))
-			{
-				minty_red_theme();
+				fontIndex_menu = 1;
 			}
 
 			ImGui::EndTabItem();
@@ -395,10 +371,12 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			ImGui::EndTabItem();
 		}
 
+		ImGui::PopFont();
 		ImGui::EndTabBar();
 		ImGui::End();
 		ImGui::EndFrame();
 		ImGui::Render();
+
 
 	//end of imgui code
 	pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
