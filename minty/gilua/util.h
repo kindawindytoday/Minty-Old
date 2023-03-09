@@ -7,6 +7,7 @@
 #include <fstream>
 #include <filesystem>
 #include "luahook.h"
+#include <chrono>
 
 namespace fs = std::filesystem;
 
@@ -23,7 +24,7 @@ namespace util
     template<typename... Args>
     void logdialog(const char* fmt, Args... args)
     {
-        const char* errordialogformat = "CS.LAMLMFNDPHJ.HAFGEFPIKFK(\"Minty\",\"%s\")";
+        const char* errordialogformat = "CS.LAMLMFNDPHJ.HAFGEFPIKFK(\"%s\",\"Minty\")";
         char errordialogtext[256];
         snprintf(errordialogtext, sizeof(errordialogtext), errordialogformat, fmt);
         luahookfunc(errordialogtext);

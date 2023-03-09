@@ -148,6 +148,42 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				ImGui::Unindent();
 			}
 
+			static bool show_colorator3000 = false;
+			static float cc_r = 1.0f;
+			static float cc_g = 1.0f;
+			static float cc_b = 1.0f;
+			static float cc_a = 1.0f;
+			if (ImGui::Checkbox("Show infusion changer", &show_colorator3000)) {}
+
+			if (show_colorator3000)
+			{
+				ImGui::Indent();
+
+				if (ImGui::Button("Change")) {
+
+					std::string result = char_eleminf + std::to_string(cc_r) + "," + std::to_string(cc_g) + "," + std::to_string(cc_b) + "," + std::to_string(cc_a) + char_eleminf_end;
+					luahookfunc(result.c_str());
+				}
+				ImGui::SameLine();
+				if (ImGui::SliderFloat("Red color", &cc_r, 0.0f, 1.0f, "%.3f"))
+				{
+
+				}
+				if (ImGui::SliderFloat("Green color", &cc_g, 0.0f, 1.0f, "%.3f"))
+				{
+
+				}
+				if (ImGui::SliderFloat("Blue color", &cc_b, 0.0f, 1.0f, "%.3f"))
+				{
+
+				}
+				if (ImGui::SliderFloat("Alpha", &cc_a, 0.0f, 1.0f, "%.3f"))
+				{
+
+				}
+				ImGui::Unindent();
+			}
+
 			if (ImGui::Checkbox("Lua editor", &showEditor)){}
 
 			static char inputTextBuffer[512] = "";
@@ -268,7 +304,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					}
 					ImGui::EndMenu();
 				}
-				if (ImGui::BeginMenu("Edit"))
+				/*if (ImGui::BeginMenu("Edit"))
 				{
 					bool ro = editor.IsReadOnly();
 					if (ImGui::MenuItem("Read-only mode", nullptr, &ro))
@@ -297,7 +333,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 						editor.SetSelection(TextEditor::Coordinates(), TextEditor::Coordinates(editor.GetTotalLines(), 0));
 
 					ImGui::EndMenu();
-				}
+				}*/
 
 				if (ImGui::BeginMenu("View"))
 				{
@@ -353,7 +389,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		if (ImGui::BeginTabItem("About"))
 		{
 			// Content for About
-			ImGui::Text("Minty v0.5");
+			ImGui::Text("Minty BETA v0.6 WIP");
 			ImGui::Text("ImGui version: %s", ImGui::GetVersion());
 			
 			ImGui::Text("Contributors: мятный пряник#0086, Moistcrafter#9172, yarik#4571, azzu#2731");

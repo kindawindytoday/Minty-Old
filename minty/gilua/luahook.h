@@ -127,6 +127,7 @@ std::optional<std::string> compile(lua_State* L, const char* script)
     {
         util::log("compilation failed(%i)\n", ret);
         util::log("%s\n", lua_tolstring(L, 1, NULL));
+        //util::logdialog(lua_tolstring(L, 1, NULL)); ---- look in util.h; kinda useful but idk how to realise it at loading or how to mek slep
         lua_pop(L, 1);
         return std::nullopt;
     }
