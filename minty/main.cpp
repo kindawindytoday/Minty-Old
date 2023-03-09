@@ -208,6 +208,54 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				luahookfunc(result.c_str());
 			}
 
+
+			//here is file tes
+			//static char* file_dialog_buffer = nullptr;
+			//static char path1[500] = "";
+			//static char path2[500] = "";
+			//static char path3[500] = "";
+			//ImGui::Text("Path settings example");
+			//ImGui::Separator();
+
+			//// Choose a folder
+			//ImGui::TextUnformatted("Test Path 1");
+			//ImGui::SetNextItemWidth(380);
+			//ImGui::InputText("##path1", path1, sizeof(path1));
+			//ImGui::SameLine();
+			//if (ImGui::Button("Browse##path1")) {
+			//	file_dialog_buffer = path1;
+			//	FileDialog::file_dialog_open = true;
+			//	FileDialog::file_dialog_open_type = FileDialog::FileDialogType::SelectFolder;
+			//}
+
+			//// Choose a different folder
+			//ImGui::TextUnformatted("Test Path 2");
+			//ImGui::SetNextItemWidth(380);
+			//ImGui::InputText("##path2", path2, sizeof(path2));
+			//ImGui::SameLine();
+			//if (ImGui::Button("Browse##path2")) {
+			//	file_dialog_buffer = path2;
+			//	FileDialog::file_dialog_open = true;
+			//	FileDialog::file_dialog_open_type = FileDialog::FileDialogType::SelectFolder;
+			//}
+
+			// Choose a file
+
+			/*ImGui::TextUnformatted("Choose a file");
+			ImGui::SetNextItemWidth(380);
+			ImGui::InputText("##path3", path3, sizeof(path3));
+			ImGui::SameLine();
+			if (ImGui::Button("Browse##path3")) {
+				file_dialog_buffer = path3;
+				FileDialog::file_dialog_open = true;
+				FileDialog::file_dialog_open_type = FileDialog::FileDialogType::OpenFile;
+			}*/
+
+			/*if (FileDialog::file_dialog_open) {
+				FileDialog::ShowFileDialog(&FileDialog::file_dialog_open, file_dialog_buffer, sizeof(file_dialog_buffer), FileDialog::file_dialog_open_type);
+			}*/
+			//here is file test
+
 			ImGui::EndTabItem();
 		}
 
@@ -274,36 +322,53 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 			if (ImGui::BeginMenuBar())
 			{
+				//file_dialog_buffer = path3;
+				//ImGui::InputText("##path3", path3, sizeof(path3));
+
+				/*if (ImGui::Button("Load .lua file")) {
+					file_dialog_buffer = path3;
+					FileDialog::file_dialog_open = true;
+					FileDialog::file_dialog_open_type = FileDialog::FileDialogType::OpenFile;
+				}*/
+
+				static char* file_dialog_buffer = nullptr;
+				static char path3[500] = "";
+				ImGui::InputText("##path3", path3, sizeof(path3));
 				if (ImGui::BeginMenu("File"))
 				{
+
 					if (ImGui::MenuItem("Save as button (WIP, not functional)"))
 					{
 
 					}
 
-					static char filename[1024] = "";
-					static std::string file_contents = "";
+					/*static char* file_dialog_buffer = nullptr;
+					static char path3[500] = "";
+					file_dialog_buffer = path3;*/
+					/*static char* file_dialog_buffer = nullptr;
+					static char path3[500] = "";*/
 					if (ImGui::MenuItem("Load .lua file"))
 					{
-						static char path3[500] = "";
-						static char* file_dialog_buffer = nullptr;
-						ImGui::TextUnformatted("Choose a file");
+						/*ImGui::TextUnformatted("Choose a file");
 						ImGui::SetNextItemWidth(380);
 						ImGui::InputText("##path3", path3, sizeof(path3));
-						ImGui::SameLine();
-						if (ImGui::Button("Browse##path3")) {
-							file_dialog_buffer = path3;
-							FileDialog::file_dialog_open = true;
-							FileDialog::file_dialog_open_type = FileDialog::FileDialogType::OpenFile;
-						}
-
+						ImGui::SameLine();*/
+						/*static char* file_dialog_buffer = nullptr;
+						static char path3[500] = "";*/
+						//file_dialog_buffer = path3;
+						FileDialog::file_dialog_open = true;
+						FileDialog::file_dialog_open_type = FileDialog::FileDialogType::OpenFile;
+						//util::log(file_dialog_buffer);
+						
 						if (FileDialog::file_dialog_open) {
 							FileDialog::ShowFileDialog(&FileDialog::file_dialog_open, file_dialog_buffer, sizeof(file_dialog_buffer), FileDialog::file_dialog_open_type);
 						}
-					
 					}
 					ImGui::EndMenu();
 				}
+				/*if (FileDialog::file_dialog_open) {
+					FileDialog::ShowFileDialog(&FileDialog::file_dialog_open, file_dialog_buffer, sizeof(file_dialog_buffer), FileDialog::file_dialog_open_type);
+				}*/
 				/*if (ImGui::BeginMenu("Edit"))
 				{
 					bool ro = editor.IsReadOnly();
