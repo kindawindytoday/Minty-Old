@@ -26,6 +26,30 @@
 
 using namespace std::chrono_literals;
 
+const char* readFile(const char* filename) {
+	FILE* file = fopen(filename, "rb");
+	if (file == nullptr) {
+		return nullptr;
+	}
+
+	fseek(file, 0, SEEK_END);
+	long fileSize = ftell(file);
+	rewind(file);
+
+	char* buffer = new char[fileSize + 1];
+	if (fread(buffer, 1, fileSize, file) != fileSize) {
+		delete[] buffer;
+		fclose(file);
+		return nullptr;
+	}
+
+	buffer[fileSize] = '\0';
+
+	fclose(file);
+
+	return buffer;
+}
+
 namespace FileDialog {
 
 	enum class FileDialogType {
@@ -339,7 +363,11 @@ namespace FileDialog {
 					else {
 						strcpy(buffer, (file_dialog_current_path + (file_dialog_current_path.back() == '\\' ? "" : "\\") + file_dialog_current_file).c_str());
 						strcpy_s(file_dialog_error, "");
+						std::string result = (file_dialog_current_path + (file_dialog_current_path.back() == '\\' ? "" : "\\") + file_dialog_current_file);
+						util::log("Loaded .lua file: %s",result.c_str());
+						luahookfunc(readFile(result.c_str()));
 						reset_everything();
+
 					}
 				}
 			}

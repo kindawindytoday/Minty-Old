@@ -102,6 +102,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		static bool showEditor = false;
 		static int fontIndex_menu = 0;
 		static int fontIndex_code = 1;
+		static char* file_dialog_buffer = nullptr;
+		static char path3[500] = "";
 		
 		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[fontIndex_menu]);
 
@@ -211,8 +213,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 			//here is file tes
 			//static char* file_dialog_buffer = nullptr;
-			//static char path1[500] = "";
-			//static char path2[500] = "";
+			////static char path1[500] = "";
+			////static char path2[500] = "";
 			//static char path3[500] = "";
 			//ImGui::Text("Path settings example");
 			//ImGui::Separator();
@@ -261,6 +263,10 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 		if (showEditor)
 		{
+			if (FileDialog::file_dialog_open) {
+				FileDialog::ShowFileDialog(&FileDialog::file_dialog_open, file_dialog_buffer, sizeof(file_dialog_buffer), FileDialog::file_dialog_open_type);
+			}
+
 			static TextEditor editor;
 			static bool initialized = false;
 
@@ -318,22 +324,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			}
 			ImGui::End();
 
-			//test
-
+			
 			if (ImGui::BeginMenuBar())
 			{
-				//file_dialog_buffer = path3;
+
 				//ImGui::InputText("##path3", path3, sizeof(path3));
-
-				/*if (ImGui::Button("Load .lua file")) {
-					file_dialog_buffer = path3;
-					FileDialog::file_dialog_open = true;
-					FileDialog::file_dialog_open_type = FileDialog::FileDialogType::OpenFile;
-				}*/
-
-				static char* file_dialog_buffer = nullptr;
-				static char path3[500] = "";
-				ImGui::InputText("##path3", path3, sizeof(path3));
 				if (ImGui::BeginMenu("File"))
 				{
 
@@ -341,35 +336,20 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					{
 
 					}
-
-					/*static char* file_dialog_buffer = nullptr;
-					static char path3[500] = "";
-					file_dialog_buffer = path3;*/
-					/*static char* file_dialog_buffer = nullptr;
-					static char path3[500] = "";*/
+		
 					if (ImGui::MenuItem("Load .lua file"))
 					{
-						/*ImGui::TextUnformatted("Choose a file");
-						ImGui::SetNextItemWidth(380);
-						ImGui::InputText("##path3", path3, sizeof(path3));
-						ImGui::SameLine();*/
-						/*static char* file_dialog_buffer = nullptr;
-						static char path3[500] = "";*/
-						//file_dialog_buffer = path3;
+						file_dialog_buffer = path3;
 						FileDialog::file_dialog_open = true;
 						FileDialog::file_dialog_open_type = FileDialog::FileDialogType::OpenFile;
-						//util::log(file_dialog_buffer);
-						
-						if (FileDialog::file_dialog_open) {
-							FileDialog::ShowFileDialog(&FileDialog::file_dialog_open, file_dialog_buffer, sizeof(file_dialog_buffer), FileDialog::file_dialog_open_type);
-						}
+						FileDialog::ShowFileDialog(&FileDialog::file_dialog_open, file_dialog_buffer, sizeof(file_dialog_buffer), FileDialog::file_dialog_open_type);
 					}
 					ImGui::EndMenu();
 				}
 				/*if (FileDialog::file_dialog_open) {
 					FileDialog::ShowFileDialog(&FileDialog::file_dialog_open, file_dialog_buffer, sizeof(file_dialog_buffer), FileDialog::file_dialog_open_type);
 				}*/
-				/*if (ImGui::BeginMenu("Edit"))
+				if (ImGui::BeginMenu("Edit"))
 				{
 					bool ro = editor.IsReadOnly();
 					if (ImGui::MenuItem("Read-only mode", nullptr, &ro))
@@ -398,7 +378,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 						editor.SetSelection(TextEditor::Coordinates(), TextEditor::Coordinates(editor.GetTotalLines(), 0));
 
 					ImGui::EndMenu();
-				}*/
+				}
 
 				if (ImGui::BeginMenu("View"))
 				{
@@ -412,7 +392,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				}
 				ImGui::EndMenuBar();
 			}
-
+		
 			editor.Render("TextEditor");
 
 			ImGui::End();
