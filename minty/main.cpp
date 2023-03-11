@@ -104,6 +104,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		static int fontIndex_code = 1;
 		static char* file_dialog_buffer = nullptr;
 		static char path3[500] = "";
+		static bool isopened = true;
 		
 		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[fontIndex_menu]);
 
@@ -114,350 +115,362 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			luahookfunc(result.c_str());
 		}
 
-		ImGui::Begin("Minty");
-		ImGui::BeginTabBar("Minty");
-
-		if (ImGui::BeginTabItem("Lua"))
+		if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_F12)))
 		{
-			static bool browser_state = false; 
-			if (ImGui::Checkbox("Browser", &browser_state)) {
-				if (browser_state) {
-					luahookfunc(char_browser_on);
-				}
-				else {
-					luahookfunc(char_browser_off);
-				}
-			}
-
-			static bool show_resizer = false;
-			static float boob_size = 1.0f;
-			if (ImGui::Checkbox("Booba resizer", &show_resizer)){}
-
-			if (show_resizer)
-			{
-				ImGui::Indent();
-
-				if (ImGui::Button("Initiate resize")) {
-					boob_size = 1.0f;
-					luahookfunc(char_bub_initiate);
-				}
-				ImGui::SameLine();
-				if (ImGui::SliderFloat("Booba scale", &boob_size, 0.0f, 4.0f, "%.3f"))
-				{
-					std::string result = char_bub_resize + std::to_string(boob_size) + "," + std::to_string(boob_size) + "," + std::to_string(boob_size) + ")";
-					luahookfunc(result.c_str());
-				}
-				ImGui::Unindent();
-			}
-
-			static bool show_colorator3000 = false;
-			static float cc_r = 1.0f;
-			static float cc_g = 1.0f;
-			static float cc_b = 1.0f;
-			static float cc_a = 1.0f;
-			if (ImGui::Checkbox("Show infusion changer", &show_colorator3000)) {}
-
-			if (show_colorator3000)
-			{
-				ImGui::Indent();
-
-				if (ImGui::Button("Change")) {
-
-					std::string result = char_eleminf + std::to_string(cc_r) + "," + std::to_string(cc_g) + "," + std::to_string(cc_b) + "," + std::to_string(cc_a) + char_eleminf_end;
-					luahookfunc(result.c_str());
-				}
-				ImGui::SameLine();
-				if (ImGui::SliderFloat("Red color", &cc_r, 0.0f, 1.0f, "%.3f"))
-				{
-
-				}
-				if (ImGui::SliderFloat("Green color", &cc_g, 0.0f, 1.0f, "%.3f"))
-				{
-
-				}
-				if (ImGui::SliderFloat("Blue color", &cc_b, 0.0f, 1.0f, "%.3f"))
-				{
-
-				}
-				if (ImGui::SliderFloat("Alpha", &cc_a, 0.0f, 1.0f, "%.3f"))
-				{
-
-				}
-				ImGui::Unindent();
-			}
-
-			if (ImGui::Checkbox("Lua editor", &showEditor)){}
-
-			static char inputTextBuffer[512] = "";
-
-			ImGui::InputTextWithHint("##input", "Enter custom UID text here...", inputTextBuffer, sizeof(inputTextBuffer));
-
-			ImGui::SameLine();
-			if (ImGui::Button("Update custom UID")) {
-				std::string result = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID"):GetComponent("Text").text = ")MY_DELIMITER" + std::string(inputTextBuffer) + "\"";
-				luahookfunc(result.c_str());
-			}
-
-			if (ImGui::SliderFloat("Timescale", &TimeScale, 0.0f, 2.0f, "%.3f"))
-			{
-				std::string result = "CS.UnityEngine.Time.timeScale = " + std::to_string(TimeScale);
-				luahookfunc(result.c_str());
-			}
-			ImGui::SameLine();
-			if (ImGui::Button("Reset (F11)")) {
-				TimeScale = 1.0f;
-				std::string result = "CS.UnityEngine.Time.timeScale = 1.0";
-				luahookfunc(result.c_str());
-			}
-
-
-			//here is file tes
-			//static char* file_dialog_buffer = nullptr;
-			////static char path1[500] = "";
-			////static char path2[500] = "";
-			//static char path3[500] = "";
-			//ImGui::Text("Path settings example");
-			//ImGui::Separator();
-
-			//// Choose a folder
-			//ImGui::TextUnformatted("Test Path 1");
-			//ImGui::SetNextItemWidth(380);
-			//ImGui::InputText("##path1", path1, sizeof(path1));
-			//ImGui::SameLine();
-			//if (ImGui::Button("Browse##path1")) {
-			//	file_dialog_buffer = path1;
-			//	FileDialog::file_dialog_open = true;
-			//	FileDialog::file_dialog_open_type = FileDialog::FileDialogType::SelectFolder;
-			//}
-
-			//// Choose a different folder
-			//ImGui::TextUnformatted("Test Path 2");
-			//ImGui::SetNextItemWidth(380);
-			//ImGui::InputText("##path2", path2, sizeof(path2));
-			//ImGui::SameLine();
-			//if (ImGui::Button("Browse##path2")) {
-			//	file_dialog_buffer = path2;
-			//	FileDialog::file_dialog_open = true;
-			//	FileDialog::file_dialog_open_type = FileDialog::FileDialogType::SelectFolder;
-			//}
-
-			// Choose a file
-
-			/*ImGui::TextUnformatted("Choose a file");
-			ImGui::SetNextItemWidth(380);
-			ImGui::InputText("##path3", path3, sizeof(path3));
-			ImGui::SameLine();
-			if (ImGui::Button("Browse##path3")) {
-				file_dialog_buffer = path3;
-				FileDialog::file_dialog_open = true;
-				FileDialog::file_dialog_open_type = FileDialog::FileDialogType::OpenFile;
-			}*/
-
-			/*if (FileDialog::file_dialog_open) {
-				FileDialog::ShowFileDialog(&FileDialog::file_dialog_open, file_dialog_buffer, sizeof(file_dialog_buffer), FileDialog::file_dialog_open_type);
-			}*/
-			//here is file test
-
-			ImGui::EndTabItem();
+			isopened = !isopened;
 		}
 
-		if (showEditor)
-		{
-			if (FileDialog::file_dialog_open) {
-				FileDialog::ShowFileDialog(&FileDialog::file_dialog_open, file_dialog_buffer, sizeof(file_dialog_buffer), FileDialog::file_dialog_open_type);
-			}
-
-			static TextEditor editor;
-			static bool initialized = false;
-
-			if (!initialized)
-			{
-				editor.SetLanguageDefinition(TextEditor::LanguageDefinition::Lua());
-				editor.SetPalette(TextEditor::GetDarkPalette());
-
-				editor.SetTabSize(4);
-				editor.SetShowWhitespaces(false);
-				editor.SetColorizerEnable(true);
-
-				initialized = true;
-			}
-			ImGui::Begin("Lua editor", &showEditor, ImGuiWindowFlags_MenuBar);
-
-			if (ImGui::Button("Run"))
-			{
-				std::string code = editor.GetText();
-
-				if (!code.empty())
-				{
-					luahookfunc(code.c_str());
-				}
-			}
-			ImGui::SameLine();
-			//saver to button below.
-
-			static std::vector<std::pair<std::string, std::function<void()>>> buttonFuncs;
-			static char buttonLabel[256] = "";
-
-			if (ImGui::Button("Create new button")) {
-				ImGui::OpenPopup("New button");
-			}
-
-			if (ImGui::BeginPopup("New button")) {
-				ImGui::InputText("Label", buttonLabel, 256);
-				if (ImGui::Button("Create")) {
-					std::string functionText = editor.GetText();
-					std::function<void()> buttonFunc = [functionText]() {
-						luahookfunc(functionText.c_str());
-					};
-					buttonFuncs.emplace_back(std::string(buttonLabel), buttonFunc);
-					memset(buttonLabel, 0, sizeof(buttonLabel));
-					ImGui::CloseCurrentPopup();
-				}
-				ImGui::EndPopup();
-			}
-
+		if (isopened) {
 			ImGui::Begin("Minty");
-			for (const auto& button : buttonFuncs) {
-				if (ImGui::Button(button.first.c_str())) {
-					button.second();
-				}
-			}
-			ImGui::End();
+			ImGui::BeginTabBar("Minty");
 
-			
-			if (ImGui::BeginMenuBar())
+			if (ImGui::BeginTabItem("Lua"))
 			{
-
-				//ImGui::InputText("##path3", path3, sizeof(path3));
-				if (ImGui::BeginMenu("File"))
-				{
-
-					if (ImGui::MenuItem("Save as button (WIP, not functional)"))
-					{
-
+				static bool browser_state = false;
+				if (ImGui::Checkbox("Browser", &browser_state)) {
+					if (browser_state) {
+						luahookfunc(char_browser_on);
 					}
-		
-					if (ImGui::MenuItem("Load .lua file"))
-					{
-						file_dialog_buffer = path3;
-						FileDialog::file_dialog_open = true;
-						FileDialog::file_dialog_open_type = FileDialog::FileDialogType::OpenFile;
-						FileDialog::ShowFileDialog(&FileDialog::file_dialog_open, file_dialog_buffer, sizeof(file_dialog_buffer), FileDialog::file_dialog_open_type);
+					else {
+						luahookfunc(char_browser_off);
 					}
-					ImGui::EndMenu();
 				}
+
+				static bool show_resizer = false;
+				static float boob_size = 1.0f;
+				if (ImGui::Checkbox("Booba resizer", &show_resizer)) {}
+
+				if (show_resizer)
+				{
+					ImGui::Indent();
+
+					if (ImGui::Button("Initiate resize")) {
+						boob_size = 1.0f;
+						luahookfunc(char_bub_initiate);
+					}
+					ImGui::SameLine();
+					if (ImGui::SliderFloat("Booba scale", &boob_size, 0.0f, 4.0f, "%.3f"))
+					{
+						std::string result = char_bub_resize + std::to_string(boob_size) + "," + std::to_string(boob_size) + "," + std::to_string(boob_size) + ")";
+						luahookfunc(result.c_str());
+					}
+					ImGui::Unindent();
+				}
+
+				static bool show_colorator3000 = false;
+				static float cc_r = 1.0f;
+				static float cc_g = 1.0f;
+				static float cc_b = 1.0f;
+				static float cc_a = 1.0f;
+				if (ImGui::Checkbox("Show infusion changer", &show_colorator3000)) {}
+
+				if (show_colorator3000)
+				{
+					ImGui::Indent();
+
+					if (ImGui::Button("Change")) {
+
+						std::string result = char_eleminf + std::to_string(cc_r) + "," + std::to_string(cc_g) + "," + std::to_string(cc_b) + "," + std::to_string(cc_a) + char_eleminf_end;
+						luahookfunc(result.c_str());
+					}
+					ImGui::SameLine();
+					if (ImGui::SliderFloat("Red color", &cc_r, 0.0f, 1.0f, "%.3f"))
+					{
+
+					}
+					if (ImGui::SliderFloat("Green color", &cc_g, 0.0f, 1.0f, "%.3f"))
+					{
+
+					}
+					if (ImGui::SliderFloat("Blue color", &cc_b, 0.0f, 1.0f, "%.3f"))
+					{
+
+					}
+					if (ImGui::SliderFloat("Alpha", &cc_a, 0.0f, 1.0f, "%.3f"))
+					{
+
+					}
+					ImGui::Unindent();
+				}
+
+				if (ImGui::Checkbox("Lua editor", &showEditor)) {}
+
+				static char inputTextBuffer[512] = "";
+
+				ImGui::InputTextWithHint("##input", "Enter custom UID text here...", inputTextBuffer, sizeof(inputTextBuffer));
+
+				ImGui::SameLine();
+				if (ImGui::Button("Update custom UID")) {
+					std::string result = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID"):GetComponent("Text").text = ")MY_DELIMITER" + std::string(inputTextBuffer) + "\"";
+					luahookfunc(result.c_str());
+				}
+
+				if (ImGui::SliderFloat("Timescale", &TimeScale, 0.0f, 2.0f, "%.3f"))
+				{
+					std::string result = "CS.UnityEngine.Time.timeScale = " + std::to_string(TimeScale);
+					luahookfunc(result.c_str());
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Reset (F11)")) {
+					TimeScale = 1.0f;
+					std::string result = "CS.UnityEngine.Time.timeScale = 1.0";
+					luahookfunc(result.c_str());
+				}
+
+
+				//here is file tes
+				//static char* file_dialog_buffer = nullptr;
+				////static char path1[500] = "";
+				////static char path2[500] = "";
+				//static char path3[500] = "";
+				//ImGui::Text("Path settings example");
+				//ImGui::Separator();
+
+				//// Choose a folder
+				//ImGui::TextUnformatted("Test Path 1");
+				//ImGui::SetNextItemWidth(380);
+				//ImGui::InputText("##path1", path1, sizeof(path1));
+				//ImGui::SameLine();
+				//if (ImGui::Button("Browse##path1")) {
+				//	file_dialog_buffer = path1;
+				//	FileDialog::file_dialog_open = true;
+				//	FileDialog::file_dialog_open_type = FileDialog::FileDialogType::SelectFolder;
+				//}
+
+				//// Choose a different folder
+				//ImGui::TextUnformatted("Test Path 2");
+				//ImGui::SetNextItemWidth(380);
+				//ImGui::InputText("##path2", path2, sizeof(path2));
+				//ImGui::SameLine();
+				//if (ImGui::Button("Browse##path2")) {
+				//	file_dialog_buffer = path2;
+				//	FileDialog::file_dialog_open = true;
+				//	FileDialog::file_dialog_open_type = FileDialog::FileDialogType::SelectFolder;
+				//}
+
+				// Choose a file
+
+				/*ImGui::TextUnformatted("Choose a file");
+				ImGui::SetNextItemWidth(380);
+				ImGui::InputText("##path3", path3, sizeof(path3));
+				ImGui::SameLine();
+				if (ImGui::Button("Browse##path3")) {
+					file_dialog_buffer = path3;
+					FileDialog::file_dialog_open = true;
+					FileDialog::file_dialog_open_type = FileDialog::FileDialogType::OpenFile;
+				}*/
+
 				/*if (FileDialog::file_dialog_open) {
 					FileDialog::ShowFileDialog(&FileDialog::file_dialog_open, file_dialog_buffer, sizeof(file_dialog_buffer), FileDialog::file_dialog_open_type);
 				}*/
-				if (ImGui::BeginMenu("Edit"))
-				{
-					bool ro = editor.IsReadOnly();
-					if (ImGui::MenuItem("Read-only mode", nullptr, &ro))
-						editor.SetReadOnly(ro);
-					ImGui::Separator();
+				//here is file test
 
-					if (ImGui::MenuItem("Undo", "ALT-Backspace", nullptr, !ro && editor.CanUndo()))
-						editor.Undo();
-					if (ImGui::MenuItem("Redo", "Ctrl-Y", nullptr, !ro && editor.CanRedo()))
-						editor.Redo();
-
-					ImGui::Separator();
-
-					if (ImGui::MenuItem("Copy", "Ctrl-C", nullptr, editor.HasSelection()))
-						editor.Copy();
-					if (ImGui::MenuItem("Cut", "Ctrl-X", nullptr, !ro && editor.HasSelection()))
-						editor.Cut();
-					if (ImGui::MenuItem("Delete", "Del", nullptr, !ro && editor.HasSelection()))
-						editor.Delete();
-					if (ImGui::MenuItem("Paste", "Ctrl-V", nullptr, !ro && ImGui::GetClipboardText() != nullptr))
-						editor.Paste();
-
-					ImGui::Separator();
-
-					if (ImGui::MenuItem("Select all", nullptr, nullptr))
-						editor.SetSelection(TextEditor::Coordinates(), TextEditor::Coordinates(editor.GetTotalLines(), 0));
-
-					ImGui::EndMenu();
-				}
-
-				if (ImGui::BeginMenu("View"))
-				{
-					if (ImGui::MenuItem("Dark palette"))
-						editor.SetPalette(TextEditor::GetDarkPalette());
-					if (ImGui::MenuItem("Light palette"))
-						editor.SetPalette(TextEditor::GetLightPalette());
-					if (ImGui::MenuItem("Retro blue palette"))
-						editor.SetPalette(TextEditor::GetRetroBluePalette());
-					ImGui::EndMenu();
-				}
-				ImGui::EndMenuBar();
+				ImGui::EndTabItem();
 			}
-		
-			editor.Render("TextEditor");
 
+			if (showEditor)
+			{
+				if (FileDialog::file_dialog_open) {
+					FileDialog::ShowFileDialog(&FileDialog::file_dialog_open, file_dialog_buffer, sizeof(file_dialog_buffer), FileDialog::file_dialog_open_type);
+				}
+
+				static TextEditor editor;
+				static bool initialized = false;
+
+				if (!initialized)
+				{
+					editor.SetLanguageDefinition(TextEditor::LanguageDefinition::Lua());
+					editor.SetPalette(TextEditor::GetDarkPalette());
+
+					editor.SetTabSize(4);
+					editor.SetShowWhitespaces(false);
+					editor.SetColorizerEnable(true);
+
+					initialized = true;
+				}
+				ImGui::Begin("Lua editor", &showEditor, ImGuiWindowFlags_MenuBar);
+
+				if (ImGui::Button("Run"))
+				{
+					std::string code = editor.GetText();
+
+					if (!code.empty())
+					{
+						luahookfunc(code.c_str());
+					}
+				}
+				ImGui::SameLine();
+				//saver to button below.
+
+				static std::vector<std::pair<std::string, std::function<void()>>> buttonFuncs;
+				static char buttonLabel[256] = "";
+
+				if (ImGui::Button("Create new button")) {
+					ImGui::OpenPopup("New button");
+				}
+
+				if (ImGui::BeginPopup("New button")) {
+					ImGui::InputText("Label", buttonLabel, 256);
+					if (ImGui::Button("Create")) {
+						std::string functionText = editor.GetText();
+						std::function<void()> buttonFunc = [functionText]() {
+							luahookfunc(functionText.c_str());
+						};
+						buttonFuncs.emplace_back(std::string(buttonLabel), buttonFunc);
+						memset(buttonLabel, 0, sizeof(buttonLabel));
+						ImGui::CloseCurrentPopup();
+					}
+					ImGui::EndPopup();
+				}
+
+				ImGui::Begin("Minty");
+				for (const auto& button : buttonFuncs) {
+					if (ImGui::Button(button.first.c_str())) {
+						button.second();
+					}
+				}
+				ImGui::End();
+
+
+				if (ImGui::BeginMenuBar())
+				{
+
+					//ImGui::InputText("##path3", path3, sizeof(path3));
+					if (ImGui::BeginMenu("File"))
+					{
+
+						if (ImGui::MenuItem("Save as button (WIP, not functional)"))
+						{
+
+						}
+
+						if (ImGui::MenuItem("Load .lua file"))
+						{
+							file_dialog_buffer = path3;
+							FileDialog::file_dialog_open = true;
+							FileDialog::file_dialog_open_type = FileDialog::FileDialogType::OpenFile;
+							FileDialog::ShowFileDialog(&FileDialog::file_dialog_open, file_dialog_buffer, sizeof(file_dialog_buffer), FileDialog::file_dialog_open_type);
+						}
+						ImGui::EndMenu();
+					}
+					/*if (FileDialog::file_dialog_open) {
+						FileDialog::ShowFileDialog(&FileDialog::file_dialog_open, file_dialog_buffer, sizeof(file_dialog_buffer), FileDialog::file_dialog_open_type);
+					}*/
+					if (ImGui::BeginMenu("Edit"))
+					{
+						bool ro = editor.IsReadOnly();
+						if (ImGui::MenuItem("Read-only mode", nullptr, &ro))
+							editor.SetReadOnly(ro);
+						ImGui::Separator();
+
+						if (ImGui::MenuItem("Undo", "ALT-Backspace", nullptr, !ro && editor.CanUndo()))
+							editor.Undo();
+						if (ImGui::MenuItem("Redo", "Ctrl-Y", nullptr, !ro && editor.CanRedo()))
+							editor.Redo();
+
+						ImGui::Separator();
+
+						if (ImGui::MenuItem("Copy", "Ctrl-C", nullptr, editor.HasSelection()))
+							editor.Copy();
+						if (ImGui::MenuItem("Cut", "Ctrl-X", nullptr, !ro && editor.HasSelection()))
+							editor.Cut();
+						if (ImGui::MenuItem("Delete", "Del", nullptr, !ro && editor.HasSelection()))
+							editor.Delete();
+						if (ImGui::MenuItem("Paste", "Ctrl-V", nullptr, !ro && ImGui::GetClipboardText() != nullptr))
+							editor.Paste();
+
+						ImGui::Separator();
+
+						if (ImGui::MenuItem("Select all", nullptr, nullptr))
+							editor.SetSelection(TextEditor::Coordinates(), TextEditor::Coordinates(editor.GetTotalLines(), 0));
+
+						ImGui::EndMenu();
+					}
+
+					if (ImGui::BeginMenu("View"))
+					{
+						if (ImGui::MenuItem("Dark palette"))
+							editor.SetPalette(TextEditor::GetDarkPalette());
+						if (ImGui::MenuItem("Light palette"))
+							editor.SetPalette(TextEditor::GetLightPalette());
+						if (ImGui::MenuItem("Retro blue palette"))
+							editor.SetPalette(TextEditor::GetRetroBluePalette());
+						ImGui::EndMenu();
+					}
+					ImGui::EndMenuBar();
+				}
+
+				editor.Render("TextEditor");
+
+				ImGui::End();
+			}
+
+			if (ImGui::BeginTabItem("Themes"))
+			{
+				// Content for themes
+				ImGui::Text("Test..");
+
+				static int themeIndex = 0;
+
+				if (ImGui::RadioButton("Default", &themeIndex, 0))
+				{
+					ImGui::StyleColorsDark();
+				}
+
+				if (ImGui::RadioButton("Dark theme", &themeIndex, 1))
+				{
+					dark_theme();
+				}
+
+				if (ImGui::RadioButton("Minty Red", &themeIndex, 2))
+				{
+					minty_red_theme();
+				}
+
+				ImGui::Separator();
+				ImGui::Text("Menu font");
+
+				static int fontSelectionIndex = 0;
+				if (ImGui::RadioButton("Myriad pro", &fontSelectionIndex, 0))
+				{
+					fontIndex_menu = 0;
+				}
+
+				if (ImGui::RadioButton("Jetbrains Mono", &fontSelectionIndex, 1))
+				{
+					fontIndex_menu = 1;
+				}
+
+				ImGui::EndTabItem();
+			}
+
+			if (ImGui::BeginTabItem("About"))
+			{
+				// Content for About
+				ImGui::Text("Minty BETA v0.6 WIP");
+				ImGui::Text("ImGui version: %s", ImGui::GetVersion());
+
+				ImGui::Text("Contributors: мятный пряник#0086, Moistcrafter#9172, yarik#4571, azzu#2731");
+				ImGui::Text("");
+				ImGui::Text("KWT Team Discord (click)");
+				if (ImGui::IsItemClicked()) {
+					// Open website in browser
+					system("start https://discord.gg/kj7PQrr6CV");
+				}
+				ImGui::Text("KWT Team GitHub (click)");
+				if (ImGui::IsItemClicked()) {
+					// Open website in browser
+					system("start https://github.com/kindawindytoday");
+				}
+				ImGui::EndTabItem();
+			}
+
+			ImGui::EndTabBar();
 			ImGui::End();
 		}
-
-		if (ImGui::BeginTabItem("Themes"))
-		{
-			// Content for themes
-			ImGui::Text("Test..");
-
-			static int themeIndex = 0;
-
-			if (ImGui::RadioButton("Default", &themeIndex, 0))
-			{ImGui::StyleColorsDark();}
-
-			if (ImGui::RadioButton("Dark theme", &themeIndex, 1))
-			{dark_theme();}
-
-			if (ImGui::RadioButton("Minty Red", &themeIndex, 2))
-			{minty_red_theme();}
-
-			ImGui::Separator();
-			ImGui::Text("Menu font");
-
-			static int fontSelectionIndex = 0;
-			if (ImGui::RadioButton("Myriad pro", &fontSelectionIndex, 0))
-			{
-				fontIndex_menu = 0;
-			}
-
-			if (ImGui::RadioButton("Jetbrains Mono", &fontSelectionIndex, 1))
-			{
-				fontIndex_menu = 1;
-			}
-
-			ImGui::EndTabItem();
-		}
-
-		if (ImGui::BeginTabItem("About"))
-		{
-			// Content for About
-			ImGui::Text("Minty BETA v0.6 WIP");
-			ImGui::Text("ImGui version: %s", ImGui::GetVersion());
-			
-			ImGui::Text("Contributors: мятный пряник#0086, Moistcrafter#9172, yarik#4571, azzu#2731");
-			ImGui::Text("");
-			ImGui::Text("KWT Team Discord (click)");
-			if (ImGui::IsItemClicked()) {
-				// Open website in browser
-				system("start https://discord.gg/kj7PQrr6CV");
-			}
-			ImGui::Text("KWT Team GitHub (click)");
-			if (ImGui::IsItemClicked()) {
-				// Open website in browser
-				system("start https://github.com/kindawindytoday");
-			}
-			ImGui::EndTabItem();
-		}
-
 		ImGui::PopFont();
-		ImGui::EndTabBar();
-		ImGui::End();
 		ImGui::EndFrame();
 		ImGui::Render();
-
 
 	//end of imgui code
 	pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);

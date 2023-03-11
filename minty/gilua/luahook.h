@@ -1,5 +1,5 @@
 #pragma once
-#define _CRT_SECURE_NO_WARNINGS
+//#define _CRT_SECURE_NO_WARNINGS
 #include <Windows.h>
 
 #include <cstdio>
@@ -30,7 +30,7 @@ pfn_loadbuffer* pp_loadbuffer;
 int xluaL_loadbuffer_hook(lua_State* L, const char* chunk, size_t sz, const char* chunkname)
 {
     gi_L = L;
-    util::log("xluaL_loadbuffer_hook called");
+    util::log("xluaL_loadbuffer_hook called. Lua ready!");
     util::logdialog("Succesfully hooked. Happy hacking!");
     main_thread = OpenThread(THREAD_ALL_ACCESS, false, GetCurrentThreadId());
     xlua = GetModuleHandleW(L"xlua");
@@ -95,7 +95,7 @@ std::optional<fs::path> get_scripts_folder()
 }
 pfn_loadbuffer* scan_loadbuffer(HMODULE ua)
 {
-    util::log("Hooking... ");
+    util::log("Hooking... Attention: if logs stops at this line - you should inject dll before loading into world.");
     auto il2cpp = util::pe::get_section_by_name(ua, "il2cpp");
     auto rdata = util::pe::get_section_by_name(ua, ".rdata");
 
