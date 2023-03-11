@@ -217,7 +217,21 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					luahookfunc(result.c_str());
 				}
 
+				static bool show_modelswap = false;
+				if (ImGui::Checkbox("Model swapper", &show_modelswap)) {}
 
+				if (show_modelswap)
+				{
+					ImGui::Indent();
+
+					if (ImGui::Button("Clone model")) {
+						luahookfunc(char_modelswap_clone);
+					}
+					if (ImGui::Button("Paste model")) {
+						luahookfunc(char_modelswap_paste);
+					}
+					ImGui::Unindent();
+				}
 				//here is file tes
 				//static char* file_dialog_buffer = nullptr;
 				////static char path1[500] = "";
