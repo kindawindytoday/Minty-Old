@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include "imgui/L2DFileDialog.h"
+#define _CRT_SECURE_NO_WARNINGS
 
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -124,16 +125,34 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			ImGui::Begin("Minty");
 			ImGui::BeginTabBar("Minty");
 
-			if (ImGui::BeginTabItem("Lua"))
+			if (ImGui::BeginTabItem("Main"))
 			{
-				static bool browser_state = false;
-				if (ImGui::Checkbox("Browser", &browser_state)) {
-					if (browser_state) {
-						luahookfunc(char_browser_on);
+				ImGui::Text("Player");
+
+				static char inputTextBuffer[512] = "";
+				ImGui::InputTextWithHint("##input", "Enter custom UID text here...", inputTextBuffer, sizeof(inputTextBuffer));
+				ImGui::SameLine();
+				if (ImGui::Button("Update custom UID")) {
+					std::string result = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID"):GetComponent("Text").text = ")MY_DELIMITER" + std::string(inputTextBuffer) + "\"";
+					luahookfunc(result.c_str());
+				}
+
+				static bool show_modelswap = false;
+				if (ImGui::Checkbox("Model swapper", &show_modelswap)) {
+					luahookfunc("CS.LAMLMFNDPHJ.HAFGEFPIKFK(\"snoo.\",\"snoo.\")");
+				}
+				if (show_modelswap)
+				{
+
+					ImGui::Indent();
+
+					if (ImGui::Button("Clone model")) {
+						luahookfunc(char_modelswap_clone);
 					}
-					else {
-						luahookfunc(char_browser_off);
+					if (ImGui::Button("Paste model")) {
+						luahookfunc(char_modelswap_paste);
 					}
+					ImGui::Unindent();
 				}
 
 				static bool show_resizer = false;
@@ -155,6 +174,19 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 						luahookfunc(result.c_str());
 					}
 					ImGui::Unindent();
+				}
+
+				static float avatarsize = 1;
+				static bool show_avatarresizer = false;
+				if (ImGui::Checkbox("Avatar resizer", &show_avatarresizer));
+				if (show_avatarresizer) {
+					ImGui::Indent();
+					if (ImGui::SliderFloat("Avatar scale", &avatarsize, 0.0f, 25.0f, "%.3f"));
+					std::string result = char_avatarresize_start + std::to_string(avatarsize) + "," + std::to_string(avatarsize) + "," + std::to_string(avatarsize) + char_avatarresize_end;
+					luahookfunc(result.c_str());
+				}
+				else {
+
 				}
 
 				static bool show_colorator3000 = false;
@@ -193,16 +225,25 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					ImGui::Unindent();
 				}
 
-				if (ImGui::Checkbox("Lua editor", &showEditor)) {}
+				ImGui::Text("World");
 
-				static char inputTextBuffer[512] = "";
+				static bool browser_state = false;
+				if (ImGui::Checkbox("Browser", &browser_state)) {
+					if (browser_state) {
+						luahookfunc(char_browser_on);
+					}
+					else {
+						luahookfunc(char_browser_off);
+					}
+				}
 
-				ImGui::InputTextWithHint("##input", "Enter custom UID text here...", inputTextBuffer, sizeof(inputTextBuffer));
-
-				ImGui::SameLine();
-				if (ImGui::Button("Update custom UID")) {
-					std::string result = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID"):GetComponent("Text").text = ")MY_DELIMITER" + std::string(inputTextBuffer) + "\"";
-					luahookfunc(result.c_str());
+				static bool nofog = false;
+				if (ImGui::Checkbox("Disable fog in world", &nofog));
+				if (nofog) {
+					luahookfunc(R"MY_DELIMITER(CS.UnityEngine.RenderSettings.fog = false)MY_DELIMITER");
+				}
+				else {
+					luahookfunc(R"MY_DELIMITER(CS.UnityEngine.RenderSettings.fog = true)MY_DELIMITER");
 				}
 
 				if (ImGui::SliderFloat("Timescale", &TimeScale, 0.0f, 2.0f, "%.3f"))
@@ -217,67 +258,45 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					luahookfunc(result.c_str());
 				}
 
-				static bool show_modelswap = false;
-				if (ImGui::Checkbox("Model swapper", &show_modelswap)) {}
+				ImGui::Text("Misc");
 
-				if (show_modelswap)
-				{
+				static bool isfpsshown = false;
+				if (ImGui::Checkbox("Show FPS", &isfpsshown));
+				if (isfpsshown) {
+					luahookfunc(char_showfps);
+				}
+				else {
+					luahookfunc(R"MY_DELIMITER(
+CS.UnityEngine.QualitySettings.vSyncCount = 1
+CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID"):GetComponent("Text").text = "UID: 0")MY_DELIMITER");
+				}
+
+				static bool unlockfps = false;
+				static float targetfps = 60;
+				if (ImGui::Checkbox("Unlock FPS", &unlockfps));
+				if (unlockfps) {
 					ImGui::Indent();
-
-					if (ImGui::Button("Clone model")) {
-						luahookfunc(char_modelswap_clone);
-					}
-					if (ImGui::Button("Paste model")) {
-						luahookfunc(char_modelswap_paste);
-					}
+					if (ImGui::SliderFloat("Target FPS", &targetfps, 10.0f, 360.0f, "%.3f"));
+					std::string result = "CS.UnityEngine.Application.targetFrameRate = " + std::to_string(targetfps);
+					luahookfunc(result.c_str());
 					ImGui::Unindent();
 				}
-				//here is file tes
-				//static char* file_dialog_buffer = nullptr;
-				////static char path1[500] = "";
-				////static char path2[500] = "";
-				//static char path3[500] = "";
-				//ImGui::Text("Path settings example");
-				//ImGui::Separator();
+				else {
+					luahookfunc("CS.UnityEngine.Application.targetFrameRate = 60");
 
-				//// Choose a folder
-				//ImGui::TextUnformatted("Test Path 1");
-				//ImGui::SetNextItemWidth(380);
-				//ImGui::InputText("##path1", path1, sizeof(path1));
-				//ImGui::SameLine();
-				//if (ImGui::Button("Browse##path1")) {
-				//	file_dialog_buffer = path1;
-				//	FileDialog::file_dialog_open = true;
-				//	FileDialog::file_dialog_open_type = FileDialog::FileDialogType::SelectFolder;
-				//}
+				}
 
-				//// Choose a different folder
-				//ImGui::TextUnformatted("Test Path 2");
-				//ImGui::SetNextItemWidth(380);
-				//ImGui::InputText("##path2", path2, sizeof(path2));
-				//ImGui::SameLine();
-				//if (ImGui::Button("Browse##path2")) {
-				//	file_dialog_buffer = path2;
-				//	FileDialog::file_dialog_open = true;
-				//	FileDialog::file_dialog_open_type = FileDialog::FileDialogType::SelectFolder;
-				//}
+				static bool isuishown = true;
+				if (ImGui::Checkbox("Hide UI", &isuishown));
+				if (isuishown) {
+					luahookfunc(R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/UICamera"):SetActive(true))MY_DELIMITER");
+				}
+				else {
+					luahookfunc(R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/UICamera"):SetActive(false))MY_DELIMITER");
+				}
 
-				// Choose a file
-
-				/*ImGui::TextUnformatted("Choose a file");
-				ImGui::SetNextItemWidth(380);
-				ImGui::InputText("##path3", path3, sizeof(path3));
-				ImGui::SameLine();
-				if (ImGui::Button("Browse##path3")) {
-					file_dialog_buffer = path3;
-					FileDialog::file_dialog_open = true;
-					FileDialog::file_dialog_open_type = FileDialog::FileDialogType::OpenFile;
-				}*/
-
-				/*if (FileDialog::file_dialog_open) {
-					FileDialog::ShowFileDialog(&FileDialog::file_dialog_open, file_dialog_buffer, sizeof(file_dialog_buffer), FileDialog::file_dialog_open_type);
-				}*/
-				//here is file test
+				ImGui::Text("Lua");
+				if (ImGui::Checkbox("Lua editor", &showEditor));
 
 				ImGui::EndTabItem();
 			}

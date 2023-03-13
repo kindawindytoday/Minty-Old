@@ -1,5 +1,5 @@
 #pragma once
-//#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 #include <Windows.h>
 
 #include <cstdio>
@@ -11,13 +11,14 @@
 #include <filesystem>
 #include "pe.h"
 #include "scanner.h"
+#pragma warning(suppress : 4996)
 extern "C" {
 #include "../lua/lua.h"
 #include "../lua/lualib.h"
 #include "../lua/lauxlib.h"
 }
 #include "util.h"
-#include "luaHook.h"
+//#include "luaHook.h"
 namespace fs = std::filesystem;
 lua_State* gi_L;
 HMODULE xlua;
@@ -36,6 +37,23 @@ int xluaL_loadbuffer_hook(lua_State* L, const char* chunk, size_t sz, const char
     xlua = GetModuleHandleW(L"xlua");
     *pp_loadbuffer = (pfn_loadbuffer)GetProcAddress(xlua, "xluaL_loadbuffer");
     return (*pp_loadbuffer)(L, chunk, sz, chunkname);
+}
+
+
+std::optional<std::string> read_whole_file(const fs::path& file)
+try
+{
+    std::stringstream buf;
+    std::ifstream ifs(file);
+    if (!ifs.is_open())
+        return std::nullopt;
+    ifs.exceptions(std::ios::failbit);
+    buf << ifs.rdbuf();
+    return buf.str();
+}
+catch (const std::ios::failure&)
+{
+    return std::nullopt;
 }
 
 void exec(const std::string& compiled)
@@ -79,20 +97,21 @@ std::optional<fs::path> this_dir()
 }
 
 
-std::optional<fs::path> get_scripts_folder()
-{
+//std::optional<fs::path> get_scripts_folder()
+//{
+//
+//    auto mod_dir = this_dir();
+//    if (!mod_dir)
+//        return std::nullopt;
+//
+//    auto scripts_path = mod_dir.value() / "Scripts";
+//    if (fs::is_directory(scripts_path))
+//        return scripts_path;
+//
+//    //util::log("Scripts folder not found\n");
+//    return std::nullopt;
+//}
 
-    auto mod_dir = this_dir();
-    if (!mod_dir)
-        return std::nullopt;
-
-    auto scripts_path = mod_dir.value() / "Scripts";
-    if (fs::is_directory(scripts_path))
-        return scripts_path;
-
-    //util::log("Scripts folder not found\n");
-    return std::nullopt;
-}
 pfn_loadbuffer* scan_loadbuffer(HMODULE ua)
 {
     util::log("Hooking... Attention: if logs stops at this line - you should inject dll before loading into world.");
@@ -125,7 +144,8 @@ std::optional<std::string> compile(lua_State* L, const char* script)
     auto ret = luaL_loadstring(L, script);
     if (ret != 0)
     {
-        util::log("compilation failed(%i)\n", ret);
+        std::string result = std::to_string(ret);
+        util::log("compilation failed(%i)\n", result);
         util::log("%s\n", lua_tolstring(L, 1, NULL));
         //util::logdialog(lua_tolstring(L, 1, NULL)); ---- look in util.h; kinda useful but idk how to realise it at loading or how to mek slep
         lua_pop(L, 1);
@@ -148,7 +168,7 @@ void get_gi_L()
     while ((ua = GetModuleHandleW(L"UserAssembly.dll")) == 0) {
         Sleep(50);
     }
-    util::log("FOUND\n");
+    util::log("FOUND\n", "");
     pp_loadbuffer = scan_loadbuffer(ua);
     *pp_loadbuffer = xluaL_loadbuffer_hook;
 
@@ -157,7 +177,8 @@ void get_gi_L()
     while (!gi_L)
         Sleep(50);
 
-    util::log("L: %p\n", gi_L);
+    
+    //util::log("L: %p\n", gi_L);
 
 }
 
@@ -167,7 +188,7 @@ DWORD initLua(LPVOID) {
     freopen("CONOUT$", "w", stdout);
     freopen("CONOUT$", "w", stderr);
     
-	util::log("Starting\n");
+	util::log("Starting\n", "");
     //auto dir = get_scripts_folder();
 
     get_gi_L();

@@ -1,4 +1,5 @@
-#pragma once
+
+
 #include <Windows.h>
 
 #include <optional>
@@ -8,6 +9,7 @@
 #include <filesystem>
 #include "luahook.h"
 #include <chrono>
+#define _CRT_SECURE_NO_WARNINGS
 
 namespace fs = std::filesystem;
 
@@ -15,14 +17,14 @@ void luahookfunc(const char* charLuaScript);
 
 namespace util
 {
-    template<typename... Args>
-    void log(const char* fmt, Args... args)
+    //template<typename... Args>
+    void log(const char* fmt, std::string args)
     {
         printf("[Minty] ");
-        printf(fmt, args...);
+        printf(fmt, args);
     }
-    template<typename... Args>
-    void logdialog(const char* fmt, Args... args)
+
+    void logdialog(const char* fmt)
     {
         const char* errordialogformat = "CS.LAMLMFNDPHJ.HAFGEFPIKFK(\"%s\",\"Minty\")";
         char errordialogtext[256];
