@@ -197,44 +197,15 @@ const char* char_openarea_fog = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/
 
 const char* char_guidearea_fog = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/LevelMapUIManager(Clone)/Canvas3D/MapBackContainer/BigWorld_Map(Clone)/GuideArea"):SetActive()MY_DELIMITER";
 
-const char* char_avatarresize_start = R"MY_DELIMITER(
-local find_active_char = function()
-    local avatarroot = CS.UnityEngine.GameObject.Find("/EntityRoot/AvatarRoot")
-    for i = 0, avatarroot.transform.childCount - 1 do
-      local child = avatarroot.transform:GetChild(i)
-      if child.gameObject.activeInHierarchy then
-        return child.gameObject
-      end
-    end
-  end
-  local find_body = function(avatar)
-    for i = 0, avatar.transform.childCount - 1 do
-      local transform = avatar.transform:GetChild(i)
-      if transform.name == "OffsetDummy" then
-        return transform
-      end
-    end
-  end
-  local scale = function()
-    local avatar = find_active_char()
-    local obj = find_body(avatar):GetChild(0)
-    obj.transform.localScale = CS.UnityEngine.Vector3(2, 2, 2)
-  end
-scale()
-)MY_DELIMITER";
-
-const char* char_avatarresize_end = R"MY_DELIMITER(
-)
-  end
-scale())MY_DELIMITER";
+const char* char_avatarresize = R"MY_DELIMITER(
+CS.UnityEngine.GameObject.Find("/EntityRoot/AvatarRoot").transform.localScale = CS.UnityEngine.Vector3()MY_DELIMITER";
 
 const char* char_showfps = R"MY_DELIMITER(
 local fps = 0
 function Update()
 fps = string.format("%.2f", 1 / tostring(CS.UnityEngine.Time.deltaTime) * CS.UnityEngine.Time.timeScale)
-CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID").transform.position = CS.UnityEngine.Vector3(CS.UnityEngine.Screen.width / 1.89, 0, 0)
 CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID"):GetComponent("Text").text = "FPS: " .. fps
-CS.UnityEngine.QualitySettings.vSyncCount = 0
+
 end
 Update()
 )MY_DELIMITER";

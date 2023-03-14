@@ -144,7 +144,6 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				}
 				if (show_modelswap)
 				{
-
 					ImGui::Indent();
 
 					if (ImGui::Button("Clone model")) {
@@ -158,37 +157,48 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 				static bool show_resizer = false;
 				static float boob_size = 1.0f;
-				if (ImGui::Checkbox("Booba resizer", &show_resizer)) {}
-
-				if (show_resizer)
-				{
-					ImGui::Indent();
-
-					if (ImGui::Button("Initiate resize")) {
-						boob_size = 1.0f;
-						luahookfunc(char_bub_initiate);
-					}
-					ImGui::SameLine();
-					if (ImGui::SliderFloat("Booba scale", &boob_size, 0.0f, 4.0f, "%.3f"))
+				ImGui::Checkbox("Booba resizer", &show_resizer);
+					if (show_resizer)
 					{
-						std::string result = char_bub_resize + std::to_string(boob_size) + "," + std::to_string(boob_size) + "," + std::to_string(boob_size) + ")";
-						luahookfunc(result.c_str());
-					}
-					ImGui::Unindent();
-				}
+						ImGui::Indent();
+						if (ImGui::Button("Initiate resize")) {
+							boob_size = 1.0f;
+							luahookfunc(char_bub_initiate);
+						}
 
-				static float avatarsize = 1;
+						ImGui::SameLine();
+
+						if (ImGui::SliderFloat("Booba scale", &boob_size, 0.0f, 4.0f, "%.3f"))
+						{
+							std::string result = char_bub_resize + std::to_string(boob_size) + "," + std::to_string(boob_size) + "," + std::to_string(boob_size) + ")";
+							luahookfunc(result.c_str());
+						}
+						ImGui::Unindent();
+					}
+
 				static bool show_avatarresizer = false;
 				ImGui::Checkbox("Avatar resizer", &show_avatarresizer);
 
 				if (show_avatarresizer) {
+					static float avatarsize = 1.0f;
 					ImGui::Indent();
-					ImGui::SliderFloat("Avatar scale", &avatarsize, 0.0f, 25.0f, "%.3f");
-					std::string result = char_avatarresize_start + std::to_string(avatarsize) + "," + std::to_string(avatarsize) + "," + std::to_string(avatarsize) + char_avatarresize_end;
-					luahookfunc(result.c_str());
-				}
-				else {
+					std::string result = char_avatarresize + std::to_string(avatarsize) + "," + std::to_string(avatarsize) + "," + std::to_string(avatarsize) + ")";
 
+					if (ImGui::SliderFloat("Avatar scale", &avatarsize, 0.0f, 25.0f, "%.3f"))
+						{
+							luahookfunc(result.c_str());
+						}
+
+					ImGui::SameLine();
+
+					if (ImGui::Button("reset")) 
+						{
+							std::string result = std::string(char_avatarresize) + "1 , 1, 1)";
+							avatarsize = 1.0f
+							luahookfunc(result.c_str());
+						}
+
+					ImGui::Unindent();
 				}
 
 				static bool show_colorator3000 = false;
@@ -196,42 +206,30 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				static float cc_g = 1.0f;
 				static float cc_b = 1.0f;
 				static float cc_a = 1.0f;
-				if (ImGui::Checkbox("Show infusion changer", &show_colorator3000)) {}
 
+				ImGui::Checkbox("Show infusion changer", &show_colorator3000);
 				if (show_colorator3000)
 				{
 					ImGui::Indent();
 
 					if (ImGui::Button("Change")) {
-
 						std::string result = char_eleminf + std::to_string(cc_r) + "," + std::to_string(cc_g) + "," + std::to_string(cc_b) + "," + std::to_string(cc_a) + char_eleminf_end;
 						luahookfunc(result.c_str());
 					}
 					ImGui::SameLine();
-					if (ImGui::SliderFloat("Red color", &cc_r, 0.0f, 1.0f, "%.3f"))
-					{
+					ImGui::SliderFloat("Red color", &cc_r, 0.0f, 1.0f, "%.3f");
+					ImGui::SliderFloat("Green color", &cc_g, 0.0f, 1.0f, "%.3f");
+					ImGui::SliderFloat("Blue color", &cc_b, 0.0f, 1.0f, "%.3f");
+					ImGui::SliderFloat("Alpha", &cc_a, 0.0f, 1.0f, "%.3f");
 
-					}
-					if (ImGui::SliderFloat("Green color", &cc_g, 0.0f, 1.0f, "%.3f"))
-					{
-
-					}
-					if (ImGui::SliderFloat("Blue color", &cc_b, 0.0f, 1.0f, "%.3f"))
-					{
-
-					}
-					if (ImGui::SliderFloat("Alpha", &cc_a, 0.0f, 1.0f, "%.3f"))
-					{
-
-					}
 					ImGui::Unindent();
 				}
 
+				ImGui::Separator();
 				ImGui::Text("World");
-
-				static bool browser_state = false;
-				if (ImGui::Checkbox("Browser", &browser_state)) {
-					if (browser_state) {
+				static bool browser_is_enabled = false;
+				if (ImGui::Checkbox("Browser", &browser_is_enabled)) {
+					if (browser_is_enabled) {
 						luahookfunc(char_browser_on);
 					}
 					else {
@@ -239,13 +237,15 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					}
 				}
 
-				static bool nofog = false;
-				ImGui::Checkbox("Disable fog", &nofog);
-				if (nofog) {
-					luahookfunc(R"MY_DELIMITER(CS.UnityEngine.RenderSettings.fog = false)MY_DELIMITER");
-				}
-				else {
-					luahookfunc(R"MY_DELIMITER(CS.UnityEngine.RenderSettings.fog = true)MY_DELIMITER");
+				static bool no_fog = false;
+				if(ImGui::Checkbox("Disable fog", &no_fog))
+				{
+					if (no_fog) {
+						luahookfunc(R"MY_DELIMITER(CS.UnityEngine.RenderSettings.fog = false)MY_DELIMITER");
+					}
+					else {
+						luahookfunc(R"MY_DELIMITER(CS.UnityEngine.RenderSettings.fog = true)MY_DELIMITER");
+					}
 				}
 
 				if (ImGui::SliderFloat("Timescale", &TimeScale, 0.0f, 2.0f, "%.3f"))
@@ -254,51 +254,38 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					luahookfunc(result.c_str());
 				}
 				ImGui::SameLine();
+
 				if (ImGui::Button("Reset (F11)")) {
 					TimeScale = 1.0f;
 					std::string result = "CS.UnityEngine.Time.timeScale = 1.0";
 					luahookfunc(result.c_str());
 				}
 
+				ImGui::Separator();
 				ImGui::Text("Misc");
-
-				static bool isfpsshown = false;
-				ImGui::Checkbox("Show FPS", &isfpsshown);
-				if (isfpsshown) {
-					luahookfunc(char_showfps);
-				}
-				else {
-					luahookfunc(R"MY_DELIMITER(
-CS.UnityEngine.QualitySettings.vSyncCount = 1
-CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID"):GetComponent("Text").text = "UID: 0")MY_DELIMITER");
-				}
+				static bool is_fps_shown = false;
+				ImGui::Checkbox("Show FPS", &is_fps_shown);
+				if (is_fps_shown) 
+					{
+						luahookfunc(char_showfps);
+					}
 
 				static bool unlockfps = false;
 				static float targetfps = 60;
 				ImGui::Checkbox("Unlock FPS", &unlockfps);
+					if (unlockfps) {
+						ImGui::Indent();
+						ImGui::SliderFloat("Target FPS", &targetfps, 10.0f, 360.0f, "%.3f");
+						std::string result = "CS.UnityEngine.Application.targetFrameRate = " + std::to_string(targetfps);
+						luahookfunc(result.c_str());
+						luahookfunc("CS.UnityEngine.QualitySettings.vSyncCount = 0");
+						ImGui::Unindent();
+					}
 
-				if (unlockfps) {
-					ImGui::Indent();
-					ImGui::SliderFloat("Target FPS", &targetfps, 10.0f, 360.0f, "%.3f");
-					std::string result = "CS.UnityEngine.Application.targetFrameRate = " + std::to_string(targetfps);
-					luahookfunc(result.c_str());
-					ImGui::Unindent();
-				}
-				else {
-				}
-
-				static bool isuishown = true;
-				// ImGui::Checkbox("Hide UI", &isuishown);
-				if (isuishown) {
-					luahookfunc(R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/UICamera"):SetActive(true))MY_DELIMITER");
-				}
-				else {
-					luahookfunc(R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/UICamera"):SetActive(false))MY_DELIMITER");
-				}
-
+				ImGui::Separator();
 				ImGui::Text("Lua");
 				ImGui::Checkbox("Lua editor", &showEditor);
-
+				
 				ImGui::EndTabItem();
 			}
 
@@ -372,11 +359,6 @@ CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID"):GetCo
 					//ImGui::InputText("##path3", path3, sizeof(path3));
 					if (ImGui::BeginMenu("File"))
 					{
-
-						if (ImGui::MenuItem("Save as button (WIP, not functional)"))
-						{
-
-						}
 
 						if (ImGui::MenuItem("Load .lua file"))
 						{
@@ -499,15 +481,20 @@ CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID"):GetCo
 				ImGui::EndTabItem();
 			}
 
-			if (ImGui::BeginTabItem("Perf"))
+			if (ImGui::BeginTabItem("Performance"))
 			{
-				while (true) 
+				if (true) 
 				{
+					static float frametime = 0;
+					static float fps = 0;
+
 					ImGuiIO& io = ImGui::GetIO();
-					// float frameTime = io.DeltaTime;
-					// float fps = 1 / frameTime;
-					// ImGui::Text(fps);
-					// std::this_thread::sleep_for(std::chrono::seconds(1));
+
+					frametime = io.DeltaTime;
+
+					fps = 1.0f / frametime;
+
+					ImGui::Text("fps: %s", std::to_string(fps).c_str());
 				}
 				
 				ImGui::EndTabItem();
