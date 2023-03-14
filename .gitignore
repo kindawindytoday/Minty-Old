@@ -1,3 +1,6 @@
 /x64
 /minty/x64
 /.vs
+/Debug
+/Minty/Debug
+/Launcher/x64

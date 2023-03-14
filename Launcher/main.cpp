@@ -5,10 +5,31 @@
 #include <fstream>
 #define _CRT_SECURE_NO_WARNINGS
 
-#include "../minty/gilua/util.h"
+//#include "../minty/gilua/util.h"
 //#include "../minty/gilua/luahook.h"
 
 namespace fs = std::filesystem;
+
+
+
+namespace util
+{
+    //template<typename... Args>
+    void log(const char* fmt, std::string args)
+    {
+        printf("[Minty] ");
+        printf(fmt, args);
+    }
+
+    void logdialog(const char* fmt)
+    {
+        const char* errordialogformat = "CS.LAMLMFNDPHJ.HAFGEFPIKFK(\"%s\",\"Minty\")";
+        char errordialogtext[256];
+        snprintf(errordialogtext, sizeof(errordialogtext), errordialogformat, fmt);
+        //luahookfunc(errordialogtext);
+        printf(errordialogtext);
+    }
+}
 
 bool InjectStandard(HANDLE hTarget, const char* dllpath)
 {
@@ -50,6 +71,41 @@ bool InjectStandard(HANDLE hTarget, const char* dllpath)
     return true;
 }
 
+std::optional<std::string> read_whole_file(const fs::path& file)
+try
+{
+    std::stringstream buf;
+    std::ifstream ifs(file);
+    if (!ifs.is_open())
+        return std::nullopt;
+    ifs.exceptions(std::ios::failbit);
+    buf << ifs.rdbuf();
+    return buf.str();
+}
+catch (const std::ios::failure&)
+{
+    return std::nullopt;
+}
+
+std::optional<fs::path> this_dir()
+{
+    HMODULE mod = NULL;
+    TCHAR path[MAX_PATH]{};
+    if (!GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, (LPCTSTR)&this_dir, &mod))
+    {
+        printf("GetModuleHandleEx failed (%i)\n", GetLastError());
+        return std::nullopt;
+    }
+
+    if (!GetModuleFileName(mod, path, MAX_PATH))
+    {
+        printf("GetModuleFileName failed (%i)\n", GetLastError());
+        return std::nullopt;
+    }
+
+    return fs::path(path).remove_filename();
+}
+
 int main()
 {
     auto current_dir = this_dir();
@@ -59,7 +115,7 @@ int main()
     auto dll_path = current_dir.value() / "Minty.dll";
     if (!fs::is_regular_file(dll_path))
     {
-        printf("GILua.dll not found\n");
+        printf("Minty.dll not found\n");
         system("pause");
         return 0;
     }

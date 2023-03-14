@@ -1,7 +1,7 @@
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
 #include <Windows.h>
-
+#define OFFET 0x265CFF0
 #include <cstdio>
 #include <cstdint>
 #include <sstream>
@@ -31,7 +31,7 @@ pfn_loadbuffer* pp_loadbuffer;
 int xluaL_loadbuffer_hook(lua_State* L, const char* chunk, size_t sz, const char* chunkname)
 {
     gi_L = L;
-    util::log("xluaL_loadbuffer_hook called. Lua ready!");
+    util::log("xluaL_loadbuffer_hook called. Lua ready!","");
     util::logdialog("Succesfully hooked. Happy hacking!");
     main_thread = OpenThread(THREAD_ALL_ACCESS, false, GetCurrentThreadId());
     xlua = GetModuleHandleW(L"xlua");
@@ -40,21 +40,21 @@ int xluaL_loadbuffer_hook(lua_State* L, const char* chunk, size_t sz, const char
 }
 
 
-std::optional<std::string> read_whole_file(const fs::path& file)
-try
-{
-    std::stringstream buf;
-    std::ifstream ifs(file);
-    if (!ifs.is_open())
-        return std::nullopt;
-    ifs.exceptions(std::ios::failbit);
-    buf << ifs.rdbuf();
-    return buf.str();
-}
-catch (const std::ios::failure&)
-{
-    return std::nullopt;
-}
+//std::optional<std::string> read_whole_file(const fs::path& file)
+//try
+//{
+//    std::stringstream buf;
+//    std::ifstream ifs(file);
+//    if (!ifs.is_open())
+//        return std::nullopt;
+//    ifs.exceptions(std::ios::failbit);
+//    buf << ifs.rdbuf();
+//    return buf.str();
+//}
+//catch (const std::ios::failure&)
+//{
+//    return std::nullopt;
+//}
 
 void exec(const std::string& compiled)
 {
@@ -77,24 +77,24 @@ void exec(const std::string& compiled)
     }
 }
 
-std::optional<fs::path> this_dir()
-{
-    HMODULE mod = NULL;
-    TCHAR path[MAX_PATH]{};
-    if (!GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, (LPCTSTR)&this_dir, &mod))
-    {
-        printf("GetModuleHandleEx failed (%i)\n", GetLastError());
-        return std::nullopt;
-    }
-
-    if (!GetModuleFileName(mod, path, MAX_PATH))
-    {
-        printf("GetModuleFileName failed (%i)\n", GetLastError());
-        return std::nullopt;
-    }
-
-    return fs::path(path).remove_filename();
-}
+//std::optional<fs::path> this_dir()
+//{
+//    HMODULE mod = NULL;
+//    TCHAR path[MAX_PATH]{};
+//    if (!GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, (LPCTSTR)&this_dir, &mod))
+//    {
+//        printf("GetModuleHandleEx failed (%i)\n", GetLastError());
+//        return std::nullopt;
+//    }
+//
+//    if (!GetModuleFileName(mod, path, MAX_PATH))
+//    {
+//        printf("GetModuleFileName failed (%i)\n", GetLastError());
+//        return std::nullopt;
+//    }
+//
+//    return fs::path(path).remove_filename();
+//}
 
 
 //std::optional<fs::path> get_scripts_folder()
@@ -114,7 +114,7 @@ std::optional<fs::path> this_dir()
 
 pfn_loadbuffer* scan_loadbuffer(HMODULE ua)
 {
-    util::log("Hooking... Attention: if logs stops at this line - you should inject dll before loading into world.");
+    util::log("Hooking... Attention: if logs stops at this line - you should inject dll before loading into world.","");
     auto il2cpp = util::pe::get_section_by_name(ua, "il2cpp");
     auto rdata = util::pe::get_section_by_name(ua, ".rdata");
 
@@ -172,7 +172,7 @@ void get_gi_L()
     pp_loadbuffer = scan_loadbuffer(ua);
     *pp_loadbuffer = xluaL_loadbuffer_hook;
 
-    //util::log("Waiting for Lua...\n");
+    //util::log("Waiting for Lua...\n","");
 
     while (!gi_L)
         Sleep(50);
