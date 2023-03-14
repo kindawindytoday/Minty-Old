@@ -12,6 +12,8 @@
 #include <vector>
 #include "imgui/L2DFileDialog.h"
 #define _CRT_SECURE_NO_WARNINGS
+#include <chrono>
+#include <thread>
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -177,10 +179,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 				static float avatarsize = 1;
 				static bool show_avatarresizer = false;
-				if (ImGui::Checkbox("Avatar resizer", &show_avatarresizer));
+				ImGui::Checkbox("Avatar resizer", &show_avatarresizer);
+
 				if (show_avatarresizer) {
 					ImGui::Indent();
-					if (ImGui::SliderFloat("Avatar scale", &avatarsize, 0.0f, 25.0f, "%.3f"));
+					ImGui::SliderFloat("Avatar scale", &avatarsize, 0.0f, 25.0f, "%.3f");
 					std::string result = char_avatarresize_start + std::to_string(avatarsize) + "," + std::to_string(avatarsize) + "," + std::to_string(avatarsize) + char_avatarresize_end;
 					luahookfunc(result.c_str());
 				}
@@ -237,7 +240,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				}
 
 				static bool nofog = false;
-				if (ImGui::Checkbox("Disable fog in world", &nofog));
+				ImGui::Checkbox("Disable fog", &nofog);
 				if (nofog) {
 					luahookfunc(R"MY_DELIMITER(CS.UnityEngine.RenderSettings.fog = false)MY_DELIMITER");
 				}
@@ -260,7 +263,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				ImGui::Text("Misc");
 
 				static bool isfpsshown = false;
-				if (ImGui::Checkbox("Show FPS", &isfpsshown));
+				ImGui::Checkbox("Show FPS", &isfpsshown);
 				if (isfpsshown) {
 					luahookfunc(char_showfps);
 				}
@@ -272,21 +275,20 @@ CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID"):GetCo
 
 				static bool unlockfps = false;
 				static float targetfps = 60;
-				if (ImGui::Checkbox("Unlock FPS", &unlockfps));
+				ImGui::Checkbox("Unlock FPS", &unlockfps);
+
 				if (unlockfps) {
 					ImGui::Indent();
-					if (ImGui::SliderFloat("Target FPS", &targetfps, 10.0f, 360.0f, "%.3f"));
+					ImGui::SliderFloat("Target FPS", &targetfps, 10.0f, 360.0f, "%.3f");
 					std::string result = "CS.UnityEngine.Application.targetFrameRate = " + std::to_string(targetfps);
 					luahookfunc(result.c_str());
 					ImGui::Unindent();
 				}
 				else {
-					luahookfunc("CS.UnityEngine.Application.targetFrameRate = 60");
-
 				}
 
 				static bool isuishown = true;
-				if (ImGui::Checkbox("Hide UI", &isuishown));
+				// ImGui::Checkbox("Hide UI", &isuishown);
 				if (isuishown) {
 					luahookfunc(R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/UICamera"):SetActive(true))MY_DELIMITER");
 				}
@@ -295,7 +297,7 @@ CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID"):GetCo
 				}
 
 				ImGui::Text("Lua");
-				if (ImGui::Checkbox("Lua editor", &showEditor));
+				ImGui::Checkbox("Lua editor", &showEditor);
 
 				ImGui::EndTabItem();
 			}
@@ -494,6 +496,20 @@ CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID"):GetCo
 					// Open website in browser
 					system("start https://github.com/kindawindytoday");
 				}
+				ImGui::EndTabItem();
+			}
+
+			if (ImGui::BeginTabItem("Perf"))
+			{
+				while (true) 
+				{
+					ImGuiIO& io = ImGui::GetIO();
+					// float frameTime = io.DeltaTime;
+					// float fps = 1 / frameTime;
+					// ImGui::Text(fps);
+					// std::this_thread::sleep_for(std::chrono::seconds(1));
+				}
+				
 				ImGui::EndTabItem();
 			}
 
