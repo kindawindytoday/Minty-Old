@@ -13,7 +13,6 @@
 #include "imgui/L2DFileDialog.h"
 #define _CRT_SECURE_NO_WARNINGS
 
-
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 Present oPresent;
@@ -109,7 +108,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		
 		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[fontIndex_menu]);
 
-		if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_F11)))
+		if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_F11)))
 		{
 			TimeScale = 1.0f;
 			std::string result = "CS.UnityEngine.Time.timeScale = 1.0";
