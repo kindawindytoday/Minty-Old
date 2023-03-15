@@ -511,34 +511,35 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			if (ImGui::BeginTabItem("Performance"))
 			{
 
-				static float fps_buffer[1200] = {}; 
-				static int buffer_index = 0;
-				static float fps_max = 0;
+				//static float fps_buffer[1200] = {}; 
+				//static int buffer_index = 0;
+				//static float fps_max = 0;
 				ImGuiIO& io = ImGui::GetIO();
 				float frametime = io.DeltaTime;
 				float fps = 1.0f / frametime;
 				static float timer = 0.0f;
 				timer += frametime;
 				static float fps_slow = 0.0f;
-				fps_buffer[buffer_index] = fps;
-				buffer_index = (buffer_index + 1) % 1200;
-				if (fps > fps_max) {
-					fps_max = fps;
-				}
-				else if (buffer_index == 0) {
-					fps_max = 0;
-					for (int i = 0; i < 1200; i++) {
-						if (fps_buffer[i] > fps_max) {
-							fps_max = fps_buffer[i];
-						}
-					}
-				}
+				// fps_buffer[buffer_index] = fps;
+				// buffer_index = (buffer_index + 1) % 1200;
+				// if (fps > fps_max) {
+				// 	fps_max = fps;
+				// }
+				// else if (buffer_index == 0) {
+				// 	fps_max = 0;
+				// 	for (int i = 0; i < 1200; i++) {
+				// 		if (fps_buffer[i] > fps_max) {
+				// 			fps_max = fps_buffer[i];
+				// 		}
+				// 	}
+				// }
+				//ImGui::PlotLines("FPS", fps_buffer, 1200, buffer_index, NULL, 0.0f, fps_max + 10.0f, ImVec2(0, 80));
 
 				if (timer > 1) {
 				 	fps_slow = 1.0f / frametime;
 					timer = 0.0f;
 				}
-				ImGui::PlotLines("FPS", fps_buffer, 1200, buffer_index, NULL, 0.0f, fps_max + 10.0f, ImVec2(0, 80));
+				
 				ImGui::Text("Current FPS: %.2f", fps_slow);
 
 				ImGui::EndTabItem();

@@ -1,5 +1,3 @@
-
-
 #include <Windows.h>
 
 #include <optional>
@@ -17,11 +15,11 @@ void luahookfunc(const char* charLuaScript);
 
 namespace util
 {
-    //template<typename... Args>
-    void log(const char* fmt, std::string args)
+    template<typename... Args>
+    void log(const char* fmt, Args... args)
     {
         printf("[Minty] ");
-        printf(fmt, args);
+        printf(fmt, args...);
     }
 
     void logdialog(const char* fmt)
