@@ -15,6 +15,8 @@
 #include <chrono>
 #include <thread>
 
+using namespace std;
+
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 Present oPresent;
@@ -113,7 +115,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_F11)))
 		{
 			TimeScale = 1.0f;
-			std::string result = "CS.UnityEngine.Time.timeScale = 1.0";
+			string result = "CS.UnityEngine.Time.timeScale = 1.0";
 			luahookfunc(result.c_str());
 		}
 
@@ -139,7 +141,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				ImGui::InputTextWithHint("##input", "Enter custom UID text here...", inputTextBuffer, sizeof(inputTextBuffer));
 				ImGui::SameLine();
 				if (ImGui::Button("Update custom UID")) {
-					std::string result = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID"):GetComponent("Text").text = ")MY_DELIMITER" + std::string(inputTextBuffer) + "\"";
+					string result = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID"):GetComponent("Text").text = ")MY_DELIMITER" + string(inputTextBuffer) + "\"";
 					luahookfunc(result.c_str());
 				}
 
@@ -175,7 +177,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 						if (ImGui::SliderFloat("Booba scale", &boob_size, 0.0f, 4.0f, "%.3f"))
 						{
-							std::string result = char_bub_resize + std::to_string(boob_size) + "," + std::to_string(boob_size) + "," + std::to_string(boob_size) + ")";
+							string result = char_bub_resize + to_string(boob_size) + "," + to_string(boob_size) + "," + to_string(boob_size) + ")";
 							luahookfunc(result.c_str());
 						}
 						ImGui::Unindent();
@@ -187,7 +189,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				if (show_avatarresizer) {
 					static float avatarsize = 1.0f;
 					ImGui::Indent();
-					std::string result = char_avatarresize + std::to_string(avatarsize) + "," + std::to_string(avatarsize) + "," + std::to_string(avatarsize) + ")";
+					string result = char_avatarresize + to_string(avatarsize) + "," + to_string(avatarsize) + "," + to_string(avatarsize) + ")";
 
 					if (ImGui::SliderFloat("Avatar scale", &avatarsize, 0.0f, 25.0f, "%.3f"))
 						{
@@ -198,7 +200,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 					if (ImGui::Button("reset")) 
 						{
-							std::string result = std::string(char_avatarresize) + "1 , 1, 1)";
+							string result = string(char_avatarresize) + "1 , 1, 1)";
 							avatarsize = 1.0f;
 							luahookfunc(result.c_str());
 						}
@@ -218,7 +220,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					ImGui::Indent();
 
 					if (ImGui::Button("Change")) {
-						std::string result = char_eleminf + std::to_string(cc_r) + "," + std::to_string(cc_g) + "," + std::to_string(cc_b) + "," + std::to_string(cc_a) + char_eleminf_end;
+						string result = char_eleminf + to_string(cc_r) + "," + to_string(cc_g) + "," + to_string(cc_b) + "," + to_string(cc_a) + char_eleminf_end;
 						luahookfunc(result.c_str());
 					}
 					ImGui::SameLine();
@@ -255,14 +257,14 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 				if (ImGui::SliderFloat("Timescale", &TimeScale, 0.0f, 2.0f, "%.3f"))
 				{
-					std::string result = "CS.UnityEngine.Time.timeScale = " + std::to_string(TimeScale);
+					string result = "CS.UnityEngine.Time.timeScale = " + to_string(TimeScale);
 					luahookfunc(result.c_str());
 				}
 				ImGui::SameLine();
 
 				if (ImGui::Button("Reset (F11)")) {
 					TimeScale = 1.0f;
-					std::string result = "CS.UnityEngine.Time.timeScale = 1.0";
+					string result = "CS.UnityEngine.Time.timeScale = 1.0";
 					luahookfunc(result.c_str());
 				}
 
@@ -281,7 +283,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					if (unlockfps) {
 						ImGui::Indent();
 						ImGui::SliderFloat("Target FPS", &targetfps, 10.0f, 360.0f, "%.3f");
-						std::string result = "CS.UnityEngine.Application.targetFrameRate = " + std::to_string(targetfps);
+						string result = "CS.UnityEngine.Application.targetFrameRate = " + to_string(targetfps);
 						luahookfunc(result.c_str());
 						luahookfunc("CS.UnityEngine.QualitySettings.vSyncCount = 0");
 						ImGui::Unindent();
@@ -318,7 +320,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 				if (ImGui::Button("Run"))
 				{
-					std::string code = editor.GetText();
+					string code = editor.GetText();
 
 					if (!code.empty())
 					{
@@ -328,7 +330,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				ImGui::SameLine();
 				//saver to button below.
 
-				static std::vector<std::pair<std::string, std::function<void()>>> buttonFuncs;
+				static vector<pair<string, function<void()>>> buttonFuncs;
 				static char buttonLabel[256] = "";
 
 				if (ImGui::Button("Create new button")) {
@@ -338,11 +340,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				if (ImGui::BeginPopup("New button")) {
 					ImGui::InputText("Label", buttonLabel, 256);
 					if (ImGui::Button("Create")) {
-						std::string functionText = editor.GetText();
-						std::function<void()> buttonFunc = [functionText]() {
+						string functionText = editor.GetText();
+						function<void()> buttonFunc = [functionText]() {
 							luahookfunc(functionText.c_str());
 						};
-						buttonFuncs.emplace_back(std::string(buttonLabel), buttonFunc);
+						buttonFuncs.emplace_back(string(buttonLabel), buttonFunc);
 						memset(buttonLabel, 0, sizeof(buttonLabel));
 						ImGui::CloseCurrentPopup();
 					}
@@ -490,17 +492,17 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					ImGui::Indent();
 
 					ImGui::Text("ImGui\n");
-					std::string licenseimgui = std::string(license_ImGui) + std::string(license_Generic);
+					string licenseimgui = string(license_ImGui) + string(license_Generic);
 					ImGui::Text(licenseimgui.c_str());
 					ImGui::Separator();
 
 					ImGui::Text("ImGuiColorTextEdit\n");
-					std::string licensetextedit = std::string(license_ColorTextEdit) + std::string(license_Generic);
+					string licensetextedit = string(license_ColorTextEdit) + string(license_Generic);
 					ImGui::Text(licensetextedit.c_str());
 					ImGui::Separator();
 					
 					ImGui::Text("ImGuiFileDialog\n");
-					std::string licensefiledialog = std::string(license_FileDialog) + std::string(license_Generic);
+					string licensefiledialog = string(license_FileDialog) + string(license_Generic);
 					ImGui::Text(licensefiledialog.c_str());
 
 					ImGui::Unindent();
