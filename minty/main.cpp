@@ -128,6 +128,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 			if (ImGui::BeginTabItem("Main"))
 			{
+				if (!is_hook_success)
+				{
+					ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "WARNING! LUA NOT HOOKED");
+					ImGui::Separator();
+				}
 				ImGui::Text("Player");
 
 				static char inputTextBuffer[512] = "";
@@ -194,7 +199,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					if (ImGui::Button("reset")) 
 						{
 							std::string result = std::string(char_avatarresize) + "1 , 1, 1)";
-							avatarsize = 1.0f
+							avatarsize = 1.0f;
 							luahookfunc(result.c_str());
 						}
 
@@ -487,12 +492,16 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				{
 					static float frametime = 0;
 					static float fps = 0;
-
+					static float timer = 0;
 					ImGuiIO& io = ImGui::GetIO();
 
 					frametime = io.DeltaTime;
-
-					fps = 1.0f / frametime;
+					timer += frametime;
+					if (timer > 1)
+					{
+						fps = 1.0f / frametime;
+						timer = 0.0f;
+					}
 
 					ImGui::Text("fps: %s", std::to_string(fps).c_str());
 				}

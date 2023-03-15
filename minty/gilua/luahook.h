@@ -25,6 +25,7 @@ HMODULE xlua;
 HANDLE main_thread;
 
 auto gi_LL = luaL_newstate();
+static bool is_hook_success = false;
 
 using pfn_loadbuffer = int (*)(lua_State*, const char*, size_t, const char*);
 pfn_loadbuffer* pp_loadbuffer;
@@ -33,6 +34,7 @@ int xluaL_loadbuffer_hook(lua_State* L, const char* chunk, size_t sz, const char
     gi_L = L;
     util::log("xluaL_loadbuffer_hook called. Lua ready!","");
     util::logdialog("Succesfully hooked. Happy hacking!");
+    is_hook_success = true;
     main_thread = OpenThread(THREAD_ALL_ACCESS, false, GetCurrentThreadId());
     xlua = GetModuleHandleW(L"xlua");
     *pp_loadbuffer = (pfn_loadbuffer)GetProcAddress(xlua, "xluaL_loadbuffer");
