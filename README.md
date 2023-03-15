@@ -2,15 +2,19 @@
 Very ril cheat in some anime game that could do cool stuff like
 ## Features
 
-```bash
-Model swap (clone and paste)
-Booba resize
-Speed up time (see for yourself ;)
-Open browser in game so you could order pizza without exiting game
-There are more features but you gotta see them yourself ;)
+```
+• Model swap (clone and paste)
+• Booba resize (see for yourself ;)
+• Scaling time
+• Open browser in game so you could order pizza without exiting game
+• Runtime lua console
+• Resizing avatar
+• Unlocking and showing FPS
+• Ability to create your own custom functions! You can make your own lua scripts, or look for them in our discord.
+• And also bunch of small stuff, check it out!
 ```
 ## Contributing
-Pull requests are very welcome. Pls open an issue first to discuss what you would like to change.
+Program is actively developing and open-source, so pull requests are very welcome. Please open an issue first to discuss what you would like to change.
 
 ## Discord Server
 Kinda Windy Today: https://discord.gg/tPBEpV6ceC
