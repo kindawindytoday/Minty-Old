@@ -212,7 +212,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				static float cc_b = 1.0f;
 				static float cc_a = 1.0f;
 
-				ImGui::Checkbox("Show infusion changer", &show_colorator3000);
+				ImGui::Checkbox("Infusion changer", &show_colorator3000);
 				if (show_colorator3000)
 				{
 					ImGui::Indent();
@@ -268,12 +268,12 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 				ImGui::Separator();
 				ImGui::Text("Misc");
-				static bool is_fps_shown = false;
-				ImGui::Checkbox("Show FPS", &is_fps_shown);
-				if (is_fps_shown) 
-					{
-						luahookfunc(char_showfps);
-					}
+				// static bool is_fps_shown = false;
+				// ImGui::Checkbox("Show FPS", &is_fps_shown);
+				// if (is_fps_shown) 
+				// {
+				// 	luahookfunc(char_showfps);
+				// }
 
 				static bool unlockfps = false;
 				static float targetfps = 60;
@@ -483,29 +483,64 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					// Open website in browser
 					system("start https://github.com/kindawindytoday");
 				}
+				ImGui::Separator();
+
+				if (ImGui::CollapsingHeader("License"))
+				{
+					ImGui::Indent();
+
+					ImGui::Text("ImGui\n");
+					std::string licenseimgui = std::string(license_ImGui) + std::string(license_Generic);
+					ImGui::Text(licenseimgui.c_str());
+					ImGui::Separator();
+
+					ImGui::Text("ImGuiColorTextEdit\n");
+					std::string licensetextedit = std::string(license_ColorTextEdit) + std::string(license_Generic);
+					ImGui::Text(licensetextedit.c_str());
+					ImGui::Separator();
+					
+					ImGui::Text("ImGuiFileDialog\n");
+					std::string licensefiledialog = std::string(license_FileDialog) + std::string(license_Generic);
+					ImGui::Text(licensefiledialog.c_str());
+
+					ImGui::Unindent();
+				}
 				ImGui::EndTabItem();
 			}
 
 			if (ImGui::BeginTabItem("Performance"))
 			{
-				if (true) 
-				{
-					static float frametime = 0;
-					static float fps = 0;
-					static float timer = 0;
-					ImGuiIO& io = ImGui::GetIO();
 
-					frametime = io.DeltaTime;
-					timer += frametime;
-					if (timer > 1)
-					{
-						fps = 1.0f / frametime;
-						timer = 0.0f;
-					}
-
-					ImGui::Text("fps: %s", std::to_string(fps).c_str());
+				static float fps_buffer[1200] = {}; 
+				static int buffer_index = 0;
+				static float fps_max = 0;
+				ImGuiIO& io = ImGui::GetIO();
+				float frametime = io.DeltaTime;
+				float fps = 1.0f / frametime;
+				static float timer = 0.0f;
+				timer += frametime;
+				static float fps_slow = 0.0f;
+				fps_buffer[buffer_index] = fps;
+				buffer_index = (buffer_index + 1) % 1200;
+				if (fps > fps_max) {
+					fps_max = fps;
 				}
-				
+				else if (buffer_index == 0) {
+					fps_max = 0;
+					for (int i = 0; i < 1200; i++) {
+						if (fps_buffer[i] > fps_max) {
+							fps_max = fps_buffer[i];
+						}
+					}
+				}
+
+				if (timer > 1) {
+				 	fps_slow = 1.0f / frametime;
+					timer = 0.0f;
+				}
+				ImGui::PlotLines("FPS", fps_buffer, 1200, buffer_index, NULL, 0.0f, fps_max + 10.0f, ImVec2(0, 80));
+				ImGui::Text("Current FPS: %.2f", fps_slow);
+
 				ImGui::EndTabItem();
 			}
 
