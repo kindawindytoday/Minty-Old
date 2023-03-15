@@ -1,5 +1,5 @@
 # Minty
-Very ril cheat in some anime game that could do cool stuff like
+Very ril cheat in some anime game that could do cool stuff 
 ## Features
 
 ```
