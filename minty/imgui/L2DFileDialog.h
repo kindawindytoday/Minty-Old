@@ -364,7 +364,7 @@ namespace FileDialog {
 						strcpy(buffer, (file_dialog_current_path + (file_dialog_current_path.back() == '\\' ? "" : "\\") + file_dialog_current_file).c_str());
 						strcpy_s(file_dialog_error, "");
 						std::string result = (file_dialog_current_path + (file_dialog_current_path.back() == '\\' ? "" : "\\") + file_dialog_current_file);
-						util::log("Loaded .lua file: %s",result.c_str());
+						util::log(2,"Loaded .lua file: %s",result.c_str());
 						luahookfunc(readFile(result.c_str()));
 						reset_everything();
 
