@@ -36,8 +36,6 @@ void InitImGui()
 	ImGui_ImplDX11_Init(pDevice, pContext);
 }
 
-
-
 LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 	if (true && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
@@ -453,6 +451,9 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					}
 				}
 				ImGui::SameLine();
+				if (ImGui::Button("Clear")) {
+					log_textbuf.clear();
+				}
 				Filter.Draw("Filter");
 				ImGui::Separator();
 				if (Filter.IsActive())
@@ -478,8 +479,6 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				
 				ImGui::End();
 			}
-
-
 
 			if (ImGui::BeginTabItem("Themes"))
 			{

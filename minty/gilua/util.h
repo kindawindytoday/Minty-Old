@@ -11,7 +11,6 @@
 #include "../imgui/imgui.h"
 #include "logtextbuf.h"
 
-
 namespace fs = std::filesystem;
 
 void luahookfunc(const char* charLuaScript);
