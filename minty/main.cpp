@@ -483,11 +483,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			if (ImGui::BeginTabItem("Themes"))
 			{
 				// Content for themes
-				ImGui::Text("Test..");
+				ImGui::Text("Theme colors");
 
 				static int themeIndex = 0;
 
-				if (ImGui::RadioButton("Default", &themeIndex, 0))
+				if (ImGui::RadioButton("Default dark", &themeIndex, 0))
 				{
 					ImGui::StyleColorsDark();
 				}
@@ -501,8 +501,29 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				{
 					minty_red_theme();
 				}
+				
+				if (ImGui::RadioButton("Default light", &themeIndex, 3))
+				{
+					ImGui::StyleColorsLight();
+				}
 
 				ImGui::Separator();
+				ImGui::Text("Theme style");
+
+				static int themestyleindex = 0;
+
+				if (ImGui::RadioButton("Rounded compact style", &themestyleindex, 0))
+				{
+					round_compact_style();
+				}
+				
+				if (ImGui::RadioButton("Big", &themestyleindex, 1))
+				{
+					big_style();
+				}
+
+				ImGui::Separator();
+
 				ImGui::Text("Menu font");
 
 				static int fontSelectionIndex = 0;
