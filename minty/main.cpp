@@ -492,19 +492,24 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					ImGui::StyleColorsDark();
 				}
 
-				if (ImGui::RadioButton("Dark theme", &themeIndex, 1))
+				if (ImGui::RadioButton("Default light", &themeIndex, 1))
+				{
+					ImGui::StyleColorsLight();
+				}
+
+				if (ImGui::RadioButton("Dark theme", &themeIndex, 2))
 				{
 					dark_theme();
 				}
 
-				if (ImGui::RadioButton("Minty Red", &themeIndex, 2))
+				if (ImGui::RadioButton("Minty Red", &themeIndex, 3))
 				{
 					minty_red_theme();
 				}
 				
-				if (ImGui::RadioButton("Default light", &themeIndex, 3))
+				if (ImGui::RadioButton("Minty Mint", &themeIndex, 4))
 				{
-					ImGui::StyleColorsLight();
+					mint_theme();
 				}
 
 				ImGui::Separator();

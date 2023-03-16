@@ -210,6 +210,7 @@
     <ResourceCompile Include="kiero\minhook\dll_resources\MinHook.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="gilua\logtextbuf.h" />
     <ClInclude Include="gilua\luaHook.h" />
     <ClInclude Include="gilua\util.h" />
     <ClInclude Include="imgui\imconfig.h" />
