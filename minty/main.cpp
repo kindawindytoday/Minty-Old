@@ -548,7 +548,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			if (ImGui::BeginTabItem("About"))
 			{
 				// Content for About
-				ImGui::Text("Minty BETA v0.6 WIP");
+				ImGui::Text("Minty BETA v0.7.1 WIP");
 				ImGui::Text("ImGui version: %s", ImGui::GetVersion());
 
 				ImVec4 linkColor = ImVec4(34.0f/255.0f, 132.0f/255.0f, 230.0f/255.0f, 1.0f);
