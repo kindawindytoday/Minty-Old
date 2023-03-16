@@ -546,13 +546,16 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				ImGui::Text("Minty BETA v0.6 WIP");
 				ImGui::Text("ImGui version: %s", ImGui::GetVersion());
 
+				ImVec4 linkColor = ImVec4(34.0f/255.0f, 132.0f/255.0f, 230.0f/255.0f, 1.0f);
+
 				ImGui::Text("Contributors: мятный пряник#0086, Moistcrafter#9172, yarik#4571, azzu#2731");
-				ImGui::Text("");
-				ImGui::Text("KWT Team Discord (click)");
+				ImGui::Separator();
+
+				ImGui::TextColored(linkColor, "KWT Team Discord (click)");
 				if (ImGui::IsItemClicked()) {
 					system("start https://discord.gg/kj7PQrr6CV");
 				}
-				ImGui::Text("KWT Team GitHub (click)");
+				ImGui::TextColored(linkColor, "KWT Team GitHub (click)");
 				if (ImGui::IsItemClicked()) {
 					system("start https://github.com/kindawindytoday");
 				}
