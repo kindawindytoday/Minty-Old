@@ -119,12 +119,29 @@ int main()
         system("pause");
         return 0;
     }
-
+    std::string exe_path;
     auto settings_path = current_dir.value() / "settings.txt";
     if (!fs::is_regular_file(settings_path))
     {
-        printf("settings.txt not found\n");
-        system("pause");
+        /*printf("settings.txt not found\n");
+        system("pause");*/
+        std::ofstream settings_file("settings.txt", std::ios_base::app);
+        if (settings_file.is_open()) {
+            settings_file << exe_path << std::endl;
+            settings_file.close();
+        }
+        else {
+            // Try to create the file if it doesn't exist
+            std::ofstream create_file("settings.txt");
+            if (create_file.is_open()) {
+                create_file << exe_path << std::endl;
+                create_file.close();
+            }
+            else {
+                std::cout << "Error: Unable to create settings file." << std::endl;
+                return 1;
+            }
+        }
         return 0;
     }
 
@@ -136,14 +153,34 @@ int main()
         return 0;
     }
 
-    std::string exe_path;
+    //std::string exe_path;
     std::getline(std::stringstream(settings.value()), exe_path);
     if (!fs::is_regular_file(exe_path))
     {
-        printf("Target executable not found\n");
-        system("pause");
+       /* printf("Target executable not found\n");
+        system("pause");*/
+        std::cout << "Please paste the file path: ";
+        std::getline(std::cin, exe_path);
+        std::ofstream settings_file("settings.txt", std::ios_base::app);
+        if (settings_file.is_open()) {
+            settings_file << exe_path << std::endl;
+            settings_file.close();
+        }
+        else {
+            std::cout << "Error: Unable to open settings file." << std::endl;
+            return 1;
+        }
+        PROCESS_INFORMATION proc_info{};
+        STARTUPINFOA startup_info{};
+        CreateProcessA(exe_path.c_str(), NULL, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, &startup_info, &proc_info);
+
+        InjectStandard(proc_info.hProcess, dll_path.string().c_str());
+        ResumeThread(proc_info.hThread);
+        CloseHandle(proc_info.hThread);
+        CloseHandle(proc_info.hProcess);
         return 0;
     }
+
 
     PROCESS_INFORMATION proc_info{};
     STARTUPINFOA startup_info{};

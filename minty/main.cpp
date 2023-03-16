@@ -14,6 +14,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <chrono>
 #include <thread>
+#include "gilua/logtextbuf.h"
 
 using namespace std;
 
@@ -34,8 +35,6 @@ void InitImGui()
 	ImGui_ImplWin32_Init(window);
 	ImGui_ImplDX11_Init(pDevice, pContext);
 }
-
-
 
 LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
@@ -63,9 +62,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; // Use the UNORM format to specify RGB88 color space
 			rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 			rtvDesc.Texture2D.MipSlice = 0;
-
 			pDevice->CreateRenderTargetView(pBackBuffer, &rtvDesc, &mainRenderTargetView);
-
 			pBackBuffer->Release();
 			oWndProc = (WNDPROC)SetWindowLongPtr(window, GWLP_WNDPROC, (LONG_PTR)WndProc);
 			InitImGui();
@@ -115,6 +112,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		static char* file_dialog_buffer = nullptr;
 		static char path3[500] = "";
 		static bool isopened = true;
+
+		static bool show_compile_log = false;
 		
 		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[fontIndex_menu]);
 
@@ -171,23 +170,23 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				static bool show_resizer = false;
 				static float boob_size = 1.0f;
 				ImGui::Checkbox("Booba resizer", &show_resizer);
-					if (show_resizer)
-					{
-						ImGui::Indent();
-						if (ImGui::Button("Initiate resize")) {
-							boob_size = 1.0f;
-							luahookfunc(char_bub_initiate);
-						}
-
-						ImGui::SameLine();
-
-						if (ImGui::SliderFloat("Booba scale", &boob_size, 0.0f, 4.0f, "%.3f"))
-						{
-							string result = char_bub_resize + to_string(boob_size) + "," + to_string(boob_size) + "," + to_string(boob_size) + ")";
-							luahookfunc(result.c_str());
-						}
-						ImGui::Unindent();
+				if (show_resizer)
+				{
+					ImGui::Indent();
+					if (ImGui::Button("Initiate resize")) {
+						boob_size = 1.0f;
+						luahookfunc(char_bub_initiate);
 					}
+
+					ImGui::SameLine();
+
+					if (ImGui::SliderFloat("Booba scale", &boob_size, 0.0f, 4.0f, "%.3f"))
+					{
+						string result = char_bub_resize + to_string(boob_size) + "," + to_string(boob_size) + "," + to_string(boob_size) + ")";
+						luahookfunc(result.c_str());
+					}
+					ImGui::Unindent();
+				}
 
 				static bool show_avatarresizer = false;
 				ImGui::Checkbox("Avatar resizer", &show_avatarresizer);
@@ -198,18 +197,18 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					string result = char_avatarresize + to_string(avatarsize) + "," + to_string(avatarsize) + "," + to_string(avatarsize) + ")";
 
 					if (ImGui::SliderFloat("Avatar scale", &avatarsize, 0.0f, 25.0f, "%.3f"))
-						{
-							luahookfunc(result.c_str());
-						}
+					{
+						luahookfunc(result.c_str());
+					}
 
 					ImGui::SameLine();
 
 					if (ImGui::Button("reset")) 
-						{
-							string result = string(char_avatarresize) + "1 , 1, 1)";
-							avatarsize = 1.0f;
-							luahookfunc(result.c_str());
-						}
+					{
+						string result = string(char_avatarresize) + "1 , 1, 1)";
+						avatarsize = 1.0f;
+						luahookfunc(result.c_str());
+					}
 
 					ImGui::Unindent();
 				}
@@ -327,12 +326,12 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				if (ImGui::Button("Run"))
 				{
 					string code = editor.GetText();
-
-					if (!code.empty())
+					if (!code.empty() && code.find_first_not_of(" \t\n\v\f\r") != string::npos)
 					{
 						luahookfunc(code.c_str());
 					}
 				}
+
 				ImGui::SameLine();
 				//saver to button below.
 
@@ -342,6 +341,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				if (ImGui::Button("Create new button")) {
 					ImGui::OpenPopup("New button");
 				}
+				ImGui::SameLine();
+				ImGui::Checkbox("Show log", &show_compile_log);
 
 				if (ImGui::BeginPopup("New button")) {
 					ImGui::InputText("Label", buttonLabel, 256);
@@ -365,14 +366,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				}
 				ImGui::End();
 
-
 				if (ImGui::BeginMenuBar())
 				{
-
 					//ImGui::InputText("##path3", path3, sizeof(path3));
 					if (ImGui::BeginMenu("File"))
 					{
-
 						if (ImGui::MenuItem("Load .lua file"))
 						{
 							file_dialog_buffer = path3;
@@ -433,30 +431,104 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 				ImGui::End();
 			}
+			
+			ImGuiTextFilter Filter;
+			if (show_compile_log)
+			{
+				ImGui::Begin("Log");
+				if (ImGui::SmallButton("[Debug] Add 5 entries"))
+				{
+					static int counter = 0;
+					const char* categories[3] = { "info", "warn", "error" };
+					const char* words[] = { "Bumfuzzled", "Cattywampus", "Snickersnee", "Abibliophobia", "Absquatulate", "Nincompoop", "Pauciloquent" };
+					for (int n = 0; n < 5; n++)
+					{
+						const char* category = categories[counter % IM_ARRAYSIZE(categories)];
+						const char* word = words[counter % IM_ARRAYSIZE(words)];
+						log_textbuf.appendf("[%05d] [%s] Hello, current time is %.1f, here's a word: '%s'\n",
+									ImGui::GetFrameCount(), category, ImGui::GetTime(), word);
+						counter++;
+					}
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Clear")) {
+					log_textbuf.clear();
+				}
+				Filter.Draw("Filter");
+				ImGui::Separator();
+				if (Filter.IsActive())
+				{
+					const char* buf_begin = log_textbuf.begin();
+					const char* buf_end = log_textbuf.end();
+					ImGuiTextBuffer log_filtered;
+					while (buf_begin < buf_end)
+					{
+						const char* line_end = strchr(buf_begin, '\n');
+						if (Filter.PassFilter(buf_begin, line_end))
+						{
+							log_filtered.append(buf_begin, line_end);
+							log_filtered.append("\n");
+						}
+						buf_begin = line_end + 1;
+					}
+					ImGui::TextUnformatted(log_filtered.begin(), log_filtered.end());
+				}
+				else {
+					ImGui::TextUnformatted(log_textbuf.begin(), log_textbuf.end());
+				}
+				
+				ImGui::End();
+			}
 
 			if (ImGui::BeginTabItem("Themes"))
 			{
 				// Content for themes
-				ImGui::Text("Test..");
+				ImGui::Text("Theme colors");
 
 				static int themeIndex = 0;
 
-				if (ImGui::RadioButton("Default", &themeIndex, 0))
+				if (ImGui::RadioButton("Default dark", &themeIndex, 0))
 				{
 					ImGui::StyleColorsDark();
 				}
 
-				if (ImGui::RadioButton("Dark theme", &themeIndex, 1))
+				if (ImGui::RadioButton("Default light", &themeIndex, 1))
+				{
+					ImGui::StyleColorsLight();
+				}
+
+				if (ImGui::RadioButton("Dark theme", &themeIndex, 2))
 				{
 					dark_theme();
 				}
 
-				if (ImGui::RadioButton("Minty Red", &themeIndex, 2))
+				if (ImGui::RadioButton("Minty Red", &themeIndex, 3))
 				{
 					minty_red_theme();
 				}
+				
+				if (ImGui::RadioButton("Minty Mint", &themeIndex, 4))
+				{
+					mint_theme();
+				}
 
 				ImGui::Separator();
+				ImGui::Text("Theme style");
+
+				static int themestyleindex = 0;
+
+				if (ImGui::RadioButton("Rounded compact style", &themestyleindex, 0))
+				{
+					round_compact_style();
+				}
+				
+				if (ImGui::RadioButton("Big", &themestyleindex, 1))
+				{
+					big_style();
+				}
+
+				ImGui::Separator();
+
 				ImGui::Text("Menu font");
 
 				static int fontSelectionIndex = 0;
@@ -479,16 +551,17 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				ImGui::Text("Minty BETA v0.6 WIP");
 				ImGui::Text("ImGui version: %s", ImGui::GetVersion());
 
+				ImVec4 linkColor = ImVec4(34.0f/255.0f, 132.0f/255.0f, 230.0f/255.0f, 1.0f);
+
 				ImGui::Text("Contributors: мятный пряник#0086, Moistcrafter#9172, yarik#4571, azzu#2731");
-				ImGui::Text("");
-				ImGui::Text("KWT Team Discord (click)");
+				ImGui::Separator();
+
+				ImGui::TextColored(linkColor, "KWT Team Discord (click)");
 				if (ImGui::IsItemClicked()) {
-					// Open website in browser
 					system("start https://discord.gg/kj7PQrr6CV");
 				}
-				ImGui::Text("KWT Team GitHub (click)");
+				ImGui::TextColored(linkColor, "KWT Team GitHub (click)");
 				if (ImGui::IsItemClicked()) {
-					// Open website in browser
 					system("start https://github.com/kindawindytoday");
 				}
 				ImGui::Separator();
@@ -542,14 +615,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				// 	}
 				// }
 				//ImGui::PlotLines("FPS", fps_buffer, 1200, buffer_index, NULL, 0.0f, fps_max + 10.0f, ImVec2(0, 80));
-
 				if (timer > 1) {
 				 	fps_slow = 1.0f / frametime;
 					timer = 0.0f;
 				}
-				
 				ImGui::Text("Current FPS: %.2f", fps_slow);
-
 				ImGui::EndTabItem();
 			}
 

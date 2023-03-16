@@ -8,6 +8,8 @@
 #include "luahook.h"
 #include <chrono>
 #define _CRT_SECURE_NO_WARNINGS
+#include "../imgui/imgui.h"
+#include "logtextbuf.h"
 
 namespace fs = std::filesystem;
 
@@ -16,10 +18,15 @@ void luahookfunc(const char* charLuaScript);
 namespace util
 {
     template<typename... Args>
-    void log(const char* fmt, Args... args)
+    void log(int output_type, const char* fmt, Args... args)
     {
-        printf("[Minty] ");
+        const char* info_type[] = {"Warning", "Error", "Info"};
+        printf("[Minty:%s] ", info_type[output_type]);
         printf(fmt, args...);
+        printf("\n");
+        log_textbuf.appendf("[Minty:%s] ", info_type[output_type]);
+        log_textbuf.appendf(fmt, args...);
+        log_textbuf.appendf("\n");
     }
 
     void logdialog(const char* fmt)

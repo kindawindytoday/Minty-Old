@@ -32,15 +32,14 @@ pfn_loadbuffer* pp_loadbuffer;
 int xluaL_loadbuffer_hook(lua_State* L, const char* chunk, size_t sz, const char* chunkname)
 {
     gi_L = L;
-    util::log("xluaL_loadbuffer_hook called. Lua ready!","");
-    util::logdialog("Succesfully hooked. Happy hacking!");
+    util::log(2,"xluaL_loadbuffer_hook called. Lua ready!","");
     is_hook_success = true;
+    util::logdialog("Succesfully hooked. Happy hacking!");
     main_thread = OpenThread(THREAD_ALL_ACCESS, false, GetCurrentThreadId());
     xlua = GetModuleHandleW(L"xlua");
     *pp_loadbuffer = (pfn_loadbuffer)GetProcAddress(xlua, "xluaL_loadbuffer");
     return (*pp_loadbuffer)(L, chunk, sz, chunkname);
 }
-
 
 //std::optional<std::string> read_whole_file(const fs::path& file)
 //try
@@ -116,7 +115,7 @@ void exec(const std::string& compiled)
 
 pfn_loadbuffer* scan_loadbuffer(HMODULE ua)
 {
-    util::log("Hooking... Attention: if logs stops at this line - you should inject dll before loading into world.","");
+    util::log(2,"Hooking... Attention: if logs stops at this line - you should inject dll before loading into world.","");
     auto il2cpp = util::pe::get_section_by_name(ua, "il2cpp");
     auto rdata = util::pe::get_section_by_name(ua, ".rdata");
 
@@ -144,14 +143,23 @@ std::optional<std::string> compile(lua_State* L, const char* script)
     };
 
     auto ret = luaL_loadstring(L, script);
-    if (ret != 0)
-    {
-        std::string result = std::to_string(ret);
-        util::log("compilation failed(%i)\n", result);
-        util::log("%s\n", lua_tolstring(L, 1, NULL));
-        //util::logdialog(lua_tolstring(L, 1, NULL)); ---- look in util.h; kinda useful but idk how to realise it at loading or how to mek slep
-        lua_pop(L, 1);
-        return std::nullopt;
+    if (is_hook_success) {
+        if (ret != 0)
+        {
+            std::string result = std::to_string(ret);
+            //util::log(1,"compilation failed(%i)", result); // i dont think we need the err code :skull
+            //util::log(1,"%s", lua_tolstring(L, 1, NULL));
+            util::log(1,"compilation failed: %s", lua_tolstring(L, 1, NULL));
+            //util::logdialog(lua_tolstring(L, 1, NULL)); ---- look in util.h; kinda useful but idk how to realise it at loading or how to mek slep
+            lua_pop(L, 1);
+            return std::nullopt;
+        }
+        else if (ret == 0) {
+            util::log(2,"compilation success: %s", lua_tolstring(L, 1, NULL));
+        }
+    }
+    else {
+        util::log(0, "compilation warning: Lua is not hooked");
     }
 
     ret = lua_dump(L, writer, &compiled_script, 0);
@@ -170,7 +178,7 @@ void get_gi_L()
     while ((ua = GetModuleHandleW(L"UserAssembly.dll")) == 0) {
         Sleep(50);
     }
-    util::log("FOUND\n", "");
+    util::log(2,"FOUND", "");
     pp_loadbuffer = scan_loadbuffer(ua);
     *pp_loadbuffer = xluaL_loadbuffer_hook;
 
@@ -190,7 +198,7 @@ DWORD initLua(LPVOID) {
     freopen("CONOUT$", "w", stdout);
     freopen("CONOUT$", "w", stderr);
     
-	util::log("Starting\n", "");
+	util::log(2,"Starting", "");
     //auto dir = get_scripts_folder();
 
     get_gi_L();
