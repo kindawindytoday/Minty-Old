@@ -328,12 +328,12 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				if (ImGui::Button("Run"))
 				{
 					string code = editor.GetText();
-
-					if (!code.empty())
+					if (!code.empty() && code.find_first_not_of(" \t\n\v\f\r") != string::npos)
 					{
 						luahookfunc(code.c_str());
 					}
 				}
+
 				ImGui::SameLine();
 				//saver to button below.
 
@@ -592,9 +592,6 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					timer = 0.0f;
 				}
 				ImGui::Text("Current FPS: %.2f", fps_slow);
-
-				ImGui::Columns(2, "MyColumns");
-
 				ImGui::EndTabItem();
 			}
 
