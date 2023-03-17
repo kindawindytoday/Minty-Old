@@ -224,6 +224,7 @@
     <ClInclude Include="imgui\L2DFileDialog.h" />
     <ClInclude Include="imgui\TextEditor.h" />
     <ClInclude Include="includes.h" />
+    <ClInclude Include="json\json.hpp" />
     <ClInclude Include="kiero\kiero.h" />
     <ClInclude Include="kiero\minhook\include\MinHook.h" />
     <ClInclude Include="kiero\minhook\src\buffer.h" />

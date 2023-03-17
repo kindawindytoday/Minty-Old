@@ -259,6 +259,9 @@
     <ClInclude Include="gilua\logtextbuf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="json\json.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="kiero\minhook\dll_resources\MinHook.def">

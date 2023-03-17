@@ -15,6 +15,7 @@
 #include <chrono>
 #include <thread>
 #include "gilua/logtextbuf.h"
+#include "json/json.hpp"
 
 using namespace std;
 
@@ -583,6 +584,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					ImGui::Text("ImGuiFileDialog\n");
 					string licensefiledialog = string(license_FileDialog) + string(license_Generic);
 					ImGui::Text(licensefiledialog.c_str());
+					ImGui::Separator();
+
+					ImGui::Text("Json\n");
+					string licensejson = string(license_json) + string(license_Generic);
+					ImGui::Text(licensejson.c_str());
 
 					ImGui::Unindent();
 				}

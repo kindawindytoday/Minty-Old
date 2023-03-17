@@ -596,6 +596,11 @@ const char* license_FileDialog = R"MY_DELIMITER(MIT License
 
 Copyright (c) 2018-2022 Stephane Cuillerdier (aka Aiekick)
 )MY_DELIMITER";
+
+const char* license_json = R"MY_DELIMITER(MIT License 
+
+Copyright (c) 2013-2022 Niels Lohmann)MY_DELIMITER";
+
 const char* license_Generic = R"MY_DELIMITER(
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
