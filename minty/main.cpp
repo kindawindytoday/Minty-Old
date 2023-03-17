@@ -129,8 +129,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		{
 			isopened = !isopened;
 		}
-
 		if (isopened) {
+
+			ImGui::SetNextFrameWantCaptureMouse(false);
+			ImGui::SetNextFrameWantCaptureKeyboard(true);
+
 			ImGui::Begin("Minty");
 			ImGui::BeginTabBar("Minty");
 
@@ -206,7 +209,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 					if (ImGui::Button("reset")) 
 					{
-						string result = string(char_avatarresize) + "1 , 1, 1)";
+						string result = string(char_avatarresize) + "1, 1, 1)";
 						avatarsize = 1.0f;
 						luahookfunc(result.c_str());
 					}
@@ -324,6 +327,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				}
 				ImGui::Begin("Lua editor", &showEditor, ImGuiWindowFlags_MenuBar);
 
+
 				if (ImGui::Button("Run"))
 				{
 					string code = editor.GetText();
@@ -381,9 +385,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 						}
 						ImGui::EndMenu();
 					}
-					/*if (FileDialog::file_dialog_open) {
-						FileDialog::ShowFileDialog(&FileDialog::file_dialog_open, file_dialog_buffer, sizeof(file_dialog_buffer), FileDialog::file_dialog_open_type);
-					}*/
+
 					if (ImGui::BeginMenu("Edit"))
 					{
 						bool ro = editor.IsReadOnly();
@@ -479,6 +481,131 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				}
 				
 				ImGui::End();
+			}
+
+			if (ImGui::BeginTabItem("Inspector"))
+			{
+				struct Property
+				{
+					const char* name;
+					int value;
+				};
+
+				Property properties[] =
+				{
+					{ "Property 1", 10 },
+					{ "Property 2", 20 },
+					{ "Property 3", 30 },
+				};
+
+				static int selectedPropertyIndex = -1;
+				static int numProperties = IM_ARRAYSIZE(properties);
+				static char newPropertyName[32] = "";
+
+				ImGui::Columns(2);
+
+				for (int i = 0; i < numProperties; i++)
+				{
+					if (i == 0)
+					{
+						ImGui::PushID(i);
+						if (ImGui::Selectable(properties[i].name, selectedPropertyIndex == i))
+						{
+							selectedPropertyIndex = i;
+						}
+						ImGui::PopID();
+					}
+					else if (i == 1)
+					{
+						bool isNodeOpen = false;
+						ImGui::PushID(i);
+						if (ImGui::TreeNode(properties[i].name))
+						{
+							isNodeOpen = true;
+							if (ImGui::IsItemClicked())
+							{
+								selectedPropertyIndex = i;
+							}
+
+							ImGui::PushID(i + 1);
+							if (ImGui::Selectable(properties[i + 1].name, selectedPropertyIndex == (i + 1)))
+							{
+								selectedPropertyIndex = i + 1;
+							}
+							ImGui::PopID();
+
+							ImGui::TreePop();
+						}
+						ImGui::PopID();
+						i++;
+					}
+					else
+					{
+						bool isNodeOpen = false;
+						ImGui::PushID(i);
+						if (ImGui::TreeNode(properties[i].name))
+						{
+							isNodeOpen = true;
+							if (ImGui::IsItemClicked())
+							{
+								selectedPropertyIndex = i;
+							}
+							ImGui::TreePop();
+						}
+						ImGui::PopID();
+					}
+				}
+
+				ImGui::NextColumn();
+
+				// Show the editor for the selected property in the right column
+
+				if (selectedPropertyIndex >= 0)
+				{
+					Property& selectedProperty = properties[selectedPropertyIndex];
+					ImGui::SliderInt("Value", &selectedProperty.value, 0, 100);
+					if (ImGui::Button("OK"))
+					{
+						selectedPropertyIndex = -1;
+					}
+				}
+
+				ImGui::InputText("New Property Name", newPropertyName, IM_ARRAYSIZE(newPropertyName));
+				if (ImGui::Button("Add Property"))
+				{
+					// Create a new array with space for an extra property
+					Property* newProperties = new Property[numProperties + 1];
+
+					// Copy the existing properties into the new array
+					for (int i = 0; i < numProperties; i++)
+					{
+						// Copy the name string into new memory for each property
+						int nameLen = strlen(properties[i].name) + 1;
+						newProperties[i].name = new char[nameLen];
+						strncpy_s(newProperties[i].name, nameLen, properties[i].name, nameLen);
+
+						// Copy the value
+						newProperties[i].value = properties[i].value;
+					}
+
+					// Add the new property to the end of the array
+					int nameLen = strlen(newPropertyName) + 1;
+					newProperties[numProperties].name = new char[nameLen];
+					strncpy_s(newProperties[numProperties].name, nameLen, newPropertyName, nameLen);
+					newProperties[numProperties].value = 0;
+
+					// Delete the old array and replace it with the new one
+					delete[] properties;
+					properties = newProperties;
+					numProperties++;
+
+					// Clear the new property name input
+					newPropertyName[0] = '\0';
+				}
+
+				ImGui::Columns(1);
+
+				ImGui::EndTabItem();
 			}
 
 			if (ImGui::BeginTabItem("Themes"))
@@ -635,6 +762,9 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		ImGui::PopFont();
 		ImGui::EndFrame();
 		ImGui::Render();
+
+		/*ImGui::SetNextFrameWantCaptureKeyboard(false);
+		ImGui::SetNextFrameWantCaptureMouse(false);*/
 
 	//end of imgui code
 	pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
