@@ -11,7 +11,6 @@
 #include <string>
 #include <vector>
 #include "imgui/L2DFileDialog.h"
-#define _CRT_SECURE_NO_WARNINGS
 #include <chrono>
 #include <thread>
 #include "gilua/logtextbuf.h"
@@ -334,10 +333,17 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					string code = editor.GetText();
 					if (!code.empty() && code.find_first_not_of(" \t\n\v\f\r") != string::npos)
 					{
-						luahookfunc(code.c_str());
+						if (is_hook_success) {
+							luahookfunc(code.c_str());
+							if (last_ret_code == 0) {
+								util::log(2,"compilation success: %s", last_tolstr);
+							}
+						}
+						else {
+							util::log(0, "Lua is not hooked", "");
+						}
 					}
 				}
-
 				ImGui::SameLine();
 				//saver to button below.
 
@@ -461,7 +467,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					log_textbuf.clear();
 				}
 				ImGui::SameLine();
-				if (ImGui::SmallButton("copy")) {
+				if (ImGui::SmallButton("Copy")) {
 					ImGui::SetClipboardText(log_textbuf.begin());
 				}
 				Filter.Draw("Filter");
