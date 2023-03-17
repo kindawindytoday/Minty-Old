@@ -15,8 +15,10 @@
 #include <chrono>
 #include <thread>
 #include "gilua/logtextbuf.h"
-#include "json/json.hpp"
 
+#include "json/json.hpp"
+//using json = nlohmann::json;
+//config json;
 using namespace std;
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -105,6 +107,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 		ImGui::NewFrame();
 		ImGui::GetStyle().IndentSpacing = 16.0f;
+
 		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[fontindex_menu]);
 		setlocale(LC_ALL, "C");
 
@@ -117,7 +120,9 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 		static float TimeScale = 1.0f;
 
-
+		settheme(theme_index);
+		setstyle(style_index);
+		
 		if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_F11)))
 		{
 			TimeScale = 1.0f;
@@ -452,11 +457,17 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					}
 				}
 				ImGui::SameLine();
-				if (ImGui::Button("Clear")) {
+				if (ImGui::SmallButton("Clear")) {
 					log_textbuf.clear();
+				}
+				ImGui::SameLine();
+				if (ImGui::SmallButton("copy")) {
+					ImGui::SetClipboardText(log_textbuf.begin());
 				}
 				Filter.Draw("Filter");
 				ImGui::Separator();
+				ImGui::BeginChild("LogScroll", ImVec2(0, 0), false, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+
 				if (Filter.IsActive())
 				{
 					const char* buf_begin = log_textbuf.begin();
@@ -474,12 +485,17 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					}
 					ImGui::TextUnformatted(log_filtered.begin(), log_filtered.end());
 				}
-				else {
+				else
+				{
 					ImGui::TextUnformatted(log_textbuf.begin(), log_textbuf.end());
 				}
-				
-				ImGui::End();
-			}
+
+				if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+					ImGui::SetScrollHereY(1.0f);
+					ImGui::EndChild();
+					
+					ImGui::End();
+				}
 
 			if (ImGui::BeginTabItem("Themes"))
 			{
@@ -597,35 +613,21 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 			if (ImGui::BeginTabItem("Performance"))
 			{
-
-				//static float fps_buffer[1200] = {}; 
-				//static int buffer_index = 0;
-				//static float fps_max = 0;
 				ImGuiIO& io = ImGui::GetIO();
 				float frametime = io.DeltaTime;
 				float fps = 1.0f / frametime;
 				static float timer = 0.0f;
 				timer += frametime;
 				static float fps_slow = 0.0f;
-				// fps_buffer[buffer_index] = fps;
-				// buffer_index = (buffer_index + 1) % 1200;
-				// if (fps > fps_max) {
-				// 	fps_max = fps;
-				// }
-				// else if (buffer_index == 0) {
-				// 	fps_max = 0;
-				// 	for (int i = 0; i < 1200; i++) {
-				// 		if (fps_buffer[i] > fps_max) {
-				// 			fps_max = fps_buffer[i];
-				// 		}
-				// 	}
-				// }
-				//ImGui::PlotLines("FPS", fps_buffer, 1200, buffer_index, NULL, 0.0f, fps_max + 10.0f, ImVec2(0, 80));
-				if (timer > 1) {
+				static float frametime_slow = 0.0f;
+
+				if (timer > 0.75) {
 				 	fps_slow = 1.0f / frametime;
+					frametime_slow = frametime;
 					timer = 0.0f;
 				}
 				ImGui::Text("Current FPS: %.2f", fps_slow);
+				ImGui::Text("Current Frametime: %.3fms", frametime_slow * 1000);
 				ImGui::EndTabItem();
 			}
 

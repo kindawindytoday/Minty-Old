@@ -2,6 +2,8 @@
 #define THEMES_H
 
 extern int fontindex_menu;
+extern int theme_index;
+extern int style_index;
 
 void settheme(int themefunc_index);
 void setstyle(int stylefunc_index);
