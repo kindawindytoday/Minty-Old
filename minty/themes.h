@@ -1,6 +1,12 @@
 #ifndef THEMES_H
 #define THEMES_H
 
+extern int fontindex_menu;
+
+void settheme(int themefunc_index);
+void setstyle(int stylefunc_index);
+void setfont(int fontfunc_index);
+
 void dark_theme();
 void minty_red_theme();
 void mint_theme();

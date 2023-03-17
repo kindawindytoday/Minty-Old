@@ -104,18 +104,18 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 		ImGui::NewFrame();
 		ImGui::GetStyle().IndentSpacing = 16.0f;
+		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[fontindex_menu]);
 		setlocale(LC_ALL, "C");
-		static float TimeScale = 1.0f;
+
 		static bool showEditor = false;
-		static int fontIndex_menu = 0;
-		static int fontIndex_code = 1;
+		static bool isopened = true;
+		static bool show_compile_log = false;
+
 		static char* file_dialog_buffer = nullptr;
 		static char path3[500] = "";
-		static bool isopened = true;
 
-		static bool show_compile_log = false;
-		
-		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[fontIndex_menu]);
+		static float TimeScale = 1.0f;
+
 
 		if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_F11)))
 		{
@@ -489,27 +489,27 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 				if (ImGui::RadioButton("Default dark", &themeIndex, 0))
 				{
-					ImGui::StyleColorsDark();
+					settheme(1);
 				}
 
 				if (ImGui::RadioButton("Default light", &themeIndex, 1))
 				{
-					ImGui::StyleColorsLight();
+					settheme(2);
 				}
 
 				if (ImGui::RadioButton("Dark theme", &themeIndex, 2))
 				{
-					dark_theme();
+					settheme(3);
 				}
 
 				if (ImGui::RadioButton("Minty Red", &themeIndex, 3))
 				{
-					minty_red_theme();
+					settheme(4);
 				}
 				
 				if (ImGui::RadioButton("Minty Mint", &themeIndex, 4))
 				{
-					mint_theme();
+					settheme(5);
 				}
 
 				ImGui::Separator();
@@ -519,12 +519,12 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 				if (ImGui::RadioButton("Rounded compact style", &themestyleindex, 0))
 				{
-					round_compact_style();
+					setstyle(1);
 				}
 				
 				if (ImGui::RadioButton("Big", &themestyleindex, 1))
 				{
-					big_style();
+					setstyle(2);
 				}
 
 				ImGui::Separator();
@@ -534,12 +534,12 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				static int fontSelectionIndex = 0;
 				if (ImGui::RadioButton("Myriad pro", &fontSelectionIndex, 0))
 				{
-					fontIndex_menu = 0;
+					setfont(1);
 				}
 
 				if (ImGui::RadioButton("Jetbrains Mono", &fontSelectionIndex, 1))
 				{
-					fontIndex_menu = 1;
+					setfont(2);
 				}
 
 				ImGui::EndTabItem();

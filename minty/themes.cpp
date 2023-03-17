@@ -1,5 +1,56 @@
 #include "includes.h"
 #include "themes.h"
+
+int fontindex_menu = 0; // define variable in themes.cpp
+
+void settheme(int themefunc_index) {
+	switch(themefunc_index) {
+		case 1:
+			ImGui::StyleColorsDark();
+			break;
+		case 2:
+			ImGui::StyleColorsLight();
+			break;
+		case 3: 
+			dark_theme();
+			break;
+		case 4:
+			minty_red_theme();
+			break;
+		case 5:
+			mint_theme();
+			break;
+		default:
+			break;
+	}
+}
+
+void setstyle(int stylefunc_index) {
+	switch(stylefunc_index) {
+		case 1:
+			round_compact_style();
+			break;
+		case 2:
+			big_style();
+			break;
+		default:
+			break;
+	}
+}
+
+void setfont(int fontfunc_index) {
+    switch(fontfunc_index) {
+        case 1:
+            fontindex_menu = 0;
+            break;
+        case 2:
+            fontindex_menu = 1;
+            break;
+        default:
+            break;
+    }
+}
+
 void dark_theme()
 {
   ImGuiStyle& style = ImGui::GetStyle();
