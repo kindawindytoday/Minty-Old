@@ -265,7 +265,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					}
 				}
 
-				if (ImGui::SliderFloat("Timescale", &TimeScale, 0.0f, 2.0f, "%.3f"))
+				if (ImGui::SliderFloat("Timescale", &TimeScale, 0.0f, 5.0f, "%.3f"))
 				{
 					string result = "CS.UnityEngine.Time.timeScale = " + to_string(TimeScale);
 					luahookfunc(result.c_str());
@@ -451,14 +451,13 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				if (ImGui::SmallButton("[Debug] Add 5 entries"))
 				{
 					static int counter = 0;
-					const char* categories[3] = { "info", "warn", "error" };
-					const char* words[] = { "Bumfuzzled", "Cattywampus", "Snickersnee", "Abibliophobia", "Absquatulate", "Nincompoop", "Pauciloquent" };
+					const char* categories[3] = { "Info", "Warning", "Error" };
+					const char* words[] = { "virus", "sob", "leak", "plead", "windsensinden", "windy", "ril", "fek" };
 					for (int n = 0; n < 5; n++)
 					{
 						const char* category = categories[counter % IM_ARRAYSIZE(categories)];
 						const char* word = words[counter % IM_ARRAYSIZE(words)];
-						log_textbuf.appendf("[%05d] [%s] Hello, current time is %.1f, here's a word: '%s'\n",
-									ImGui::GetFrameCount(), category, ImGui::GetTime(), word);
+						log_textbuf.appendf("[Minty:%s] [%05d] Hello, current time is %.1f, here's a word: '%s'\n", category, ImGui::GetFrameCount(), ImGui::GetTime(), word);
 						counter++;
 					}
 				}
