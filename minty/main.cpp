@@ -496,11 +496,12 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				}
 
 				if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+				{
 					ImGui::SetScrollHereY(1.0f);
-					ImGui::EndChild();
-					
-					ImGui::End();
 				}
+				ImGui::EndChild();	
+				ImGui::End();
+			}
 
 			if (ImGui::BeginTabItem("Themes"))
 			{
