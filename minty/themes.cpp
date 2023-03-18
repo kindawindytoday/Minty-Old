@@ -58,14 +58,11 @@ void setstyle(int stylefunc_index) {
 void setfont(int fontfunc_index) {
     switch(fontfunc_index) {
         case 1:
-            fontindex_menu = 0;
-            break;
-        case 2:
             fontindex_menu = 1;
             break;
-		// case 3:
-        //     fontindex_menu = 2;
-        //     break;
+        case 2:
+            fontindex_menu = 0;
+            break;
         default:
             break;
     }

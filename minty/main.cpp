@@ -107,7 +107,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		ImGui::NewFrame();
 		ImGui::GetStyle().IndentSpacing = 16.0f;
 
-        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[fontindex_menu]);
+		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[fontindex_menu]);
 
 		setlocale(LC_ALL, "C");
 
@@ -448,7 +448,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			ImGuiTextFilter Filter;
 			if (show_compile_log)
 			{
-				ImGui::Begin("Log");
+				ImGui::Begin("Log", &show_compile_log);
 				if (ImGui::SmallButton("[Debug] Add 5 entries"))
 				{
 					static int counter = 0;
@@ -566,20 +566,15 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				ImGui::Text("Menu font");
 
 				static int fontSelectionIndex = 0;
-				if (ImGui::RadioButton("Myriad pro", &fontSelectionIndex, 0))
+				if (ImGui::RadioButton("Jetbrains Mono", &fontSelectionIndex, 0))
 				{
 					setfont(1);
 				}
 
-				if (ImGui::RadioButton("Jetbrains Mono", &fontSelectionIndex, 1))
+				if (ImGui::RadioButton("Myriad Pro", &fontSelectionIndex, 1))
 				{
 					setfont(2);
 				}
-
-				// if (ImGui::RadioButton("ProggyClean", &fontSelectionIndex, 2))
-				// {
-				// 	setfont(3);
-				// }
 
 				ImGui::EndTabItem();
 			}
