@@ -107,7 +107,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		ImGui::NewFrame();
 		ImGui::GetStyle().IndentSpacing = 16.0f;
 
-		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[fontindex_menu]);
+        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[fontindex_menu]);
+
 		setlocale(LC_ALL, "C");
 
 		static bool showEditor = false;
@@ -520,19 +521,24 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					settheme(2);
 				}
 
-				if (ImGui::RadioButton("Dark theme", &themeIndex, 2))
+				if (ImGui::RadioButton("Default classic", &themeIndex, 2))
 				{
 					settheme(3);
 				}
 
-				if (ImGui::RadioButton("Minty Red", &themeIndex, 3))
+				if (ImGui::RadioButton("Dark theme", &themeIndex, 3))
 				{
 					settheme(4);
 				}
-				
-				if (ImGui::RadioButton("Minty Mint", &themeIndex, 4))
+
+				if (ImGui::RadioButton("Minty Red", &themeIndex, 4))
 				{
 					settheme(5);
+				}
+				
+				if (ImGui::RadioButton("Minty Mint", &themeIndex, 5))
+				{
+					settheme(6);
 				}
 
 				ImGui::Separator();
@@ -550,6 +556,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					setstyle(2);
 				}
 
+				if (ImGui::RadioButton("ImGui Default", &themestyleindex, 2))
+				{
+					setstyle(3);
+				}
+
 				ImGui::Separator();
 
 				ImGui::Text("Menu font");
@@ -564,6 +575,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				{
 					setfont(2);
 				}
+
+				// if (ImGui::RadioButton("ProggyClean", &fontSelectionIndex, 2))
+				// {
+				// 	setfont(3);
+				// }
 
 				ImGui::EndTabItem();
 			}

@@ -13,6 +13,7 @@ void dark_theme();
 void minty_red_theme();
 void mint_theme();
 
+void default_style();
 void round_compact_style();
 void big_style();
 
