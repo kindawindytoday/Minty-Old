@@ -3,14 +3,13 @@
 #include <filesystem>
 #include <optional>
 #include <fstream>
+#include <commdlg.h>
 #define _CRT_SECURE_NO_WARNINGS
 
 //#include "../minty/gilua/util.h"
 //#include "../minty/gilua/luahook.h"
 
 namespace fs = std::filesystem;
-
-
 
 namespace util
 {
@@ -157,19 +156,41 @@ int main()
     std::getline(std::stringstream(settings.value()), exe_path);
     if (!fs::is_regular_file(exe_path))
     {
+        std::cout << "File path in settings.exe invalid" << std::endl;
+        std::cout << "Please select your Game Executable" << std::endl;
        /* printf("Target executable not found\n");
         system("pause");*/
-        std::cout << "Please paste the file path: ";
-        std::getline(std::cin, exe_path);
-        std::ofstream settings_file("settings.txt", std::ios_base::app);
-        if (settings_file.is_open()) {
-            settings_file << exe_path << std::endl;
-            settings_file.close();
+        OPENFILENAMEA ofn{};
+        char szFile[260]{};
+        ZeroMemory(&ofn, sizeof(ofn));
+        ofn.lStructSize = sizeof(ofn);
+        ofn.lpstrFile = szFile;
+        ofn.lpstrFile[0] = '\0';
+        ofn.hwndOwner = NULL;
+        ofn.nMaxFile = sizeof(szFile);
+        ofn.lpstrFilter = "Executable Files (*.exe)\0*.exe\0All Files (*.*)\0*.*\0";
+        ofn.nFilterIndex = 1;
+        ofn.lpstrTitle = "Select Executable File";
+        ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
+
+        if (GetOpenFileNameA(&ofn))
+        {
+            exe_path = ofn.lpstrFile;
+            std::ofstream settings_file("settings.txt", std::ios_base::out);
+            if (settings_file.is_open()) {
+                settings_file << exe_path << std::endl;
+                settings_file.close();
+            }
+            else {
+                std::cout << "Error: Unable to open settings file." << std::endl;
+                return 1;
+            }
         }
         else {
-            std::cout << "Error: Unable to open settings file." << std::endl;
+            std::cout << "Error: Unable to open file dialog." << std::endl;
             return 1;
         }
+
         PROCESS_INFORMATION proc_info{};
         STARTUPINFOA startup_info{};
         CreateProcessA(exe_path.c_str(), NULL, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, &startup_info, &proc_info);
@@ -180,7 +201,6 @@ int main()
         CloseHandle(proc_info.hProcess);
         return 0;
     }
-
 
     PROCESS_INFORMATION proc_info{};
     STARTUPINFOA startup_info{};

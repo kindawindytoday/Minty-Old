@@ -1,5 +1,73 @@
 #include "includes.h"
 #include "themes.h"
+
+int fontindex_menu = 1; // define variable in themes.cpp
+int theme_index = 1;
+int style_index = 1;
+
+void settheme(int themefunc_index) {
+	switch(themefunc_index) {
+		case 1:
+			ImGui::StyleColorsDark();
+			theme_index = 1;
+			break;
+		case 2:
+			ImGui::StyleColorsLight();
+			theme_index = 2;
+			break;
+		case 3: 
+			ImGui::StyleColorsClassic();
+			theme_index = 3;
+			break;
+		case 4: 
+			dark_theme();
+			theme_index = 4;
+			break;
+		case 5:
+			minty_red_theme();
+			theme_index = 5;
+			break;
+		case 6:
+			mint_theme();
+			theme_index = 6;
+			break;
+		default:
+			break;
+	}
+}
+
+void setstyle(int stylefunc_index) {
+	switch(stylefunc_index) {
+		case 1:
+			style_index = 1;
+			round_compact_style();
+			break;
+		case 2:
+			style_index = 2;
+			big_style();
+			break;
+		case 3:
+			style_index = 3;
+			default_style();
+			break;
+		default:
+			break;
+	}
+}
+
+void setfont(int fontfunc_index) {
+    switch(fontfunc_index) {
+        case 1:
+            fontindex_menu = 1;
+            break;
+        case 2:
+            fontindex_menu = 0;
+            break;
+        default:
+            break;
+    }
+}
+
 void dark_theme()
 {
   ImGuiStyle& style = ImGui::GetStyle();
@@ -62,6 +130,7 @@ void dark_theme()
 
 void mint_theme()
 {
+	ImGui::StyleColorsDark();
 	ImVec4* colors = ImGui::GetStyle().Colors;
 	colors[ImGuiCol_FrameBg] = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
 	colors[ImGuiCol_FrameBgHovered] = ImVec4(0.05f, 0.90f, 0.54f, 1.00f);
@@ -186,4 +255,52 @@ void big_style()
 	style.ScrollbarRounding = 9.0f;
 	style.GrabMinSize = 5.0f;
 	style.GrabRounding = 3.0f;
+}
+
+void default_style()
+{
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.Alpha                   = 1.0f;             
+    style.DisabledAlpha           = 0.60f;            
+    style.WindowPadding           = ImVec2(8,8);      
+    style.WindowRounding          = 0.0f;             
+    style.WindowBorderSize        = 1.0f;             
+    style.WindowMinSize           = ImVec2(32,32);    
+    style.WindowTitleAlign        = ImVec2(0.0f,0.5f);
+    style.WindowMenuButtonPosition= ImGuiDir_Left;    
+    style.ChildRounding           = 0.0f;             
+    style.ChildBorderSize         = 1.0f;             
+    style.PopupRounding           = 0.0f;             
+    style.PopupBorderSize         = 1.0f;             
+    style.FramePadding            = ImVec2(4,3);      
+    style.FrameRounding           = 0.0f;             
+    style.FrameBorderSize         = 0.0f;             
+    style.ItemSpacing             = ImVec2(8,4);      
+    style.ItemInnerSpacing        = ImVec2(4,4);      
+    style.CellPadding             = ImVec2(4,2);      
+    style.TouchExtraPadding       = ImVec2(0,0);      
+    style.IndentSpacing           = 21.0f;            
+    style.ColumnsMinSpacing       = 6.0f;             
+    style.ScrollbarSize           = 14.0f;            
+    style.ScrollbarRounding       = 9.0f;             
+    style.GrabMinSize             = 12.0f;            
+    style.GrabRounding            = 0.0f;             
+    style.LogSliderDeadzone       = 4.0f;             
+    style.TabRounding             = 4.0f;             
+    style.TabBorderSize           = 0.0f;             
+    style.TabMinWidthForCloseButton = 0.0f;           
+    style.ColorButtonPosition     = ImGuiDir_Right;   
+    style.ButtonTextAlign         = ImVec2(0.5f,0.5f);
+    style.SelectableTextAlign     = ImVec2(0.0f,0.0f);
+    style.SeparatorTextBorderSize = 3.0f;             
+    style.SeparatorTextAlign      = ImVec2(0.0f,0.5f);
+    style.SeparatorTextPadding    = ImVec2(20.0f,3.f);
+    style.DisplayWindowPadding    = ImVec2(19,19);    
+    style.DisplaySafeAreaPadding  = ImVec2(3,3);      
+    style.MouseCursorScale        = 1.0f;             
+    style.AntiAliasedLines        = true;             
+    style.AntiAliasedLinesUseTex  = true;             
+    style.AntiAliasedFill         = true;             
+    style.CurveTessellationTol    = 1.25f;            
+    style.CircleTessellationMaxError = 0.30f;
 }

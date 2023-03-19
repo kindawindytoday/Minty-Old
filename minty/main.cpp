@@ -11,11 +11,13 @@
 #include <string>
 #include <vector>
 #include "imgui/L2DFileDialog.h"
-#define _CRT_SECURE_NO_WARNINGS
 #include <chrono>
 #include <thread>
 #include "gilua/logtextbuf.h"
 
+#include "json/json.hpp"
+//using json = nlohmann::json;
+//config json;
 using namespace std;
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -104,19 +106,23 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 		ImGui::NewFrame();
 		ImGui::GetStyle().IndentSpacing = 16.0f;
+
+		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[fontindex_menu]);
+
 		setlocale(LC_ALL, "C");
-		static float TimeScale = 1.0f;
+
 		static bool showEditor = false;
-		static int fontIndex_menu = 0;
-		static int fontIndex_code = 1;
+		static bool isopened = true;
+		static bool show_compile_log = false;
+
 		static char* file_dialog_buffer = nullptr;
 		static char path3[500] = "";
-		static bool isopened = true;
 
-		static bool show_compile_log = false;
+		static float TimeScale = 1.0f;
+
+		settheme(theme_index);
+		setstyle(style_index);
 		
-		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[fontIndex_menu]);
-
 		if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_F11)))
 		{
 			TimeScale = 1.0f;
@@ -260,7 +266,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					}
 				}
 
-				if (ImGui::SliderFloat("Timescale", &TimeScale, 0.0f, 2.0f, "%.3f"))
+				if (ImGui::SliderFloat("Timescale", &TimeScale, 0.0f, 5.0f, "%.3f"))
 				{
 					string result = "CS.UnityEngine.Time.timeScale = " + to_string(TimeScale);
 					luahookfunc(result.c_str());
@@ -293,6 +299,17 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 						luahookfunc("CS.UnityEngine.QualitySettings.vSyncCount = 0");
 						ImGui::Unindent();
 					}
+
+				static bool hideui = false;
+
+				if(ImGui::Checkbox("Hide UI", &hideui)) {
+					if (hideui) {
+						luahookfunc(char_uicamera_off);
+					}
+					else {
+						luahookfunc(char_uicamera_on);
+					}
+				}
 
 				ImGui::Separator();
 				ImGui::Text("Lua");
@@ -328,10 +345,17 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					string code = editor.GetText();
 					if (!code.empty() && code.find_first_not_of(" \t\n\v\f\r") != string::npos)
 					{
-						luahookfunc(code.c_str());
+						if (is_hook_success) {
+							luahookfunc(code.c_str());
+							if (last_ret_code == 0) {
+								util::log(2,"compilation success: %s", last_tolstr);
+							}
+						}
+						else {
+							util::log(0, "Lua is not hooked", "");
+						}
 					}
 				}
-
 				ImGui::SameLine();
 				//saver to button below.
 
@@ -435,27 +459,32 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			ImGuiTextFilter Filter;
 			if (show_compile_log)
 			{
-				ImGui::Begin("Log");
+				ImGui::Begin("Log", &show_compile_log);
 				if (ImGui::SmallButton("[Debug] Add 5 entries"))
 				{
 					static int counter = 0;
-					const char* categories[3] = { "info", "warn", "error" };
-					const char* words[] = { "Bumfuzzled", "Cattywampus", "Snickersnee", "Abibliophobia", "Absquatulate", "Nincompoop", "Pauciloquent" };
+					const char* categories[3] = { "Info", "Warning", "Error" };
+					const char* words[] = { "virus", "sob", "leak", "plead", "windsensinden", "windy", "ril", "fek" };
 					for (int n = 0; n < 5; n++)
 					{
 						const char* category = categories[counter % IM_ARRAYSIZE(categories)];
 						const char* word = words[counter % IM_ARRAYSIZE(words)];
-						log_textbuf.appendf("[%05d] [%s] Hello, current time is %.1f, here's a word: '%s'\n",
-									ImGui::GetFrameCount(), category, ImGui::GetTime(), word);
+						log_textbuf.appendf("[Minty:%s] [%05d] Hello, current time is %.1f, here's a word: '%s'\n", category, ImGui::GetFrameCount(), ImGui::GetTime(), word);
 						counter++;
 					}
 				}
 				ImGui::SameLine();
-				if (ImGui::Button("Clear")) {
+				if (ImGui::SmallButton("Clear")) {
 					log_textbuf.clear();
+				}
+				ImGui::SameLine();
+				if (ImGui::SmallButton("Copy")) {
+					ImGui::SetClipboardText(log_textbuf.begin());
 				}
 				Filter.Draw("Filter");
 				ImGui::Separator();
+				ImGui::BeginChild("LogScroll", ImVec2(0, 0), false, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+
 				if (Filter.IsActive())
 				{
 					const char* buf_begin = log_textbuf.begin();
@@ -473,10 +502,16 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					}
 					ImGui::TextUnformatted(log_filtered.begin(), log_filtered.end());
 				}
-				else {
+				else
+				{
 					ImGui::TextUnformatted(log_textbuf.begin(), log_textbuf.end());
 				}
-				
+
+				if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+				{
+					ImGui::SetScrollHereY(1.0f);
+				}
+				ImGui::EndChild();	
 				ImGui::End();
 			}
 
@@ -489,27 +524,32 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 				if (ImGui::RadioButton("Default dark", &themeIndex, 0))
 				{
-					ImGui::StyleColorsDark();
+					settheme(1);
 				}
 
 				if (ImGui::RadioButton("Default light", &themeIndex, 1))
 				{
-					ImGui::StyleColorsLight();
+					settheme(2);
 				}
 
-				if (ImGui::RadioButton("Dark theme", &themeIndex, 2))
+				if (ImGui::RadioButton("Default classic", &themeIndex, 2))
 				{
-					dark_theme();
+					settheme(3);
 				}
 
-				if (ImGui::RadioButton("Minty Red", &themeIndex, 3))
+				if (ImGui::RadioButton("Dark theme", &themeIndex, 3))
 				{
-					minty_red_theme();
+					settheme(4);
+				}
+
+				if (ImGui::RadioButton("Minty Red", &themeIndex, 4))
+				{
+					settheme(5);
 				}
 				
-				if (ImGui::RadioButton("Minty Mint", &themeIndex, 4))
+				if (ImGui::RadioButton("Minty Mint", &themeIndex, 5))
 				{
-					mint_theme();
+					settheme(6);
 				}
 
 				ImGui::Separator();
@@ -519,12 +559,17 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 				if (ImGui::RadioButton("Rounded compact style", &themestyleindex, 0))
 				{
-					round_compact_style();
+					setstyle(1);
 				}
 				
 				if (ImGui::RadioButton("Big", &themestyleindex, 1))
 				{
-					big_style();
+					setstyle(2);
+				}
+
+				if (ImGui::RadioButton("ImGui Default", &themestyleindex, 2))
+				{
+					setstyle(3);
 				}
 
 				ImGui::Separator();
@@ -532,14 +577,14 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				ImGui::Text("Menu font");
 
 				static int fontSelectionIndex = 0;
-				if (ImGui::RadioButton("Myriad pro", &fontSelectionIndex, 0))
+				if (ImGui::RadioButton("Jetbrains Mono", &fontSelectionIndex, 0))
 				{
-					fontIndex_menu = 0;
+					setfont(1);
 				}
 
-				if (ImGui::RadioButton("Jetbrains Mono", &fontSelectionIndex, 1))
+				if (ImGui::RadioButton("Myriad Pro", &fontSelectionIndex, 1))
 				{
-					fontIndex_menu = 1;
+					setfont(2);
 				}
 
 				ImGui::EndTabItem();
@@ -548,7 +593,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			if (ImGui::BeginTabItem("About"))
 			{
 				// Content for About
-				ImGui::Text("Minty BETA v0.6 WIP");
+				ImGui::Text("Minty BETA v0.7.1 WIP");
 				ImGui::Text("ImGui version: %s", ImGui::GetVersion());
 
 				ImVec4 linkColor = ImVec4(34.0f/255.0f, 132.0f/255.0f, 230.0f/255.0f, 1.0f);
@@ -583,6 +628,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					ImGui::Text("ImGuiFileDialog\n");
 					string licensefiledialog = string(license_FileDialog) + string(license_Generic);
 					ImGui::Text(licensefiledialog.c_str());
+					ImGui::Separator();
+
+					ImGui::Text("Json\n");
+					string licensejson = string(license_json) + string(license_Generic);
+					ImGui::Text(licensejson.c_str());
 
 					ImGui::Unindent();
 				}
@@ -591,35 +641,21 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 			if (ImGui::BeginTabItem("Performance"))
 			{
-
-				//static float fps_buffer[1200] = {}; 
-				//static int buffer_index = 0;
-				//static float fps_max = 0;
 				ImGuiIO& io = ImGui::GetIO();
 				float frametime = io.DeltaTime;
 				float fps = 1.0f / frametime;
 				static float timer = 0.0f;
 				timer += frametime;
 				static float fps_slow = 0.0f;
-				// fps_buffer[buffer_index] = fps;
-				// buffer_index = (buffer_index + 1) % 1200;
-				// if (fps > fps_max) {
-				// 	fps_max = fps;
-				// }
-				// else if (buffer_index == 0) {
-				// 	fps_max = 0;
-				// 	for (int i = 0; i < 1200; i++) {
-				// 		if (fps_buffer[i] > fps_max) {
-				// 			fps_max = fps_buffer[i];
-				// 		}
-				// 	}
-				// }
-				//ImGui::PlotLines("FPS", fps_buffer, 1200, buffer_index, NULL, 0.0f, fps_max + 10.0f, ImVec2(0, 80));
-				if (timer > 1) {
+				static float frametime_slow = 0.0f;
+
+				if (timer > 0.75) {
 				 	fps_slow = 1.0f / frametime;
+					frametime_slow = frametime;
 					timer = 0.0f;
 				}
 				ImGui::Text("Current FPS: %.2f", fps_slow);
+				ImGui::Text("Current Frametime: %.3fms", frametime_slow * 1000);
 				ImGui::EndTabItem();
 			}
 

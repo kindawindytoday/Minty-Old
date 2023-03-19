@@ -1,6 +1,9 @@
 #pragma once
 
 #include "..\gilua\luaHook.h"
+#include "../json/json.hpp"
+//using json = nlohmann::json;
+//config json;
 
 const char* char_changeuid = "CS.UnityEngine.GameObject.Find(\"/BetaWatermarkCanvas(Clone)/Panel/TxtUID\"):GetComponent(\"Text\").text = \"<b><i><color=#11edb1>KINDA WINDY TODAY</color></i></b>\"";
 
@@ -182,7 +185,7 @@ local function FindOffsetDummy()
 				for k = 0, getOffsetDummy.transform.childCount - 1 do
 				   local avatarModel = getOffsetDummy.transform:GetChild(k)
 				   if avatarModel.name:find("Avatar") then
-					  return findHierarchyPath(avatarModel.gameObject)
+					  return findHierarchyPath(avatarModel.gameObject) .. "/Bip001/Bip001 Pelvis/Bip001 Spine/Bip001 Spine1/Bip001 Spine2/boba"
 				   end
 				end
 			 end
@@ -191,7 +194,7 @@ local function FindOffsetDummy()
 	end
  end
 
-CS.UnityEngine.GameObject.Find(FindOffsetDummy() .. "/Bip001/Bip001 Pelvis/Bip001 Spine/Bip001 Spine1/Bip001 Spine2/boba").transform.localScale = CS.UnityEngine.Vector3()MY_DELIMITER";
+CS.UnityEngine.GameObject.Find(FindOffsetDummy()).transform.localScale = CS.UnityEngine.Vector3()MY_DELIMITER";
 
 const char* char_openarea_fog = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/LevelMapUIManager(Clone)/Canvas3D/MapBackContainer/BigWorld_Map(Clone)/MapArea/OpenArea_Fog"):SetActive()MY_DELIMITER";
 
@@ -586,6 +589,10 @@ end
 xpcall(swap, onError)
 )MY_DELIMITER";
 
+const char* char_uicamera_on = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/UICamera"):GetComponent("Camera").enabled = true)MY_DELIMITER";
+
+const char* char_uicamera_off = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/UICamera"):GetComponent("Camera").enabled = false)MY_DELIMITER";
+
 const char* license_ImGui = R"MY_DELIMITER(The MIT License (MIT)
 
 Copyright (c) 2014-2023 Omar Cornut)MY_DELIMITER";
@@ -596,6 +603,12 @@ const char* license_FileDialog = R"MY_DELIMITER(MIT License
 
 Copyright (c) 2018-2022 Stephane Cuillerdier (aka Aiekick)
 )MY_DELIMITER";
+
+const char* license_json = R"MY_DELIMITER(MIT License 
+
+Copyright (c) 2013-2022 Niels Lohmann
+)MY_DELIMITER";
+
 const char* license_Generic = R"MY_DELIMITER(
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

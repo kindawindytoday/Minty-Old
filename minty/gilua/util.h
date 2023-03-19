@@ -7,7 +7,6 @@
 #include <filesystem>
 #include "luahook.h"
 #include <chrono>
-#define _CRT_SECURE_NO_WARNINGS
 #include "../imgui/imgui.h"
 #include "logtextbuf.h"
 

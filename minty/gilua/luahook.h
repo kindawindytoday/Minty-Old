@@ -1,5 +1,4 @@
 #pragma once
-#define _CRT_SECURE_NO_WARNINGS
 #include <Windows.h>
 #define OFFET 0x265CFF0
 #include <cstdio>
@@ -26,6 +25,8 @@ HANDLE main_thread;
 
 auto gi_LL = luaL_newstate();
 static bool is_hook_success = false;
+static int last_ret_code;
+const char* last_tolstr;
 
 using pfn_loadbuffer = int (*)(lua_State*, const char*, size_t, const char*);
 pfn_loadbuffer* pp_loadbuffer;
@@ -143,24 +144,21 @@ std::optional<std::string> compile(lua_State* L, const char* script)
     };
 
     auto ret = luaL_loadstring(L, script);
-    if (is_hook_success) {
-        if (ret != 0)
-        {
-            std::string result = std::to_string(ret);
-            //util::log(1,"compilation failed(%i)", result); // i dont think we need the err code :skull
-            //util::log(1,"%s", lua_tolstring(L, 1, NULL));
-            util::log(1,"compilation failed: %s", lua_tolstring(L, 1, NULL));
-            //util::logdialog(lua_tolstring(L, 1, NULL)); ---- look in util.h; kinda useful but idk how to realise it at loading or how to mek slep
-            lua_pop(L, 1);
-            return std::nullopt;
-        }
-        else if (ret == 0) {
-            util::log(2,"compilation success: %s", lua_tolstring(L, 1, NULL));
-        }
+    last_ret_code = ret;
+    last_tolstr = lua_tolstring(L, 1, NULL);
+
+    if (ret != 0)
+    {
+        std::string result = std::to_string(ret);
+        //util::log(1,"compilation failed(%i)", result); // i dont think we need the err code :skull
+        //util::log(1,"%s", lua_tolstring(L, 1, NULL));
+        util::log(1,"compilation failed: %s", lua_tolstring(L, 1, NULL));
+        //util::logdialog(lua_tolstring(L, 1, NULL)); ---- look in util.h; kinda useful but idk how to realise it at loading or how to mek slep
+        lua_pop(L, 1);
+        return std::nullopt;
     }
-    else {
-        util::log(0, "compilation warning: Lua is not hooked");
-    }
+
+
 
     ret = lua_dump(L, writer, &compiled_script, 0);
     if (ret != 0)
