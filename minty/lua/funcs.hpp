@@ -589,6 +589,10 @@ end
 xpcall(swap, onError)
 )MY_DELIMITER";
 
+const char* char_uicamera_on = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/UICamera"):GetComponent("Camera").enabled = true)MY_DELIMITER";
+
+const char* char_uicamera_off = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/UICamera"):GetComponent("Camera").enabled = false)MY_DELIMITER";
+
 const char* license_ImGui = R"MY_DELIMITER(The MIT License (MIT)
 
 Copyright (c) 2014-2023 Omar Cornut)MY_DELIMITER";

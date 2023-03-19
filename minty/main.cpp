@@ -300,6 +300,17 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 						ImGui::Unindent();
 					}
 
+				static bool hideui = false;
+
+				if(ImGui::Checkbox("Hide UI", &hideui)) {
+					if (hideui) {
+						luahookfunc(char_uicamera_off);
+					}
+					else {
+						luahookfunc(char_uicamera_on);
+					}
+				}
+
 				ImGui::Separator();
 				ImGui::Text("Lua");
 				ImGui::Checkbox("Lua editor", &showEditor);
