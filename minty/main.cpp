@@ -90,6 +90,9 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 			ImGui::GetIO().Fonts->AddFontFromMemoryTTF((void*)jetbrains, sizeof(jetbrains), 18.f, &fontcoding, ranges);
 			io.Fonts->Build();
 
+			ImGui::GetIO().Fonts->AddFontFromMemoryTTF((void*)anime, sizeof(anime), 18.f, &fontcoding);
+			io.Fonts->Build();
+
 			//ImGui::GetIO().Fonts->Build();
 
 			ImGui_ImplDX11_InvalidateDeviceObjects();
@@ -563,6 +566,11 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 					settheme(6);
 				}
 
+				if (ImGui::RadioButton("Minty Mint Light", &themeIndex, 6))
+				{
+					settheme(7);
+				}
+
 				ImGui::Separator();
 				ImGui::Text("Theme style");
 
@@ -583,6 +591,11 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 					setstyle(3);
 				}
 
+				if (ImGui::RadioButton("Big Squared", &themestyleindex, 3))
+				{
+					setstyle(4);
+				}
+
 				ImGui::Separator();
 
 				ImGui::Text("Menu font");
@@ -596,6 +609,11 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				if (ImGui::RadioButton("Myriad Pro", &fontSelectionIndex, 1))
 				{
 					setfont(2);
+				}
+
+				if (ImGui::RadioButton("Anime", &fontSelectionIndex, 2))
+				{
+					setfont(3);
 				}
 
 				ImGui::EndTabItem();

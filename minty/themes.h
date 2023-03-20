@@ -12,10 +12,12 @@ void setfont(int fontfunc_index);
 void dark_theme();
 void minty_red_theme();
 void mint_theme();
+void mint_theme_light();
 
 void default_style();
 void round_compact_style();
 void big_style();
+void big_square_style();
 
 #endif
 #pragma once
