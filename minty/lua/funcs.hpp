@@ -589,6 +589,10 @@ end
 xpcall(swap, onError)
 )MY_DELIMITER";
 
+const char* char_dmgnum_on = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("Canvas/Pages/InLevelMainPage/GrpMainPage/ParticleDamageTextContainer"):SetActive(true))MY_DELIMITER";
+
+const char* char_dmgnum_off = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("Canvas/Pages/InLevelMainPage/GrpMainPage/ParticleDamageTextContainer"):SetActive(false))MY_DELIMITER";
+
 const char* char_uicamera_on = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/UICamera"):GetComponent("Camera").enabled = true)MY_DELIMITER";
 
 const char* char_uicamera_off = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/UICamera"):GetComponent("Camera").enabled = false)MY_DELIMITER";

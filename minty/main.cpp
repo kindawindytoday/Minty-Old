@@ -48,7 +48,7 @@ LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 }
 
 bool init = false;
-HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
+static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
 	if (!init)
 	{
@@ -308,6 +308,17 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					}
 					else {
 						luahookfunc(char_uicamera_on);
+					}
+				}
+
+				static bool hidenumdmg = false;
+
+				if(ImGui::Checkbox("Hide damage numbers", &hidenumdmg)) {
+					if (hidenumdmg) {
+						luahookfunc(char_dmgnum_off);
+					}
+					else {
+						luahookfunc(char_dmgnum_on);
 					}
 				}
 
