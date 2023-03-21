@@ -71,7 +71,7 @@ jobs:
 
         name: Minty-${{env.BUILD_CONFIGURATION}}
 
-        path: ./bin/Release-x64/*
+        path: ./x64/Release/*
 
         if-no-files-found: error
 
