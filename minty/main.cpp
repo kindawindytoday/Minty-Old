@@ -325,6 +325,18 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 					}
 				}
 
+				static char inputmoFilePath[512] = "";
+				static char inputpngFilePath[512] = "";
+				ImGui::Separator();
+				ImGui::Text("MO Loader");
+				ImGui::InputTextWithHint("mopath", "Enter your path to MO file", inputmoFilePath, sizeof(inputmoFilePath));
+				ImGui::InputTextWithHint("pngpath", "Enter your path to png file", inputpngFilePath, sizeof(inputpngFilePath));
+				
+				if (ImGui::Button("Load MO")) {
+					string result = string(char_moloader) + R"MY_DELIMITER(local moFilePath = ")MY_DELIMITER" + string(inputmoFilePath) + "\" \n" + R"MY_DELIMITER(local TextPath = ")MY_DELIMITER" + string(inputpngFilePath) + "\" \n" + string(char_moloader2);
+					luahookfunc(result.c_str());
+				}
+
 				ImGui::Separator();
 				ImGui::Text("Lua");
 				ImGui::Checkbox("Lua editor", &showEditor);
