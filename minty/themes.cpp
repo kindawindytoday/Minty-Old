@@ -309,6 +309,7 @@ void big_square_style()
 	style.ScrollbarRounding = 0.0f;
 	style.GrabMinSize = 5.0f;
 	style.GrabRounding = 0.0f;
+	style.TabRounding = 0.0f;
 }
 
 void default_style()
