@@ -207,9 +207,6 @@
     <None Include="kiero\minhook\dll_resources\MinHook.def" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="kiero\minhook\dll_resources\MinHook.rc" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="gilua\logtextbuf.h" />
     <ClInclude Include="gilua\luaHook.h" />
     <ClInclude Include="gilua\util.h" />
@@ -226,6 +223,7 @@
     <ClInclude Include="includes.h" />
     <ClInclude Include="json\json.hpp" />
     <ClInclude Include="kiero\kiero.h" />
+    <ClInclude Include="kiero\minhook\dll_resources\resource.h" />
     <ClInclude Include="kiero\minhook\include\MinHook.h" />
     <ClInclude Include="kiero\minhook\src\buffer.h" />
     <ClInclude Include="kiero\minhook\src\hde\hde32.h" />

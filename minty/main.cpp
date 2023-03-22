@@ -14,6 +14,7 @@
 #include <chrono>
 #include <thread>
 #include "gilua/logtextbuf.h"
+#include <Windows.h>
 
 #include "json/json.hpp"
 //using json = nlohmann::json;
@@ -326,11 +327,72 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				}
 
 				static char inputmoFilePath[512] = "";
-				static char inputpngFilePath[512] = "";
+				char inputpngFilePath[512] = "";
+				OPENFILENAMEA moofd{};
+				OPENFILENAMEA pngofd{};
+				std::string mo_path;
+				std::string png_path;
+				ZeroMemory(&moofd, sizeof(moofd));
+				moofd.lStructSize = sizeof(moofd);
+				moofd.lpstrFile = inputmoFilePath;
+				moofd.lpstrFile[0] = '\0';
+				moofd.hwndOwner = NULL;
+				moofd.nMaxFile = sizeof(inputmoFilePath);
+				moofd.lpstrFilter = ".Mo 3D Model (*.mo)\0*.mo\0All Files (*.*)\0*.*\0";
+				moofd.nFilterIndex = 1;
+				moofd.lpstrTitle = "Select Model File";
+				moofd.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
+
+				bool show_mofile_dialog = false;
+
 				ImGui::Separator();
 				ImGui::Text("MO Loader");
 				ImGui::InputTextWithHint("mopath", "Enter your path to MO file", inputmoFilePath, sizeof(inputmoFilePath));
+				ImGui::SameLine();
+
+				if (ImGui::Button("Locate"))
+				{
+					show_mofile_dialog = true;
+				}
+
+				if (show_mofile_dialog)
+				{
+					if (GetOpenFileNameA(&moofd))
+					{
+						std::string mo_path = moofd.lpstrFile;
+						string(inputmoFilePath) = moofd.lpstrFile;
+						// do something with mo_path
+					}
+					else {
+						std::cout << "Error: Unable to open file dialog." << std::endl;
+						// handle error
+					}
+					show_mofile_dialog = false;
+				}
+
 				ImGui::InputTextWithHint("pngpath", "Enter your path to png file", inputpngFilePath, sizeof(inputpngFilePath));
+				
+				ImGui::SameLine();
+				//if (ImGui::Button("Locate"))
+				//{
+				//	if (GetOpenFileNameA(&pngofd))
+				//	{
+				//		string(inputpngFilePath) = pngofd.lpstrFile;
+				//		/*std::ofstream settings_file("settings.txt", std::ios_base::out);
+				//		if (settings_file.is_open()) {
+				//			settings_file << png_path << std::endl;
+				//			settings_file.close();
+				//		}
+				//		else {
+				//			std::cout << "Error: Unable to open settings file." << std::endl;
+				//			return 1;
+				//		}*/
+				//	}
+				//	else {
+				//		std::cout << "Error: Unable to open file dialog." << std::endl;
+				//		return 1;
+				//	}
+				//}
 				
 				if (ImGui::Button("Load MO")) {
 					string result = string(char_moloader) + R"MY_DELIMITER(local moFilePath = ")MY_DELIMITER" + string(inputmoFilePath) + "\" \n" + R"MY_DELIMITER(local TextPath = ")MY_DELIMITER" + string(inputpngFilePath) + "\" \n" + string(char_moloader2);
