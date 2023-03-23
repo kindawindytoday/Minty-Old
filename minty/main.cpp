@@ -48,6 +48,18 @@ LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
 }
 
+static void HelpMarker(const char* desc)
+{
+    ImGui::TextDisabled("(?)");
+    if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort) && ImGui::BeginTooltip())
+    {
+        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+        ImGui::TextUnformatted(desc);
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    }
+}
+
 bool init = false;
 static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
@@ -714,31 +726,6 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				}
 				ImGui::Separator();
 
-				if (ImGui::CollapsingHeader("License"))
-				{
-					ImGui::Indent();
-
-					ImGui::Text("ImGui\n");
-					string licenseimgui = string(license_ImGui) + string(license_Generic);
-					ImGui::Text(licenseimgui.c_str());
-					ImGui::Separator();
-
-					ImGui::Text("ImGuiColorTextEdit\n");
-					string licensetextedit = string(license_ColorTextEdit) + string(license_Generic);
-					ImGui::Text(licensetextedit.c_str());
-					ImGui::Separator();
-					
-					ImGui::Text("ImGuiFileDialog\n");
-					string licensefiledialog = string(license_FileDialog) + string(license_Generic);
-					ImGui::Text(licensefiledialog.c_str());
-					ImGui::Separator();
-
-					ImGui::Text("Json\n");
-					string licensejson = string(license_json) + string(license_Generic);
-					ImGui::Text(licensejson.c_str());
-
-					ImGui::Unindent();
-				}
 				ImGui::EndTabItem();
 			}
 
@@ -759,6 +746,12 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				}
 				ImGui::Text("Current FPS: %.2f", fps_slow);
 				ImGui::Text("Current Frametime: %.3fms", frametime_slow * 1000);
+				ImGui::EndTabItem();
+			}
+
+			if (ImGui::BeginTabItem("Dumping"))
+			{
+				ImGui::Text("Dump");
 				ImGui::EndTabItem();
 			}
 
