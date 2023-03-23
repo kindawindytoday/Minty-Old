@@ -137,10 +137,15 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 		static char path3[500] = "";
 
 		static float TimeScale = 1.0f;
+		static bool themeInit = false;
 
-		settheme(theme_index);
-		setstyle(style_index);
-		
+		if (!themeInit)
+		{
+				settheme(theme_index);
+				setstyle(style_index);
+				themeInit = true;
+		}
+				
 		if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_F11)))
 		{
 			TimeScale = 1.0f;
@@ -616,7 +621,7 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				ImGui::EndChild();	
 				ImGui::End();
 			}
-
+			static bool show_style_editor = false;
 			if (ImGui::BeginTabItem("Themes"))
 			{
 				// Content for themes
@@ -704,6 +709,12 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 					setfont(3);
 				}
 
+				ImGui::Separator();
+
+				ImGui::Text("Style Editor");
+
+				ImGui::Checkbox("Show Style Editor", &show_style_editor);
+
 				ImGui::EndTabItem();
 			}
 
@@ -731,18 +742,22 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				ImGui::EndTabItem();
 			}
 
-			static bool show_debug_window = false;
+			static bool show_debug_metrics = false;
+			
 			if (ImGui::BeginTabItem("Debug"))
 			{
-				ImGui::Checkbox("Show Debug info", &show_debug_window);
+				ImGui::Checkbox("Show Debug Metrics", &show_debug_metrics);
+				
 
 				ImGui::EndTabItem();
 			}
 
-			if(show_debug_window)
+			if(show_debug_metrics)
+			ImGui::ShowMetricsWindow(&show_debug_metrics);
+			if (show_style_editor)
 			{
-				ImGui::Begin("Debug metrics");
-				HelpMarker("hm");
+				ImGui::Begin("ImGui Style Editor", &show_style_editor);
+				ImGui::ShowStyleEditor();
 				ImGui::End();
 			}
 
