@@ -141,9 +141,9 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 
 		if (!themeInit)
 		{
-				settheme(theme_index);
-				setstyle(style_index);
-				themeInit = true;
+			settheme(theme_index);
+			setstyle(style_index);
+			themeInit = true;
 		}
 				
 		if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_F11)))
@@ -247,6 +247,7 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				static float cc_g = 1.0f;
 				static float cc_b = 1.0f;
 				static float cc_a = 1.0f;
+				static ImVec4 infusion_col = ImVec4( 1.0f, 1.0f, 1.0f, 1.0f );
 
 				ImGui::Checkbox("Infusion changer", &show_colorator3000);
 				if (show_colorator3000)
@@ -258,10 +259,13 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 						luahookfunc(result.c_str());
 					}
 					ImGui::SameLine();
-					ImGui::SliderFloat("Red color", &cc_r, 0.0f, 1.0f, "%.3f");
-					ImGui::SliderFloat("Green color", &cc_g, 0.0f, 1.0f, "%.3f");
-					ImGui::SliderFloat("Blue color", &cc_b, 0.0f, 1.0f, "%.3f");
-					ImGui::SliderFloat("Alpha", &cc_a, 0.0f, 1.0f, "%.3f");
+
+					ImGui::ColorEdit4("Infusion Color", &infusion_col.x, ImGuiColorEditFlags_AlphaBar);
+
+					cc_r = infusion_col.x;
+					cc_g = infusion_col.y;
+					cc_b = infusion_col.z;
+					cc_a = infusion_col.w;
 
 					ImGui::Unindent();
 				}
