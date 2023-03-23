@@ -16,7 +16,6 @@
 #include "gilua/logtextbuf.h"
 #include <Windows.h>
 #include <ShObjIdl.h>
-#include <ObjBase.h>
 
 #include "json/json.hpp"
 //using json = nlohmann::json;
@@ -47,20 +46,6 @@ LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 		return true;
 
 	return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
-
-}
-
-static void HelpMarker(const char* desc)
-{
-    ImGui::TextDisabled("(?)");
-if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))
-{
-    ImGui::BeginTooltip();
-    ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-    ImGui::TextUnformatted(desc);
-    ImGui::PopTextWrapPos();
-    ImGui::EndTooltip();
-}
 
 }
 
@@ -107,8 +92,8 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 			ImGui::GetIO().Fonts->AddFontFromMemoryTTF((void*)jetbrains, sizeof(jetbrains), 18.f, &fontcoding, ranges);
 			io.Fonts->Build();
 
-			/*ImGui::GetIO().Fonts->AddFontFromMemoryTTF((void*)anime, sizeof(anime), 18.f, &fontcoding, ranges);
-			io.Fonts->Build();*/
+			ImGui::GetIO().Fonts->AddFontFromMemoryTTF((void*)anime, sizeof(anime), 18.f, &fontcoding, ranges);
+			io.Fonts->Build();
 
 			//ImGui::GetIO().Fonts->Build();
 
@@ -139,15 +124,10 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 		static char path3[500] = "";
 
 		static float TimeScale = 1.0f;
-		static bool themeInit = false;
 
-		if (!themeInit)
-		{
-			settheme(theme_index);
-			setstyle(style_index);
-			themeInit = true;
-		}
-				
+		settheme(theme_index);
+		setstyle(style_index);
+		
 		if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_F11)))
 		{
 			TimeScale = 1.0f;
@@ -171,8 +151,7 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 					ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "WARNING! LUA NOT HOOKED");
 					ImGui::Separator();
 				}
-				//ImGui::Text("Player");
-				ImGui::SeparatorText("Player");
+				ImGui::Text("Player");
 
 				static char inputTextBuffer[512] = "";
 				ImGui::InputTextWithHint("##input", "Enter custom UID text here...", inputTextBuffer, sizeof(inputTextBuffer));
@@ -181,15 +160,11 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 					string result = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID"):GetComponent("Text").text = ")MY_DELIMITER" + string(inputTextBuffer) + "\"";
 					luahookfunc(result.c_str());
 				}
-				ImGui::SameLine();
-				HelpMarker("Changes your game UID to any defined text. HTML/Rich Text tags can be applied.");
 
 				static bool show_modelswap = false;
 				if (ImGui::Checkbox("Model swapper", &show_modelswap)) {
 					luahookfunc("CS.LAMLMFNDPHJ.HAFGEFPIKFK(\"snoo.\",\"snoo.\")");
 				}
-				ImGui::SameLine();
-				HelpMarker("Swaps your avatars' models. Switch to character which model you want to set on another, press Clone; Switch to character, which model you want to replace with copied, press Paste.");
 				if (show_modelswap)
 				{
 					ImGui::Indent();
@@ -206,8 +181,6 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				static bool show_resizer = false;
 				static float boob_size = 1.0f;
 				ImGui::Checkbox("Booba resizer", &show_resizer);
-				ImGui::SameLine();
-				HelpMarker("Changes size of character breasts. Press Initiate and move slider.");
 				if (show_resizer)
 				{
 					ImGui::Indent();
@@ -228,8 +201,6 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 
 				static bool show_avatarresizer = false;
 				ImGui::Checkbox("Avatar resizer", &show_avatarresizer);
-				ImGui::SameLine();
-				HelpMarker("Resizes your current character's size. Just move slider. ");
 
 				if (show_avatarresizer) {
 					static float avatarsize = 1.0f;
@@ -258,11 +229,8 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				static float cc_g = 1.0f;
 				static float cc_b = 1.0f;
 				static float cc_a = 1.0f;
-				static ImVec4 infusion_col = ImVec4( 1.0f, 1.0f, 1.0f, 1.0f );
 
 				ImGui::Checkbox("Infusion changer", &show_colorator3000);
-				ImGui::SameLine();
-				HelpMarker("Changes color of Elemental Infusion/Blade trail of your current character. Adjust color either with sliders or with color picker. Works perfectly on swords, greatswords, polearms.");
 				if (show_colorator3000)
 				{
 					ImGui::Indent();
@@ -272,38 +240,16 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 						luahookfunc(result.c_str());
 					}
 					ImGui::SameLine();
-
-					ImGui::ColorEdit4("Infusion Color", &infusion_col.x, ImGuiColorEditFlags_AlphaBar);
-
-					cc_r = infusion_col.x;
-					cc_g = infusion_col.y;
-					cc_b = infusion_col.z;
-					cc_a = infusion_col.w;
+					ImGui::SliderFloat("Red color", &cc_r, 0.0f, 1.0f, "%.3f");
+					ImGui::SliderFloat("Green color", &cc_g, 0.0f, 1.0f, "%.3f");
+					ImGui::SliderFloat("Blue color", &cc_b, 0.0f, 1.0f, "%.3f");
+					ImGui::SliderFloat("Alpha", &cc_a, 0.0f, 1.0f, "%.3f");
 
 					ImGui::Unindent();
 				}
 
-				static bool animcheng = false;
-				ImGui::Checkbox("Unlock FPS", &animcheng);
-				ImGui::SameLine();
-				HelpMarker("Unlocks your framerate to defined target FPS.");
-				if (animcheng) {
-					ImGui::Indent();
-					if (ImGui::Button("Change"))
-					{
-						string result = animchanger + somechosenanimidkbestiemakeitplease + animchanger2; 
-						luahookfunc(result.c_str());
-					}
-					if (ImGui::Button("Reset"))
-					{
-						luahookfunc(animchangerreturn);
-					}
-					ImGui::Unindent();
-				}
-
-				//ImGui::Separator();
-				//ImGui::Text("World");
-				ImGui::SeparatorText("World");
+				ImGui::Separator();
+				ImGui::Text("World");
 				static bool browser_is_enabled = false;
 				if (ImGui::Checkbox("Browser", &browser_is_enabled)) {
 					if (browser_is_enabled) {
@@ -313,8 +259,6 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 						luahookfunc(char_browser_off);
 					}
 				}
-				ImGui::SameLine();
-				HelpMarker("Spawns big interactive screen, where you can access any internet page. Click it either while holding Alt, or while charging a bow.");
 
 				static bool no_fog = false;
 				if(ImGui::Checkbox("Disable fog", &no_fog))
@@ -326,8 +270,6 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 						luahookfunc(R"MY_DELIMITER(CS.UnityEngine.RenderSettings.fog = true)MY_DELIMITER");
 					}
 				}
-				ImGui::SameLine();
-				HelpMarker("Disables visual fog in world.");
 
 				if (ImGui::SliderFloat("Timescale", &TimeScale, 0.0f, 5.0f, "%.3f"))
 				{
@@ -335,39 +277,15 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 					luahookfunc(result.c_str());
 				}
 				ImGui::SameLine();
-				HelpMarker("Changes speed of game time. Applies to everything in game.");
 
-				ImGui::SameLine();
 				if (ImGui::Button("Reset (F11)")) {
 					TimeScale = 1.0f;
 					string result = "CS.UnityEngine.Time.timeScale = 1.0";
 					luahookfunc(result.c_str());
 				}
 
-				char inputmoFilePath[512] = "";
-				char inputpngFilePath[512] = "";
-
-				bool show_mofile_dialog = false;
-
 				ImGui::Separator();
-				ImGui::Text("MO Loader");
-
-
-				ImGui::InputTextWithHint("", "Enter your path to .mo file", inputmoFilePath, sizeof(inputmoFilePath));
-				ImGui::InputTextWithHint("", "Enter your path to .png file", inputpngFilePath, sizeof(inputpngFilePath));
-
-				ImGui::SameLine();
-
-				if (ImGui::Button("Load MO")) {
-					string result = string(char_moloader) + R"MY_DELIMITER(local moFilePath = ")MY_DELIMITER" + string(inputmoFilePath) + "\" \n" + R"MY_DELIMITER(local TextPath = ")MY_DELIMITER" + string(inputpngFilePath) + "\" \n" + string(char_moloader2);
-					luahookfunc(result.c_str());
-				}
-				ImGui::SameLine();
-				HelpMarker("Creates 3D object in world, which will be imported from defined paths.");
-
-				//ImGui::Separator();
-				//ImGui::Text("Misc");
-				ImGui::SeparatorText("Misc");
+				ImGui::Text("Misc");
 				// static bool is_fps_shown = false;
 				// ImGui::Checkbox("Show FPS", &is_fps_shown);
 				// if (is_fps_shown) 
@@ -378,8 +296,6 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				static bool unlockfps = false;
 				static float targetfps = 60;
 				ImGui::Checkbox("Unlock FPS", &unlockfps);
-				ImGui::SameLine();
-				HelpMarker("Unlocks your framerate to defined target FPS.");
 					if (unlockfps) {
 						ImGui::Indent();
 						ImGui::SliderFloat("Target FPS", &targetfps, 10.0f, 360.0f, "%.3f");
@@ -399,12 +315,10 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 						luahookfunc(char_uicamera_on);
 					}
 				}
-				ImGui::SameLine();
-				HelpMarker("Hides all game UI.");
 
 				static bool hidenumdmg = false;
 
-				if(ImGui::Checkbox("Hide DMG numbers", &hidenumdmg)) {
+				if(ImGui::Checkbox("Hide damage numbers", &hidenumdmg)) {
 					if (hidenumdmg) {
 						luahookfunc(char_dmgnum_off);
 					}
@@ -412,36 +326,145 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 						luahookfunc(char_dmgnum_on);
 					}
 				}
+
+				bool showmoofd = false;
+				static char inputmoFilePath[512] = "";
+				char inputpngFilePath[512] = "";
+				/*OPENFILENAMEA moofd{};
+				OPENFILENAMEA pngofd{};*/
+				std::string mo_path;
+				std::string png_path;
+				/*ZeroMemory(&moofd, sizeof(moofd));
+				moofd.lStructSize = sizeof(moofd);
+				moofd.lpstrFile = inputmoFilePath;
+				moofd.lpstrFile[0] = '\0';
+				moofd.hwndOwner = NULL;
+				moofd.nMaxFile = sizeof(inputmoFilePath);
+				moofd.lpstrFilter = ".Mo 3D Model (*.mo)\0*.mo\0All Files (*.*)\0*.*\0";
+				moofd.nFilterIndex = 1;
+				moofd.lpstrTitle = "Select Model File";
+				moofd.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;*/
+
+				bool show_mofile_dialog = false;
+
+				ImGui::Separator();
+				ImGui::Text("MO Loader");
+				ImGui::InputTextWithHint("mopath", "Enter your path to MO file", inputmoFilePath, sizeof(inputmoFilePath));
 				ImGui::SameLine();
-				HelpMarker("Hides that floating damage numbers.");
 
-				/*static bool turnoffdithering = false;  -------- may not wok
+				if (ImGui::Button("Locate"))
+				{
+					showmoofd = true;
+					ImGui::OpenPopup("MO");
+				}
 
-				if (ImGui::Checkbox("Enable peeking", &turnoffdithering)) {
-					if (turnoffdithering) {
-						luahookfunc(enablepeeking);
+				if (showmoofd)
+				{
+					// Create the file dialog
+					IFileDialog* pFileDialog;
+					CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pFileDialog));
+
+					// Set the file dialog options
+					DWORD dwOptions;
+					pFileDialog->GetOptions(&dwOptions);
+					pFileDialog->SetOptions(dwOptions | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST | FOS_FILEMUSTEXIST);
+
+					// Set the file dialog filters
+					COMDLG_FILTERSPEC filterSpec[] = { { L"Mo 3D Model (*.mo)", L"*.mo" }, { L"All Files (*.*)", L"*.*" } };
+					pFileDialog->SetFileTypes(2, filterSpec);
+
+					// Show the file dialog
+					if (SUCCEEDED(pFileDialog->Show(NULL)))
+					{
+						// Get the selected file path
+						IShellItem* pItem;
+						pFileDialog->GetResult(&pItem);
+						PWSTR pszFilePath;
+						pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+
+						// Copy the file path to the inputmoFilePath buffer
+						wcstombs_s(NULL, inputmoFilePath, 512, pszFilePath, 512);
+
+						// Free resources
+						CoTaskMemFree(pszFilePath);
+						pItem->Release();
 					}
-					else {
-						luahookfunc(disablepeeking);
-					}
-				}*/
 
-				/*static bool changefov = false; --------- no wok too
-				static float targetfov = 60;
-				ImGui::Checkbox("Change camera FOV", &changefov);
+					pFileDialog->Release();
+
+					// Reset the showmoofd flag
+					showmoofd = false;
+				}
+
+				//if (ImGui::Button("Locate"))
+				//{
+				//	show_mofile_dialog = true;
+
+				//	// Reset the file name buffer
+				//	ZeroMemory(inputmoFilePath, sizeof(inputmoFilePath));
+
+				//	// Initialize the file dialog struct
+				//	ZeroMemory(&moofd, sizeof(moofd));
+				//	moofd.lStructSize = sizeof(moofd);
+				//	moofd.hwndOwner = NULL;
+				//	moofd.lpstrFile = inputmoFilePath;
+				//	moofd.nMaxFile = sizeof(inputmoFilePath);
+				//	moofd.lpstrFilter = "Mo 3D Model (*.mo)\0*.mo\0All Files (*.*)\0*.*\0";
+				//	moofd.nFilterIndex = 1;
+				//	moofd.lpstrTitle = "Select Model File";
+				//	moofd.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
+
+				//	// Show the file dialog
+				//	if (GetOpenFileNameA(&moofd))
+				//	{
+				//		// Do something with the file path
+				//		string(inputmoFilePath) = moofd.lpstrFile;
+				//	}
+
+				//	// Reset the file name buffer again
+				//	ZeroMemory(inputmoFilePath, sizeof(inputmoFilePath));
+				//}
+
+				//// Handle messages for the file dialog
+				//MSG msg;
+				//while (PeekMessageA(&msg, NULL, 0, 0, PM_REMOVE))
+				//{
+				//	TranslateMessage(&msg);
+				//	DispatchMessageA(&msg);
+				//}
+
+
+				ImGui::InputTextWithHint("pngpath", "Enter your path to png file", inputpngFilePath, sizeof(inputpngFilePath));
+				
 				ImGui::SameLine();
-				HelpMarker("Changes Field Of View.");
-				if (changefov) {
-					ImGui::Indent();
-					ImGui::SliderFloat("Field Of View", &targetfov, 10.0f, 180.0f, "%.3f");
-					string result = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("EntityRoot/MainCamera(Clone)"):GetComponent("Camera").main.fieldOfView = )MY_DELIMITER" + to_string(targetfov);
+				//if (ImGui::Button("Locate"))
+				//{
+				//	if (GetOpenFileNameA(&pngofd))
+				//	{
+				//		string(inputpngFilePath) = pngofd.lpstrFile;
+				//		/*std::ofstream settings_file("settings.txt", std::ios_base::out);
+				//		if (settings_file.is_open()) {
+				//			settings_file << png_path << std::endl;
+				//			settings_file.close();
+				//		}
+				//		else {
+				//			std::cout << "Error: Unable to open settings file." << std::endl;
+				//			return 1;
+				//		}*/
+				//	}
+				//	else {
+				//		std::cout << "Error: Unable to open file dialog." << std::endl;
+				//		return 1;
+				//	}
+				//}
+				
+				if (ImGui::Button("Load MO")) {
+					string result = string(char_moloader) + R"MY_DELIMITER(local moFilePath = ")MY_DELIMITER" + string(inputmoFilePath) + "\" \n" + R"MY_DELIMITER(local TextPath = ")MY_DELIMITER" + string(inputpngFilePath) + "\" \n" + string(char_moloader2);
 					luahookfunc(result.c_str());
-					ImGui::Unindent();
-				}*/
+				}
 
-				//ImGui::Separator();
-				//ImGui::Text("Lua");
-				ImGui::SeparatorText("Lua");
+				ImGui::Separator();
+				ImGui::Text("Lua");
 				ImGui::Checkbox("Lua editor", &showEditor);
 				
 				ImGui::EndTabItem();
@@ -643,7 +666,7 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				ImGui::EndChild();	
 				ImGui::End();
 			}
-			static bool show_style_editor = false;
+
 			if (ImGui::BeginTabItem("Themes"))
 			{
 				// Content for themes
@@ -726,11 +749,10 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 					setfont(2);
 				}
 
-				ImGui::Separator();
-
-				ImGui::Text("Style Editor");
-
-				ImGui::Checkbox("Show Style Editor", &show_style_editor);
+				if (ImGui::RadioButton("Anime", &fontSelectionIndex, 2))
+				{
+					setfont(3);
+				}
 
 				ImGui::EndTabItem();
 			}
@@ -756,31 +778,51 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				}
 				ImGui::Separator();
 
+				if (ImGui::CollapsingHeader("License"))
+				{
+					ImGui::Indent();
+
+					ImGui::Text("ImGui\n");
+					string licenseimgui = string(license_ImGui) + string(license_Generic);
+					ImGui::Text(licenseimgui.c_str());
+					ImGui::Separator();
+
+					ImGui::Text("ImGuiColorTextEdit\n");
+					string licensetextedit = string(license_ColorTextEdit) + string(license_Generic);
+					ImGui::Text(licensetextedit.c_str());
+					ImGui::Separator();
+					
+					ImGui::Text("ImGuiFileDialog\n");
+					string licensefiledialog = string(license_FileDialog) + string(license_Generic);
+					ImGui::Text(licensefiledialog.c_str());
+					ImGui::Separator();
+
+					ImGui::Text("Json\n");
+					string licensejson = string(license_json) + string(license_Generic);
+					ImGui::Text(licensejson.c_str());
+
+					ImGui::Unindent();
+				}
 				ImGui::EndTabItem();
 			}
 
-			static bool show_debug_metrics = false;
-			
-			if (ImGui::BeginTabItem("Debug"))
+			if (ImGui::BeginTabItem("Performance"))
 			{
-				ImGui::Checkbox("Show Debug Metrics", &show_debug_metrics);
-				
+				ImGuiIO& io = ImGui::GetIO();
+				float frametime = io.DeltaTime;
+				float fps = 1.0f / frametime;
+				static float timer = 0.0f;
+				timer += frametime;
+				static float fps_slow = 0.0f;
+				static float frametime_slow = 0.0f;
 
-				ImGui::EndTabItem();
-			}
-
-			if(show_debug_metrics)
-			ImGui::ShowMetricsWindow(&show_debug_metrics);
-			if (show_style_editor)
-			{
-				ImGui::Begin("ImGui Style Editor", &show_style_editor);
-				ImGui::ShowStyleEditor();
-				ImGui::End();
-			}
-
-			if (ImGui::BeginTabItem("Dumping"))
-			{
-				ImGui::Text("Dump");
+				if (timer > 0.75) {
+				 	fps_slow = 1.0f / frametime;
+					frametime_slow = frametime;
+					timer = 0.0f;
+				}
+				ImGui::Text("Current FPS: %.2f", fps_slow);
+				ImGui::Text("Current Frametime: %.3fms", frametime_slow * 1000);
 				ImGui::EndTabItem();
 			}
 
