@@ -284,13 +284,19 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				}
 
 				static bool animcheng = false;
-				ImGui::Checkbox("Unlock FPS", &animcheng);
+				static int anim_select_index = 0;
+				ImGui::Checkbox("Animation Changer", &animcheng);
 				ImGui::SameLine();
-				HelpMarker("Unlocks your framerate to defined target FPS.");
+				HelpMarker("Change current avatar's animation");
 				if (animcheng) {
 					ImGui::Indent();
+					if(ImGui::BeginCombo("Animation", animation_options[anim_select_index]))
+					{
+						ImGui::EndCombo();
+					}
 					if (ImGui::Button("Change"))
 					{
+						static string somechosenanimidkbestiemakeitplease = "";
 						string result = animchanger + somechosenanimidkbestiemakeitplease + animchanger2; 
 						luahookfunc(result.c_str());
 					}

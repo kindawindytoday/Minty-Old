@@ -5,6 +5,7 @@
 //using json = nlohmann::json;
 //config json;
 
+const char* animation_options[] = {"1", "2", "3"};
 const char* char_changeuid = "CS.UnityEngine.GameObject.Find(\"/BetaWatermarkCanvas(Clone)/Panel/TxtUID\"):GetComponent(\"Text\").text = \"<b><i><color=#11edb1>KINDA WINDY TODAY</color></i></b>\"";
 
 const char* char_eleminf = R"MY_DELIMITER(
