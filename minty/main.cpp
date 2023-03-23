@@ -51,13 +51,15 @@ LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 static void HelpMarker(const char* desc)
 {
     ImGui::TextDisabled("(?)");
-    if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort) && ImGui::BeginTooltip())
-    {
-        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-        ImGui::TextUnformatted(desc);
-        ImGui::PopTextWrapPos();
-        ImGui::EndTooltip();
-    }
+if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))
+{
+    ImGui::BeginTooltip();
+    ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+    ImGui::TextUnformatted(desc);
+    ImGui::PopTextWrapPos();
+    ImGui::EndTooltip();
+}
+
 }
 
 bool init = false;
@@ -729,24 +731,19 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				ImGui::EndTabItem();
 			}
 
-			if (ImGui::BeginTabItem("Performance"))
+			static bool show_debug_window = false;
+			if (ImGui::BeginTabItem("Debug"))
 			{
-				ImGuiIO& io = ImGui::GetIO();
-				float frametime = io.DeltaTime;
-				float fps = 1.0f / frametime;
-				static float timer = 0.0f;
-				timer += frametime;
-				static float fps_slow = 0.0f;
-				static float frametime_slow = 0.0f;
+				ImGui::Checkbox("Show Debug info", &show_debug_window);
 
-				if (timer > 0.75) {
-				 	fps_slow = 1.0f / frametime;
-					frametime_slow = frametime;
-					timer = 0.0f;
-				}
-				ImGui::Text("Current FPS: %.2f", fps_slow);
-				ImGui::Text("Current Frametime: %.3fms", frametime_slow * 1000);
 				ImGui::EndTabItem();
+			}
+
+			if(show_debug_window)
+			{
+				ImGui::Begin("Debug metrics");
+				HelpMarker("hm");
+				ImGui::End();
 			}
 
 			if (ImGui::BeginTabItem("Dumping"))
