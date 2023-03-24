@@ -13,6 +13,7 @@
 #include "imgui/L2DFileDialog.h"
 #include <chrono>
 #include <thread>
+
 #include "gilua/logtextbuf.h"
 #include <Windows.h>
 #include <ShObjIdl.h>
@@ -53,15 +54,14 @@ LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 static void HelpMarker(const char* desc)
 {
     ImGui::TextDisabled("(?)");
-if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))
-{
-    ImGui::BeginTooltip();
-    ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-    ImGui::TextUnformatted(desc);
-    ImGui::PopTextWrapPos();
-    ImGui::EndTooltip();
-}
-
+	if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))
+	{
+		ImGui::BeginTooltip();
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted(desc);
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
 }
 
 bool init = false;
@@ -174,11 +174,11 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				//ImGui::Text("Player");
 				ImGui::SeparatorText("Player");
 
-				static char inputTextBuffer[512] = "";
-				ImGui::InputTextWithHint("##input", "Enter custom UID text here...", inputTextBuffer, sizeof(inputTextBuffer));
+				static char UID_inputTextBuffer[512] = "";
+				ImGui::InputTextWithHint("##input", "Enter custom UID text here...", UID_inputTextBuffer, sizeof(UID_inputTextBuffer));
 				ImGui::SameLine();
 				if (ImGui::Button("Update custom UID")) {
-					string result = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID"):GetComponent("Text").text = ")MY_DELIMITER" + string(inputTextBuffer) + "\"";
+					string result = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID"):GetComponent("Text").text = ")MY_DELIMITER" + string(UID_inputTextBuffer) + "\"";
 					luahookfunc(result.c_str());
 				}
 				ImGui::SameLine();
@@ -292,6 +292,15 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 					ImGui::Indent();
 					if(ImGui::BeginCombo("Animation", animation_options[anim_select_index]))
 					{
+						for (int i = 0; i < sizeof(animation_options) / sizeof(animation_options[0]); i++) {
+							bool is_anim_Selected = (anim_select_index == i);
+							if (ImGui::Selectable(animation_options[i], is_anim_Selected)) {
+								anim_select_index = i;
+							}
+							if (is_anim_Selected) {
+								ImGui::SetItemDefaultFocus();
+							}
+						}
 						ImGui::EndCombo();
 					}
 					if (ImGui::Button("Change"))
@@ -783,10 +792,39 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				ImGui::ShowStyleEditor();
 				ImGui::End();
 			}
+			
+			static char DumpCS_path_Textbuf[1024] = "";
 
 			if (ImGui::BeginTabItem("Dumping"))
 			{
-				ImGui::Text("Dump");
+
+				ImGui::InputTextWithHint("Dump path", "C:/Users/User/Desktop", DumpCS_path_Textbuf, sizeof(DumpCS_path_Textbuf));
+				ImGui::SameLine();
+				HelpMarker("Provide a valid path to dump. \nProvide an existing folder as it cannot create new folders.");
+
+				ImGui::Separator();
+
+				if (ImGui::Button("Dump CSharp")) {
+					if(strlen(DumpCS_path_Textbuf) != 0)
+					{
+						string result = "local DUMP_FOLDER = \"" + string(DumpCS_path_Textbuf) + "\"" + char_dumpcs_part1 + char_dumpcs_part2;
+						luahookfunc(result.c_str());
+					}
+				}
+				if(ImGui::IsItemHovered() && strlen(DumpCS_path_Textbuf) != 0){
+					ImGui::SameLine();
+					ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "WARNING! This will freeze your game, give it 20 minutes or so to complete.");
+				}
+				else{}
+				
+				if(ImGui::Button("Dump current hierarchy"))
+				{
+					if(strlen(DumpCS_path_Textbuf) != 0)
+					{
+						string result = "local dump_path = \"" + string(DumpCS_path_Textbuf) + "\"" + char_dump_hierarchy;
+						luahookfunc(result.c_str());
+					}
+				}
 				ImGui::EndTabItem();
 			}
 
