@@ -123,6 +123,242 @@ const char* animation_options[] = {
 "WalkToIdle",
 "WalkToRun"
 };
+
+const char* emo_options[] = {
+    "Angry05",
+    "Angry06",
+    "Closed01",
+    "Closed02",
+    "Closed03",
+    "Closed04",
+    "Closed05",
+    "Happy01",
+    "Happy02",
+    "Happy03",
+    "Happy04",
+    "Happy05",
+    "Normal01",
+    "Normal02",
+    "Normal03",
+    "Normal04",
+    "Normal05",
+    "Normal06",
+    "Sad01",
+    "Sad02",
+    "Sad03",
+    "Sad04",
+    "Sad05",
+    "Surprise01",
+    "Surprise02",
+    "Surprise03",
+    "Surprise04",
+    "Surprise05",
+    "Sweat01",
+    "Sweat02",
+    "Sweat03",
+    "Sweat04",
+    "Sweat05",
+    "Tired01",
+    "Tired02",
+    "Tired03",
+    "Tired04",
+    "Tired05",
+    "Default",
+    "Angry_01",
+    "Angry_02",
+    "Angry_03",
+    "Angry_04",
+    "Default_01",
+    "Doubt_01",
+    "Doubt_02",
+    "Doubt_03",
+    "Doubt_04",
+    "Gentle_01",
+    "Gentle_02",
+    "Gentle_03",
+    "Gentle_04",
+    "HiClosed_01",
+    "HiClosed_02",
+    "HiClosed_03",
+    "HiClosed_04",
+    "HiClosed_05",
+    "HiClosed_06",
+    "HiClosed_07",
+    "LowClosed_01",
+    "LowClosed_02",
+    "LowClosed_03",
+    "LowClosed_04",
+    "LowClosed_05",
+    "LowClosed_06",
+    "LowClosed_07",
+    "MidClosed_01",
+    "MidClosed_02",
+    "MidClosed_03",
+    "MidClosed_04",
+    "MidClosed_05",
+    "MidClosed_06",
+    "MidClosed_07",
+    "Normal_01",
+    "Normal_02",
+    "Normal_03",
+    "Normal_04",
+    "Normal_05",
+    "Surprise_01",
+    "Surprise_02",
+    "Sweat_01",
+    "Sweat_02",
+    "Sweat_03",
+    "Sweat_04"
+};
+
+const char* pho_options[] = {
+    "P_None",
+    "P_A",
+    "P_O",
+    "P_E",
+    "P_I",
+    "P_U",
+    "P_N",
+    "P_Smile01",
+    "P_Smile02",
+    "P_Smile03",
+    "P_Smile04",
+    "P_Smile05",
+    "P_Smile06",
+    "P_Angry01",
+    "P_Angry02",
+    "P_Angry03",
+    "P_Angry04",
+    "P_Doya01",
+    "P_Doya02",
+    "P_Pero01",
+    "P_Pero02",
+    "P_Neko01",
+    "P_Neko02",
+    "P_Delta01",
+    "P_Delta02",
+    "P_Square01",
+    "P_Line01",
+    "P_TalkNone01",
+    "P_TalkNone02",
+    "P_TalkNone03",
+    "P_TalkSmile01",
+    "P_TalkSmile02",
+    "P_TalkSmile03",
+    "P_TalkAngry01",
+    "P_TalkAngry02",
+    "P_TalkAngry03",
+    "P_TalkNone04",
+    "P_TalkDoya01",
+    "P_TalkSquare01",
+    "P_TalkDelta01",
+    "P_TalkSmile04",
+    "P_Default",
+    "P_Default01",
+    "P_Normal01",
+    "P_Doya03",
+    "P_Angry05",
+    "P_Fury01",
+    "P_A01",
+    "P_I01",
+    "P_U01",
+    "P_E01",
+    "P_O01",
+    "P_N01",
+    "P_TalkNormal121",
+    "P_TalkNormal122",
+    "P_TalkNormal131",
+    "P_TalkNormal132",
+    "P_TalkNormal221",
+    "P_TalkNormal222",
+    "P_TalkNormal231",
+    "P_TalkNormal232",
+    "P_TalkNormal321",
+    "P_TalkNormal322",
+    "P_TalkNormal331",
+    "P_TalkSmile121",
+    "P_TalkSmile122",
+    "P_TalkSmile131",
+    "P_TalkSmile132",
+    "P_TalkSmile221",
+    "P_TalkSmile222",
+    "P_TalkSmile231",
+    "P_TalkSmile232",
+    "P_TalkSmile321",
+    "P_TalkSmile322",
+    "P_TalkSmile331",
+    "P_TalkAngry121",
+    "P_TalkAngry122",
+    "P_TalkAngry131",
+    "P_TalkAngry132",
+    "P_TalkAngry221",
+    "P_TalkAngry222",
+    "P_TalkAngry231",
+    "P_TalkAngry232",
+    "P_TalkAngry321",
+    "P_TalkAngry322",
+    "P_TalkAngry331",
+    "P_Default_01",
+    "P_A_01",
+    "P_I_01",
+    "P_U_01",
+    "P_E_01",
+    "P_O_01",
+    "P_N_01",
+    "P_Angry_01",
+    "P_Angry_02",
+    "P_Angry_03",
+    "P_Angry_04",
+    "P_Angry_05",
+    "P_Doya_01",
+    "P_Doya_02",
+    "P_Doya_03",
+    "P_Fury_01",
+    "P_Neko_01",
+    "P_Neko_02",
+    "P_Normal_01",
+    "P_Smile_01",
+    "P_Smile_02",
+    "P_Smile_03",
+    "P_Smile_04",
+    "P_Smile_05",
+    "P_Talk_Angry_121",
+    "P_Talk_Angry_122",
+    "P_Talk_Angry_131",
+    "P_Talk_Angry_132",
+    "P_Talk_Angry_221",
+    "P_Talk_Angry_222",
+    "P_Talk_Angry_231",
+    "P_Talk_Angry_232",
+    "P_Talk_Angry_321",
+    "P_Talk_Angry_322",
+    "P_Talk_Angry_331",
+    "P_Talk_Normal_121",
+    "P_Talk_Normal_122",
+    "P_Talk_Normal_131",
+    "P_Talk_Normal_132",
+    "P_Talk_Normal_221",
+    "P_Talk_Normal_222",
+    "P_Talk_Normal_231",
+    "P_Talk_Normal_232",
+    "P_Talk_Normal_321",
+    "P_Talk_Normal_322",
+    "P_Talk_Normal_331",
+    "P_Talk_Smile_121",
+    "P_Talk_Smile_122",
+    "P_Talk_Smile_131",
+    "P_Talk_Smile_132",
+    "P_Talk_Smile_221",
+    "P_Talk_Smile_222",
+    "P_Talk_Smile_231",
+    "P_Talk_Smile_232",
+    "P_Talk_Smile_321",
+    "P_Talk_Smile_322",
+    "P_Talk_Smile_331",
+    "P_Pero_01",
+    "P_Pero_02"
+};
+
 const char* char_changeuid = "CS.UnityEngine.GameObject.Find(\"/BetaWatermarkCanvas(Clone)/Panel/TxtUID\"):GetComponent(\"Text\").text = \"<b><i><color=#11edb1>KINDA WINDY TODAY</color></i></b>\"";
 
 const char* char_eleminf = R"MY_DELIMITER(
@@ -1312,6 +1548,48 @@ local function onError(error)
 end
 
 xpcall(AnimChanger, onError)
+)MY_DELIMITER";
+
+const char* emochengemo1 = R"MY_DELIMITER(
+local function find_active_char()
+    local avatarroot = CS.UnityEngine.GameObject.Find("/EntityRoot/AvatarRoot")
+    for i = 0, avatarroot.transform.childCount - 1 do
+        local child = avatarroot.transform:GetChild(i)
+        if child.gameObject.activeInHierarchy then
+            return child.gameObject
+        end
+    end
+end
+
+local function find_body(avatar)
+    for i = 0, avatar.transform.childCount - 1 do
+        local transform = avatar.transform:GetChild(i)
+
+        if transform.name == "OffsetDummy" then
+            return transform
+        end
+    end
+end
+
+local function EmoChanger()
+	local avatar = find_active_char()
+	CS.MoleMole.ActorUtils.ShowMessage(find_body(avatar):GetChild(0).name)
+	local obj = find_body(avatar):GetChild(0)
+	local emo = obj:GetComponent("EmoSync")
+	emo:SetEmotion(")MY_DELIMITER";
+
+const char* emochengemo2 = R"MY_DELIMITER(",0)
+	emo:SetPhoneme(")MY_DELIMITER";
+
+const char* emochengpho2 = R"MY_DELIMITER(",0)
+	emo:EmoFinish()
+end
+
+local function onError(error)
+	CS.MoleMole.ActorUtils.ShowMessage(tostring(error))
+end
+
+xpcall(EmoChanger, onError)
 )MY_DELIMITER";
 
 //DumpCS License

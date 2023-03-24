@@ -287,7 +287,7 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				static int anim_select_index = 0;
 				ImGui::Checkbox("Animation Changer", &animcheng);
 				ImGui::SameLine();
-				HelpMarker("Change current avatar's animation");
+				HelpMarker("Change current avatar's animation.");
 				if (animcheng) {
 					ImGui::Indent();
 					if(ImGui::Combo("Animations", &anim_select_index, animation_options, IM_ARRAYSIZE(animation_options))) {}
@@ -303,6 +303,26 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 					}
 					ImGui::Unindent();
 				}
+
+				static bool emocheng = false;
+				static int emo_select_index = 0;
+				static int pho_select_index = 0;
+				ImGui::Checkbox("Emotion Changer", &emocheng);
+				ImGui::SameLine();
+				HelpMarker("Change current avatar's emotion.");
+				if (emocheng) {
+					ImGui::Indent();
+					if (ImGui::Combo("Face expression", &emo_select_index, emo_options, IM_ARRAYSIZE(emo_options))) {}
+					if (ImGui::Combo("Mouth expression", &pho_select_index, pho_options, IM_ARRAYSIZE(pho_options))) {}
+
+					if (ImGui::Button("Change"))
+					{
+						string result = emochengemo1 + string(emo_options[emo_select_index]) + emochengemo2 + string(pho_options[emo_select_index]) + emochengpho2;
+						luahookfunc(result.c_str());
+					}
+		
+				}
+
 
 				ImGui::SeparatorText("World");
 				static bool browser_is_enabled = false;
