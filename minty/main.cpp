@@ -13,7 +13,11 @@
 #include "imgui/L2DFileDialog.h"
 #include <chrono>
 #include <thread>
+
 #include "gilua/logtextbuf.h"
+#include <Windows.h>
+#include <ShObjIdl.h>
+#include <ObjBase.h>
 
 #include "json/json.hpp"
 //using json = nlohmann::json;
@@ -47,8 +51,21 @@ LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
 }
 
+static void HelpMarker(const char* desc)
+{
+    ImGui::TextDisabled("(?)");
+	if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))
+	{
+		ImGui::BeginTooltip();
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted(desc);
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
+}
+
 bool init = false;
-HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
+static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
 	if (!init)
 	{
@@ -90,6 +107,9 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			ImGui::GetIO().Fonts->AddFontFromMemoryTTF((void*)jetbrains, sizeof(jetbrains), 18.f, &fontcoding, ranges);
 			io.Fonts->Build();
 
+			/*ImGui::GetIO().Fonts->AddFontFromMemoryTTF((void*)anime, sizeof(anime), 18.f, &fontcoding, ranges);
+			io.Fonts->Build();*/
+
 			//ImGui::GetIO().Fonts->Build();
 
 			ImGui_ImplDX11_InvalidateDeviceObjects();
@@ -119,10 +139,15 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		static char path3[500] = "";
 
 		static float TimeScale = 1.0f;
+		static bool themeInit = false;
 
-		settheme(theme_index);
-		setstyle(style_index);
-		
+		if (!themeInit)
+		{
+			settheme(theme_index);
+			setstyle(style_index);
+			themeInit = true;
+		}
+				
 		if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_F11)))
 		{
 			TimeScale = 1.0f;
@@ -146,20 +171,25 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "WARNING! LUA NOT HOOKED");
 					ImGui::Separator();
 				}
-				ImGui::Text("Player");
 
-				static char inputTextBuffer[512] = "";
-				ImGui::InputTextWithHint("##input", "Enter custom UID text here...", inputTextBuffer, sizeof(inputTextBuffer));
+				ImGui::SeparatorText("Player");
+
+				static char UID_inputTextBuffer[512] = "";
+				ImGui::InputTextWithHint("##input", "Enter custom UID text here...", UID_inputTextBuffer, sizeof(UID_inputTextBuffer));
 				ImGui::SameLine();
 				if (ImGui::Button("Update custom UID")) {
-					string result = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID"):GetComponent("Text").text = ")MY_DELIMITER" + string(inputTextBuffer) + "\"";
+					string result = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID"):GetComponent("Text").text = ")MY_DELIMITER" + string(UID_inputTextBuffer) + "\"";
 					luahookfunc(result.c_str());
 				}
+				ImGui::SameLine();
+				HelpMarker("Changes your game UID to any defined text. HTML/Rich Text tags can be applied.");
 
 				static bool show_modelswap = false;
 				if (ImGui::Checkbox("Model swapper", &show_modelswap)) {
 					luahookfunc("CS.LAMLMFNDPHJ.HAFGEFPIKFK(\"snoo.\",\"snoo.\")");
 				}
+				ImGui::SameLine();
+				HelpMarker("Swaps your avatars' models. Switch to character which model you want to set on another, press Clone; Switch to character, which model you want to replace with copied, press Paste.");
 				if (show_modelswap)
 				{
 					ImGui::Indent();
@@ -176,6 +206,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				static bool show_resizer = false;
 				static float boob_size = 1.0f;
 				ImGui::Checkbox("Booba resizer", &show_resizer);
+				ImGui::SameLine();
+				HelpMarker("Changes size of character breasts. Press Initiate and move slider.");
 				if (show_resizer)
 				{
 					ImGui::Indent();
@@ -196,6 +228,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 				static bool show_avatarresizer = false;
 				ImGui::Checkbox("Avatar resizer", &show_avatarresizer);
+				ImGui::SameLine();
+				HelpMarker("Resizes your current character's size. Just move slider. ");
 
 				if (show_avatarresizer) {
 					static float avatarsize = 1.0f;
@@ -224,8 +258,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				static float cc_g = 1.0f;
 				static float cc_b = 1.0f;
 				static float cc_a = 1.0f;
+				static ImVec4 infusion_col = ImVec4( 1.0f, 1.0f, 1.0f, 1.0f );
 
 				ImGui::Checkbox("Infusion changer", &show_colorator3000);
+				ImGui::SameLine();
+				HelpMarker("Changes color of Elemental Infusion/Blade trail of your current character. Adjust color either with sliders or with color picker. Works perfectly on swords, greatswords, polearms.");
 				if (show_colorator3000)
 				{
 					ImGui::Indent();
@@ -235,16 +272,59 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 						luahookfunc(result.c_str());
 					}
 					ImGui::SameLine();
-					ImGui::SliderFloat("Red color", &cc_r, 0.0f, 1.0f, "%.3f");
-					ImGui::SliderFloat("Green color", &cc_g, 0.0f, 1.0f, "%.3f");
-					ImGui::SliderFloat("Blue color", &cc_b, 0.0f, 1.0f, "%.3f");
-					ImGui::SliderFloat("Alpha", &cc_a, 0.0f, 1.0f, "%.3f");
+
+					ImGui::ColorEdit4("Infusion Color", &infusion_col.x, ImGuiColorEditFlags_AlphaBar);
+
+					cc_r = infusion_col.x;
+					cc_g = infusion_col.y;
+					cc_b = infusion_col.z;
+					cc_a = infusion_col.w;
 
 					ImGui::Unindent();
 				}
 
-				ImGui::Separator();
-				ImGui::Text("World");
+				static bool animcheng = false;
+				static int anim_select_index = 0;
+				ImGui::Checkbox("Animation Changer", &animcheng);
+				ImGui::SameLine();
+				HelpMarker("Change current avatar's animation.");
+				if (animcheng) {
+					ImGui::Indent();
+					if(ImGui::Combo("Animations", &anim_select_index, animation_options, IM_ARRAYSIZE(animation_options))) {}
+			
+					if (ImGui::Button("Change"))
+					{
+						string result = animchanger + string(animation_options[anim_select_index]) + animchanger2; 
+						luahookfunc(result.c_str());
+					}
+					if (ImGui::Button("Reset"))
+					{
+						luahookfunc(animchangerreturn);
+					}
+					ImGui::Unindent();
+				}
+
+				static bool emocheng = false;
+				static int emo_select_index = 0;
+				static int pho_select_index = 0;
+				ImGui::Checkbox("Emotion Changer", &emocheng);
+				ImGui::SameLine();
+				HelpMarker("Change current avatar's emotion.");
+				if (emocheng) {
+					ImGui::Indent();
+					if (ImGui::Combo("Face expression", &emo_select_index, emo_options, IM_ARRAYSIZE(emo_options))) {}
+					if (ImGui::Combo("Mouth expression", &pho_select_index, pho_options, IM_ARRAYSIZE(pho_options))) {}
+
+					if (ImGui::Button("Change"))
+					{
+						string result = emochengemo1 + string(emo_options[emo_select_index]) + emochengemo2 + string(pho_options[emo_select_index]) + emochengpho2;
+						luahookfunc(result.c_str());
+					}
+		
+				}
+
+
+				ImGui::SeparatorText("World");
 				static bool browser_is_enabled = false;
 				if (ImGui::Checkbox("Browser", &browser_is_enabled)) {
 					if (browser_is_enabled) {
@@ -254,6 +334,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 						luahookfunc(char_browser_off);
 					}
 				}
+				ImGui::SameLine();
+				HelpMarker("Spawns big interactive screen, where you can access any internet page. Click it either while holding Alt, or while charging a bow.");
 
 				static bool no_fog = false;
 				if(ImGui::Checkbox("Disable fog", &no_fog))
@@ -265,6 +347,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 						luahookfunc(R"MY_DELIMITER(CS.UnityEngine.RenderSettings.fog = true)MY_DELIMITER");
 					}
 				}
+				ImGui::SameLine();
+				HelpMarker("Disables visual fog in world.");
 
 				if (ImGui::SliderFloat("Timescale", &TimeScale, 0.0f, 5.0f, "%.3f"))
 				{
@@ -272,25 +356,44 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					luahookfunc(result.c_str());
 				}
 				ImGui::SameLine();
+				HelpMarker("Changes speed of game time. Applies to everything in game.");
 
+				ImGui::SameLine();
 				if (ImGui::Button("Reset (F11)")) {
 					TimeScale = 1.0f;
 					string result = "CS.UnityEngine.Time.timeScale = 1.0";
 					luahookfunc(result.c_str());
 				}
 
+				char inputmoFilePath[512] = "";
+				char inputpngFilePath[512] = "";
+
+				bool show_mofile_dialog = false;
+
 				ImGui::Separator();
-				ImGui::Text("Misc");
-				// static bool is_fps_shown = false;
-				// ImGui::Checkbox("Show FPS", &is_fps_shown);
-				// if (is_fps_shown) 
-				// {
-				// 	luahookfunc(char_showfps);
-				// }
+				ImGui::Text("MO Loader");
+
+
+				ImGui::InputTextWithHint("", "Enter your path to .mo file", inputmoFilePath, sizeof(inputmoFilePath));
+				ImGui::InputTextWithHint("", "Enter your path to .png file", inputpngFilePath, sizeof(inputpngFilePath));
+
+				ImGui::SameLine();
+
+				if (ImGui::Button("Load MO")) {
+					string result = string(char_moloader) + R"MY_DELIMITER(local moFilePath = ")MY_DELIMITER" + string(inputmoFilePath) + "\" \n" + R"MY_DELIMITER(local TextPath = ")MY_DELIMITER" + string(inputpngFilePath) + "\" \n" + string(char_moloader2);
+					luahookfunc(result.c_str());
+				}
+				ImGui::SameLine();
+				HelpMarker("Creates 3D object in world, which will be imported from defined paths.");
+
+
+				ImGui::SeparatorText("Misc");
 
 				static bool unlockfps = false;
 				static float targetfps = 60;
 				ImGui::Checkbox("Unlock FPS", &unlockfps);
+				ImGui::SameLine();
+				HelpMarker("Unlocks your framerate to defined target FPS.");
 					if (unlockfps) {
 						ImGui::Indent();
 						ImGui::SliderFloat("Target FPS", &targetfps, 10.0f, 360.0f, "%.3f");
@@ -310,9 +413,49 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 						luahookfunc(char_uicamera_on);
 					}
 				}
+				ImGui::SameLine();
+				HelpMarker("Hides all game UI.");
 
-				ImGui::Separator();
-				ImGui::Text("Lua");
+				static bool hidenumdmg = false;
+
+				if(ImGui::Checkbox("Hide DMG numbers", &hidenumdmg)) {
+					if (hidenumdmg) {
+						luahookfunc(char_dmgnum_off);
+					}
+					else {
+						luahookfunc(char_dmgnum_on);
+					}
+				}
+				ImGui::SameLine();
+				HelpMarker("Hides that floating damage numbers.");
+
+				/*static bool turnoffdithering = false;  -------- may not wok
+
+				if (ImGui::Checkbox("Enable peeking", &turnoffdithering)) {
+					if (turnoffdithering) {
+						luahookfunc(enablepeeking);
+					}
+					else {
+						luahookfunc(disablepeeking);
+					}
+				}*/
+
+				/*static bool changefov = false; --------- no wok too
+				static float targetfov = 60;
+				ImGui::Checkbox("Change camera FOV", &changefov);
+				ImGui::SameLine();
+				HelpMarker("Changes Field Of View.");
+				if (changefov) {
+					ImGui::Indent();
+					ImGui::SliderFloat("Field Of View", &targetfov, 10.0f, 180.0f, "%.3f");
+					string result = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("EntityRoot/MainCamera(Clone)"):GetComponent("Camera").main.fieldOfView = )MY_DELIMITER" + to_string(targetfov);
+					luahookfunc(result.c_str());
+					ImGui::Unindent();
+				}*/
+
+				//ImGui::Separator();
+				//ImGui::Text("Lua");
+				ImGui::SeparatorText("Lua");
 				ImGui::Checkbox("Lua editor", &showEditor);
 				
 				ImGui::EndTabItem();
@@ -514,7 +657,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				ImGui::EndChild();	
 				ImGui::End();
 			}
-
+			static bool show_style_editor = false;
 			if (ImGui::BeginTabItem("Themes"))
 			{
 				// Content for themes
@@ -552,6 +695,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					settheme(6);
 				}
 
+				if (ImGui::RadioButton("Minty Mint Light", &themeIndex, 6))
+				{
+					settheme(7);
+				}
+
 				ImGui::Separator();
 				ImGui::Text("Theme style");
 
@@ -572,6 +720,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					setstyle(3);
 				}
 
+				if (ImGui::RadioButton("Big Squared", &themestyleindex, 3))
+				{
+					setstyle(4);
+				}
+
 				ImGui::Separator();
 
 				ImGui::Text("Menu font");
@@ -586,6 +739,12 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				{
 					setfont(2);
 				}
+
+				ImGui::Separator();
+
+				ImGui::Text("Style Editor");
+
+				ImGui::Checkbox("Show Style Editor", &show_style_editor);
 
 				ImGui::EndTabItem();
 			}
@@ -611,51 +770,58 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				}
 				ImGui::Separator();
 
-				if (ImGui::CollapsingHeader("License"))
-				{
-					ImGui::Indent();
-
-					ImGui::Text("ImGui\n");
-					string licenseimgui = string(license_ImGui) + string(license_Generic);
-					ImGui::Text(licenseimgui.c_str());
-					ImGui::Separator();
-
-					ImGui::Text("ImGuiColorTextEdit\n");
-					string licensetextedit = string(license_ColorTextEdit) + string(license_Generic);
-					ImGui::Text(licensetextedit.c_str());
-					ImGui::Separator();
-					
-					ImGui::Text("ImGuiFileDialog\n");
-					string licensefiledialog = string(license_FileDialog) + string(license_Generic);
-					ImGui::Text(licensefiledialog.c_str());
-					ImGui::Separator();
-
-					ImGui::Text("Json\n");
-					string licensejson = string(license_json) + string(license_Generic);
-					ImGui::Text(licensejson.c_str());
-
-					ImGui::Unindent();
-				}
 				ImGui::EndTabItem();
 			}
 
-			if (ImGui::BeginTabItem("Performance"))
+			static bool show_debug_metrics = false;
+			
+			if (ImGui::BeginTabItem("Debug"))
 			{
-				ImGuiIO& io = ImGui::GetIO();
-				float frametime = io.DeltaTime;
-				float fps = 1.0f / frametime;
-				static float timer = 0.0f;
-				timer += frametime;
-				static float fps_slow = 0.0f;
-				static float frametime_slow = 0.0f;
+				ImGui::Checkbox("Show Debug Metrics", &show_debug_metrics);
+				ImGui::EndTabItem();
+			}
 
-				if (timer > 0.75) {
-				 	fps_slow = 1.0f / frametime;
-					frametime_slow = frametime;
-					timer = 0.0f;
+			if(show_debug_metrics)
+			ImGui::ShowMetricsWindow(&show_debug_metrics);
+			if (show_style_editor)
+			{
+				ImGui::Begin("ImGui Style Editor", &show_style_editor);
+				ImGui::ShowStyleEditor();
+				ImGui::End();
+			}
+			
+			static char Dump_Path[1024] = "";
+
+			if (ImGui::BeginTabItem("Dumping"))
+			{
+
+				ImGui::InputTextWithHint("Dump output path", "C:/Users/User/Desktop", Dump_Path, sizeof(Dump_Path));
+				ImGui::SameLine();
+				HelpMarker("Provide a valid path to dump. \nProvide an existing folder as it cannot create new folders.");
+
+				ImGui::Separator();
+
+				if (ImGui::Button("Dump CSharp")) {
+					if(strlen(Dump_Path) != 0)
+					{
+						string result = "local DUMP_FOLDER = \"" + string(Dump_Path) + "\"" + char_dumpcs_part1 + char_dumpcs_part2;
+						luahookfunc(result.c_str());
+					}
 				}
-				ImGui::Text("Current FPS: %.2f", fps_slow);
-				ImGui::Text("Current Frametime: %.3fms", frametime_slow * 1000);
+				if(ImGui::IsItemHovered() && strlen(Dump_Path) != 0){
+					ImGui::SameLine();
+					ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "WARNING! This will freeze your game, give it 20 minutes or so to complete.");
+				}
+				else{}
+				
+				if(ImGui::Button("Dump current hierarchy"))
+				{
+					if(strlen(Dump_Path) != 0)
+					{
+						string result = "local dump_path = \"" + string(Dump_Path) + "\"" + char_dump_hierarchy;
+						luahookfunc(result.c_str());
+					}
+				}
 				ImGui::EndTabItem();
 			}
 

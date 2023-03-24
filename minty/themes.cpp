@@ -31,6 +31,10 @@ void settheme(int themefunc_index) {
 			mint_theme();
 			theme_index = 6;
 			break;
+		case 7:
+			mint_theme_light();
+			theme_index = 7;
+			break;
 		default:
 			break;
 	}
@@ -50,6 +54,10 @@ void setstyle(int stylefunc_index) {
 			style_index = 3;
 			default_style();
 			break;
+		case 4:
+			style_index = 4;
+			big_square_style();
+			break;
 		default:
 			break;
 	}
@@ -63,6 +71,9 @@ void setfont(int fontfunc_index) {
         case 2:
             fontindex_menu = 0;
             break;
+		case 3:
+			fontindex_menu = 2;
+			break;
         default:
             break;
     }
@@ -131,6 +142,33 @@ void dark_theme()
 void mint_theme()
 {
 	ImGui::StyleColorsDark();
+	ImVec4* colors = ImGui::GetStyle().Colors;
+	colors[ImGuiCol_FrameBg] = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
+	colors[ImGuiCol_FrameBgHovered] = ImVec4(0.05f, 0.90f, 0.54f, 1.00f);
+	colors[ImGuiCol_FrameBgActive] = ImVec4(0.05f, 0.90f, 0.54f, 1.00f);
+	colors[ImGuiCol_TitleBg] = ImVec4(0.01f, 0.35f, 0.20f, 1.00f);
+	colors[ImGuiCol_TitleBgActive] = ImVec4(0.01f, 0.69f, 0.40f, 1.00f);
+	colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.01f, 0.48f, 0.28f, 1.00f);
+	colors[ImGuiCol_CheckMark] = ImVec4(0.00f, 0.51f, 0.29f, 1.00f);
+	colors[ImGuiCol_SliderGrab] = ImVec4(0.08f, 0.72f, 0.48f, 1.00f);
+	colors[ImGuiCol_SliderGrabActive] = ImVec4(0.05f, 0.90f, 0.54f, 1.00f);
+	colors[ImGuiCol_Button] = ImVec4(0.13f, 0.43f, 0.31f, 1.00f);
+	colors[ImGuiCol_ButtonHovered] = ImVec4(0.00f, 0.82f, 0.47f, 1.00f);
+	colors[ImGuiCol_ButtonActive] = ImVec4(0.05f, 0.90f, 0.54f, 1.00f);
+	colors[ImGuiCol_Header] = ImVec4(0.00f, 0.43f, 0.25f, 1.00f);
+	colors[ImGuiCol_HeaderHovered] = ImVec4(0.00f, 0.79f, 0.45f, 1.00f);
+	colors[ImGuiCol_HeaderActive] = ImVec4(0.00f, 0.63f, 0.36f, 1.00f);
+	colors[ImGuiCol_ResizeGrip] = ImVec4(0.00f, 0.55f, 0.31f, 1.00f);
+	colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.05f, 0.90f, 0.54f, 1.00f);
+	colors[ImGuiCol_ResizeGripActive] = ImVec4(0.05f, 0.90f, 0.54f, 1.00f);
+	colors[ImGuiCol_Tab] = ImVec4(0.00f, 0.40f, 0.23f, 1.00f);
+	colors[ImGuiCol_TabHovered] = ImVec4(0.00f, 0.75f, 0.43f, 1.00f);
+	colors[ImGuiCol_TabActive] = ImVec4(0.00f, 0.68f, 0.39f, 1.00f);
+}
+
+void mint_theme_light()
+{
+	ImGui::StyleColorsLight();
 	ImVec4* colors = ImGui::GetStyle().Colors;
 	colors[ImGuiCol_FrameBg] = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
 	colors[ImGuiCol_FrameBgHovered] = ImVec4(0.05f, 0.90f, 0.54f, 1.00f);
@@ -255,6 +293,23 @@ void big_style()
 	style.ScrollbarRounding = 9.0f;
 	style.GrabMinSize = 5.0f;
 	style.GrabRounding = 3.0f;
+}
+
+void big_square_style()
+{
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.WindowPadding = ImVec2(15, 15);
+	style.WindowRounding = 0.0f;
+	style.FramePadding = ImVec2(5, 5);
+	style.FrameRounding = 0.0f;
+	style.ItemSpacing = ImVec2(12, 8);
+	style.ItemInnerSpacing = ImVec2(8, 6);
+	style.IndentSpacing = 25.0f;
+	style.ScrollbarSize = 15.0f;
+	style.ScrollbarRounding = 0.0f;
+	style.GrabMinSize = 5.0f;
+	style.GrabRounding = 0.0f;
+	style.TabRounding = 0.0f;
 }
 
 void default_style()
