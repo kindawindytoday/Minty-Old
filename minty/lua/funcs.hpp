@@ -5,7 +5,124 @@
 //using json = nlohmann::json;
 //config json;
 
-const char* animation_options[] = {"1", "2", "3"};
+const char* animation_options[] = { 
+"ActivitySkill_ElectricCoreFly",
+"Akimbo02AS",
+"Akimbo02BS",
+"Akimbo02Loop",
+"Attack01",
+"Attack02",
+"Attack03",
+"Attack04",
+"Attack05",
+"ChannelAS",
+"ChannelBS",
+"ChannelLoop",
+"ClimbDownToGround",
+"ClimbIdle",
+"ClimbJump",
+"ClimbMove0",
+"ClimbMove1",
+"CrouchDrop",
+"CrouchIdle",
+"CrouchMove",
+"CrouchRoll",
+"CrouchToStandby",
+"DropDown",
+"ExtraAttack",
+"ExtraAttack_AS",
+"FallDie",
+"FallDie_AS",
+"FallOnGround",
+"FallOnGroundLit",
+"FallToGroundRun",
+"FallToGroundRunHard",
+"FallToGroundSprint",
+"FallingAnthem_AS_1",
+"FallingAnthem_AS_2",
+"FallingAnthem_BS_1",
+"FallingAnthem_BS_2",
+"FallingAnthem_Loop",
+"FallingAnthem_Loop_Low",
+"Fly",
+"FlyStart",
+"FrozenWindmill",
+"FrozenWindmill_AS",
+"HitGroundDie",
+"Hit_H",
+"Hit_L",
+"Hit_Throw",
+"Hit_ThrowAir",
+"Hit_Throw_Ground",
+"Icespine",
+"Icespine_Out",
+"Jump",
+"JumpForRun",
+"JumpForSprint",
+"JumpForWalk",
+"JumpOffWall",
+"JumpUpWallForStandby",
+"JumpUpWallReady",
+"LiquidStrike_AS",
+"LiquidStrike_AS_OnWater",
+"LiquidStrike_BS",
+"LiquidStrike_BS1",
+"LiquidStrike_BS_0",
+"LiquidStrike_FatalMove",
+"LiquidStrike_FatalStandby",
+"LiquidStrike_Move",
+"LiquidStrike_MoveStandby",
+"LiquidStrike_Strike",
+"NormalDie",
+"PlayMusic_Lyre_AS",
+"PlayMusic_Lyre_BS",
+"PlayMusic_Lyre_Loop",
+"PlayMusic_Qin_AS",
+"PlayMusic_Qin_BS",
+"PlayMusic_Qin_Loop",
+"Run",
+"RunToIdle",
+"RunToWalk",
+"ShowUp",
+"SitBDown",
+"SitBLoop",
+"SitBUp",
+"SitDown",
+"SitLoop",
+"SitUp",
+"SkiffNormal",
+"SlipBackWall",
+"SlipFaceWall",
+"Sprint",
+"SprintBS",
+"SprintToIdle",
+"SprintToRun",
+"Standby",
+"Standby2ClimbA",
+"Standby2ClimbB",
+"StandbyPutaway",
+"StandbyPutawayOver",
+"StandbyShow_01",
+"StandbyShow_02",
+"StandbyVoice",
+"StandbyWeapon",
+"Struggle",
+"SwimDash",
+"SwimDie",
+"SwimIdle",
+"SwimJump",
+"SwimJumpDrop",
+"SwimJumpToWater",
+"SwimMove",
+"Think01AS",
+"Think01BS",
+"Think01Loop",
+"TurnDir",
+"Upstairs",
+"Walk",
+"WalkToIdle",
+"WalkToRun"
+};
 const char* char_changeuid = "CS.UnityEngine.GameObject.Find(\"/BetaWatermarkCanvas(Clone)/Panel/TxtUID\"):GetComponent(\"Text\").text = \"<b><i><color=#11edb1>KINDA WINDY TODAY</color></i></b>\"";
 
 const char* char_eleminf = R"MY_DELIMITER(
@@ -203,16 +320,6 @@ const char* char_guidearea_fog = R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("
 
 const char* char_avatarresize = R"MY_DELIMITER(
 CS.UnityEngine.GameObject.Find("/EntityRoot/AvatarRoot").transform.localScale = CS.UnityEngine.Vector3()MY_DELIMITER";
-
-const char* char_showfps = R"MY_DELIMITER(
-local fps = 0
-function Update()
-fps = string.format("%.2f", 1 / tostring(CS.UnityEngine.Time.deltaTime) * CS.UnityEngine.Time.timeScale)
-CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID"):GetComponent("Text").text = "FPS: " .. fps
-
-end
-Update()
-)MY_DELIMITER";
 
 const char* char_modelswap_clone = R"MY_DELIMITER(
     local function findBodyPartWithName(model,queryName)
@@ -1194,16 +1301,13 @@ local function AnimChanger()
 	CS.MoleMole.ActorUtils.ShowMessage(find_body(avatar):GetChild(0).name)
 	local obj = find_body(avatar):GetChild(0)
 	local ac = obj:GetComponent("Animator")
-	ac:Play("
-)MY_DELIMITER";
+	ac:Play(")MY_DELIMITER";
 
-const char* animchanger2 = R"MY_DELIMITER(
-", 0) -- turn on
+const char* animchanger2 = R"MY_DELIMITER(", 0) -- turn on
 	--ac:Rebind() -- turn off
 end
 
 local function onError(error)
-    CS.UnityEngine.GameObject.Find("/BetaWatermarkCanvas(Clone)/Panel/TxtUID"):GetComponent("Text").text = tostring(error)
 	CS.MoleMole.ActorUtils.ShowMessage(tostring(error))
 end
 

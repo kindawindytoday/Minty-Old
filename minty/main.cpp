@@ -171,7 +171,7 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 					ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "WARNING! LUA NOT HOOKED");
 					ImGui::Separator();
 				}
-				//ImGui::Text("Player");
+
 				ImGui::SeparatorText("Player");
 
 				static char UID_inputTextBuffer[512] = "";
@@ -290,23 +290,11 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				HelpMarker("Change current avatar's animation");
 				if (animcheng) {
 					ImGui::Indent();
-					if(ImGui::BeginCombo("Animation", animation_options[anim_select_index]))
-					{
-						for (int i = 0; i < sizeof(animation_options) / sizeof(animation_options[0]); i++) {
-							bool is_anim_Selected = (anim_select_index == i);
-							if (ImGui::Selectable(animation_options[i], is_anim_Selected)) {
-								anim_select_index = i;
-							}
-							if (is_anim_Selected) {
-								ImGui::SetItemDefaultFocus();
-							}
-						}
-						ImGui::EndCombo();
-					}
+					if(ImGui::Combo("Animations", &anim_select_index, animation_options, IM_ARRAYSIZE(animation_options))) {}
+			
 					if (ImGui::Button("Change"))
 					{
-						static string somechosenanimidkbestiemakeitplease = "";
-						string result = animchanger + somechosenanimidkbestiemakeitplease + animchanger2; 
+						string result = animchanger + string(animation_options[anim_select_index]) + animchanger2; 
 						luahookfunc(result.c_str());
 					}
 					if (ImGui::Button("Reset"))
@@ -316,8 +304,6 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 					ImGui::Unindent();
 				}
 
-				//ImGui::Separator();
-				//ImGui::Text("World");
 				ImGui::SeparatorText("World");
 				static bool browser_is_enabled = false;
 				if (ImGui::Checkbox("Browser", &browser_is_enabled)) {
@@ -380,15 +366,8 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				ImGui::SameLine();
 				HelpMarker("Creates 3D object in world, which will be imported from defined paths.");
 
-				//ImGui::Separator();
-				//ImGui::Text("Misc");
+
 				ImGui::SeparatorText("Misc");
-				// static bool is_fps_shown = false;
-				// ImGui::Checkbox("Show FPS", &is_fps_shown);
-				// if (is_fps_shown) 
-				// {
-				// 	luahookfunc(char_showfps);
-				// }
 
 				static bool unlockfps = false;
 				static float targetfps = 60;
@@ -779,8 +758,6 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 			if (ImGui::BeginTabItem("Debug"))
 			{
 				ImGui::Checkbox("Show Debug Metrics", &show_debug_metrics);
-				
-
 				ImGui::EndTabItem();
 			}
 
@@ -793,25 +770,25 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				ImGui::End();
 			}
 			
-			static char DumpCS_path_Textbuf[1024] = "";
+			static char Dump_Path[1024] = "";
 
 			if (ImGui::BeginTabItem("Dumping"))
 			{
 
-				ImGui::InputTextWithHint("Dump path", "C:/Users/User/Desktop", DumpCS_path_Textbuf, sizeof(DumpCS_path_Textbuf));
+				ImGui::InputTextWithHint("Dump output path", "C:/Users/User/Desktop", Dump_Path, sizeof(Dump_Path));
 				ImGui::SameLine();
 				HelpMarker("Provide a valid path to dump. \nProvide an existing folder as it cannot create new folders.");
 
 				ImGui::Separator();
 
 				if (ImGui::Button("Dump CSharp")) {
-					if(strlen(DumpCS_path_Textbuf) != 0)
+					if(strlen(Dump_Path) != 0)
 					{
-						string result = "local DUMP_FOLDER = \"" + string(DumpCS_path_Textbuf) + "\"" + char_dumpcs_part1 + char_dumpcs_part2;
+						string result = "local DUMP_FOLDER = \"" + string(Dump_Path) + "\"" + char_dumpcs_part1 + char_dumpcs_part2;
 						luahookfunc(result.c_str());
 					}
 				}
-				if(ImGui::IsItemHovered() && strlen(DumpCS_path_Textbuf) != 0){
+				if(ImGui::IsItemHovered() && strlen(Dump_Path) != 0){
 					ImGui::SameLine();
 					ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "WARNING! This will freeze your game, give it 20 minutes or so to complete.");
 				}
@@ -819,9 +796,9 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				
 				if(ImGui::Button("Dump current hierarchy"))
 				{
-					if(strlen(DumpCS_path_Textbuf) != 0)
+					if(strlen(Dump_Path) != 0)
 					{
-						string result = "local dump_path = \"" + string(DumpCS_path_Textbuf) + "\"" + char_dump_hierarchy;
+						string result = "local dump_path = \"" + string(Dump_Path) + "\"" + char_dump_hierarchy;
 						luahookfunc(result.c_str());
 					}
 				}
