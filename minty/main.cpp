@@ -20,6 +20,9 @@
 #include <ObjBase.h>
 
 #include "json/json.hpp"
+
+#include "games/tictactoe.hpp"
+#include "games/lightsout.hpp"
 //using json = nlohmann::json;
 //config json;
 using namespace std;
@@ -824,7 +827,23 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				}
 				ImGui::EndTabItem();
 			}
+			if (ImGui::BeginTabItem("Games"))
+			{
+				ImGui::SeparatorText("Lights out");
+				lightsout_main();
 
+					ImGui::SeparatorText("Tic Tac Toe");
+					ImGui::BeginChild("Button Box", ImVec2(0, 0), false, ImGuiWindowFlags_NoScrollbar );
+					tictactoe_main();
+					ImGui::EndChild();
+
+					ImGui::SeparatorText("Wordle");
+					ImGui::Text("Coming soon...");
+					
+
+				ImGui::EndTabItem();
+			}
+	
 			ImGui::EndTabBar();
 			ImGui::End();
 		}

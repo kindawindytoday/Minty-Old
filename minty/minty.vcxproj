@@ -207,6 +207,8 @@
     <None Include="kiero\minhook\dll_resources\MinHook.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="games\lightsout.hpp" />
+    <ClInclude Include="games\tictactoe.hpp" />
     <ClInclude Include="gilua\logtextbuf.h" />
     <ClInclude Include="gilua\luaHook.h" />
     <ClInclude Include="gilua\util.h" />
