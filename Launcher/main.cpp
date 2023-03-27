@@ -5,11 +5,15 @@
 #include <fstream>
 #include <commdlg.h>
 #define _CRT_SECURE_NO_WARNINGS
+#include "../minty/json/json.hpp"
+
 
 //#include "../minty/gilua/util.h"
 //#include "../minty/gilua/luahook.h"
 
 namespace fs = std::filesystem;
+
+std::ifstream f("cfg.json");
 
 namespace util
 {
@@ -107,6 +111,9 @@ std::optional<fs::path> this_dir()
 
 int main()
 {
+    nlohmann::json cfg;
+
+
     auto current_dir = this_dir();
     if (!current_dir)
         return 0;
@@ -119,41 +126,41 @@ int main()
         return 0;
     }
     std::string exe_path;
-    auto settings_path = current_dir.value() / "settings.txt";
-    if (!fs::is_regular_file(settings_path))
-    {
-        /*printf("settings.txt not found\n");
-        system("pause");*/
-        std::ofstream settings_file("settings.txt", std::ios_base::app);
+    fs::path settings_path = fs::current_path() / "cfg.json";
+
+    /*std::ifstream ifs("cfg.json");
+    ifs >> cfg;*/
+
+    f >> cfg;
+
+    // Check if the settings file exists
+    if (!fs::exists(settings_path)) {
+        std::ofstream settings_file(settings_path);
         if (settings_file.is_open()) {
-            settings_file << exe_path << std::endl;
+            // Write the executable path to the settings file
+            cfg["exec_path"] = exe_path;
+            settings_file << cfg.dump(4) << std::endl;
             settings_file.close();
         }
         else {
-            // Try to create the file if it doesn't exist
-            std::ofstream create_file("settings.txt");
-            if (create_file.is_open()) {
-                create_file << exe_path << std::endl;
-                create_file.close();
-            }
-            else {
-                std::cout << "Error: Unable to create settings file." << std::endl;
-                return 1;
-            }
+            std::cout << "Error: Unable to create config file." << std::endl;
+            return 1;
         }
-        return 0;
     }
-
+ 
     auto settings = read_whole_file(settings_path);
     if (!settings)
     {
-        printf("Failed reading settings.txt\n");
+        printf("Failed reading cfg.json\n");
         system("pause");
         return 0;
     }
 
     //std::string exe_path;
-    std::getline(std::stringstream(settings.value()), exe_path);
+    //std::getline(std::stringstream(settings.value()), exe_path);
+    std::cout << exe_path << std::endl;
+    exe_path = cfg["exec_path"];
+    std::cout << exe_path << std::endl;
     if (!fs::is_regular_file(exe_path))
     {
         std::cout << "File path in settings.exe invalid" << std::endl;
@@ -175,10 +182,13 @@ int main()
 
         if (GetOpenFileNameA(&ofn))
         {
-            exe_path = ofn.lpstrFile;
-            std::ofstream settings_file("settings.txt", std::ios_base::out);
+            std::string(exe_path) = ofn.lpstrFile;
+            std::ofstream settings_file("cfg.json", std::ios_base::out);
             if (settings_file.is_open()) {
-                settings_file << exe_path << std::endl;
+                /*settings_file << exe_path << std::endl;
+                settings_file.close();*/
+                cfg["exec_path"] = exe_path;
+                settings_file << cfg.dump(4) << std::endl;
                 settings_file.close();
             }
             else {
@@ -205,6 +215,7 @@ int main()
     PROCESS_INFORMATION proc_info{};
     STARTUPINFOA startup_info{};
     CreateProcessA(exe_path.c_str(), NULL, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, &startup_info, &proc_info);
+    //CreateProcessA(exe_path.c_str(), NULL, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, &startup_info, &proc_info);
 
     InjectStandard(proc_info.hProcess, dll_path.string().c_str());
     ResumeThread(proc_info.hThread);
