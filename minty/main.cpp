@@ -20,6 +20,10 @@
 #include <ObjBase.h>
 
 #include "json/json.hpp"
+
+#include "games/tictactoe.hpp" //WORK IN PROGRESS
+#include "games/lightsout.hpp"
+#include "games/wordle.hpp"
 //using json = nlohmann::json;
 //config json;
 using namespace std;
@@ -155,7 +159,7 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 			luahookfunc(result.c_str());
 		}
 
-		if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_F12)))
+		if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_F12), false))
 		{
 			isopened = !isopened;
 		}
@@ -824,7 +828,22 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				}
 				ImGui::EndTabItem();
 			}
+			if (ImGui::BeginTabItem("Games"))
+			{
+				ImGui::SeparatorText("Lights out");
+				lightsout_main();
 
+					ImGui::SeparatorText("Tic Tac Toe");
+					
+					tictactoe_main();
+
+
+					ImGui::SeparatorText("");
+					wordle_main();
+					
+				ImGui::EndTabItem();
+			}
+	
 			ImGui::EndTabBar();
 			ImGui::End();
 		}

@@ -118,6 +118,9 @@ pfn_loadbuffer* scan_loadbuffer(HMODULE ua)
 {
     util::log(2,"Hooking... Attention: if logs stops at this line - you should inject dll before loading into world.","");
     auto il2cpp = util::pe::get_section_by_name(ua, "il2cpp");
+    if (il2cpp == NULL)
+        il2cpp = util::pe::get_section_by_name(ua, ".text");
+
     auto rdata = util::pe::get_section_by_name(ua, ".rdata");
 
     auto str = util::scanner::find_pat((const uint8_t*)"xluaL_loadbuffer", "xxxxxxxxxxxxxxxx", (const uint8_t*)((uint64_t)ua + rdata->VirtualAddress), rdata->Misc.VirtualSize);

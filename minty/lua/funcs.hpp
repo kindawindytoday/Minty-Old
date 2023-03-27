@@ -2455,6 +2455,8 @@ end
 xpcall(start, onError)
 )MY_DELIMITER";
 
+
+
 void luahookfunc(const char* charLuaScript) {
 
 	auto compiled = compile(gi_LL, charLuaScript);
