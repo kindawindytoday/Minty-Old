@@ -21,8 +21,9 @@
 
 #include "json/json.hpp"
 
-#include "games/tictactoe.hpp"
+#include "games/tictactoe.hpp" //WORK IN PROGRESS
 #include "games/lightsout.hpp"
+#include "games/wordle.hpp"
 //using json = nlohmann::json;
 //config json;
 using namespace std;
@@ -158,7 +159,7 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 			luahookfunc(result.c_str());
 		}
 
-		if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_F12)))
+		if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_F12), false))
 		{
 			isopened = !isopened;
 		}
@@ -833,14 +834,13 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				lightsout_main();
 
 					ImGui::SeparatorText("Tic Tac Toe");
-					ImGui::BeginChild("Button Box", ImVec2(0, 0), false, ImGuiWindowFlags_NoScrollbar );
-					tictactoe_main();
-					ImGui::EndChild();
-
-					ImGui::SeparatorText("Wordle");
-					ImGui::Text("Coming soon...");
 					
+					tictactoe_main();
 
+
+					ImGui::SeparatorText("");
+					wordle_main();
+					
 				ImGui::EndTabItem();
 			}
 	

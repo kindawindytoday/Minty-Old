@@ -8,7 +8,7 @@
 #include <chrono>
 #include <thread>
 #include <random>
-#include "../json/json.hpp"
+
 
 const std::string image_x_b64 = "";
 const std::string image_o_b64 = "";
@@ -272,10 +272,12 @@ void tictactoe_main()
 
     ImGui::EndDisabled();
 
+    //ImGui::BeginChild("Button Box", ImVec2(0, 0), false, ImGuiWindowFlags_NoResize);
     ImGui::BeginDisabled(!ttt_is_my_turn);
 
     ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.5f, 0.5f));
-
+    if (true)
+    {
     for (int y = 0; y < 3; y++)
     {
         for (int x = 0; x < 3; x++)
@@ -299,10 +301,12 @@ void tictactoe_main()
             ImGui::PopID();
         }
     }
+    }
 
     ImGui::PopStyleVar();
 
     ImGui::EndDisabled();
+    //ImGui::EndChild();
 
     if(ImGui::Button("Reset game"))
     {

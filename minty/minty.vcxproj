@@ -209,6 +209,7 @@
   <ItemGroup>
     <ClInclude Include="games\lightsout.hpp" />
     <ClInclude Include="games\tictactoe.hpp" />
+    <ClInclude Include="games\wordle.hpp" />
     <ClInclude Include="gilua\logtextbuf.h" />
     <ClInclude Include="gilua\luaHook.h" />
     <ClInclude Include="gilua\util.h" />
