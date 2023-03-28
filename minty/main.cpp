@@ -837,8 +837,8 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 					
 					tictactoe_main();
 
-
 					ImGui::SeparatorText("");
+
 					wordle_main();
 					
 				ImGui::EndTabItem();
