@@ -13,7 +13,7 @@
 
 namespace fs = std::filesystem;
 
-std::ifstream f("cfg.json");
+//std::ifstream f("cfg.json");
 
 namespace util
 {
@@ -131,8 +131,8 @@ int main()
     /*std::ifstream ifs("cfg.json");
     ifs >> cfg;*/
 
-    f >> cfg;
-
+    //f >> cfg;
+    std::ifstream settings_file(settings_path);
     // Check if the settings file exists
     if (!fs::exists(settings_path)) {
         std::ofstream settings_file(settings_path);
@@ -148,6 +148,8 @@ int main()
         }
     }
  
+    settings_file >> cfg;
+
     auto settings = read_whole_file(settings_path);
     if (!settings)
     {
@@ -201,6 +203,7 @@ int main()
             return 1;
         }
 
+        exe_path = cfg["exec_path"];
         PROCESS_INFORMATION proc_info{};
         STARTUPINFOA startup_info{};
         CreateProcessA(exe_path.c_str(), NULL, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, &startup_info, &proc_info);
