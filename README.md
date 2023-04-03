@@ -5,13 +5,15 @@
 ## Features
 
 ```
-• Model swap (clone and paste)
+• Model swap
 • Booba resize (see for yourself ;)
 • Scaling time
 • Open browser in game so you could order pizza without exiting game
 • Runtime lua console
 • Resizing avatar
 • Unlocking and showing FPS
+• Importing 3D .mo objects
+• Dumping IL2CPP
 • Ability to create your own custom functions! You can make your own lua scripts, or look for them in our discord.
 • And also bunch of small stuff, check it out!
 ```
@@ -19,7 +21,7 @@
 Program is actively developing and open-source, so pull requests are very welcome. Please open an issue first to discuss what you would like to change.
 
 ## Discord Server
-<a href="https://discord.gg/tPBEpV6ceC"><span style="font-size: 16px; vertical-align: middle;">Kinda Windy Today</span></a> <img src="https://cdn.discordapp.com/attachments/1067370364281298954/1087131061726740581/kwt.png" alt="alt text" style="height: 1em; width: 1em; font-size: 16px; vertical-align: middle; display: inline-block;"> 
+<a href="https://discord.gg/kindawindytoday"><span style="font-size: 16px; vertical-align: middle;">Kinda Windy Today</span></a> <img src="https://cdn.discordapp.com/attachments/1067370364281298954/1087131061726740581/kwt.png" alt="alt text" style="height: 1em; width: 1em; font-size: 16px; vertical-align: middle; display: inline-block;"> 
 
 ## Special thanks
 
