@@ -269,6 +269,9 @@
     <ClInclude Include="games\wordle.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="games\minesweeper.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="kiero\minhook\dll_resources\MinHook.def">

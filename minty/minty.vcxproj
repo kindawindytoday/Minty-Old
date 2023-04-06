@@ -208,6 +208,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="games\lightsout.hpp" />
+    <ClInclude Include="games\minesweeper.hpp" />
     <ClInclude Include="games\tictactoe.hpp" />
     <ClInclude Include="games\wordle.hpp" />
     <ClInclude Include="gilua\logtextbuf.h" />

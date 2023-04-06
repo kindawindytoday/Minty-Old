@@ -48,7 +48,7 @@ static bool wordle_keyinput_enabled = true;
 static bool is_in_lib = false;
 
 static int wordle_game_end_state = false;
-static int curr_row_index = 0;
+static int wordle_curr_row_index = 0;
 static const char* wordle_word = "";
 
 static const char* wordle_display_letter[] = {
@@ -147,10 +147,10 @@ void wordle_shake_row(int row) {
     const float time = (float)ImGui::GetTime();
     const float widthlist[] = {9,15,21, 20,15,10, 11,15,19, 18,15,12, 13,15,17, 14};
     for (int i = 0; i < IM_ARRAYSIZE(widthlist); i++) {
-        wordle_indent_width[curr_row_index] = widthlist[i];
+        wordle_indent_width[wordle_curr_row_index] = widthlist[i];
         std::this_thread::sleep_for(std::chrono::milliseconds(15));
     }
-    wordle_indent_width[curr_row_index] = 15.0f;
+    wordle_indent_width[wordle_curr_row_index] = 15.0f;
 }
 
 bool wordle_search_lib(const char* word, const char* words[], int size) {
@@ -214,8 +214,8 @@ void wordle_animate_row(int row, bool clear, std::string setcol, bool updategame
             wordle_game_end_state = 2;
             wordle_try_end_game_popup = true;
         } else {
-            if (curr_row_index != 5) {
-                curr_row_index++;
+            if (wordle_curr_row_index != 5) {
+                wordle_curr_row_index++;
             } else {
                 wordle_game_end_state = 1;
             }
@@ -254,7 +254,7 @@ std::array<std::string, 5> wordle_guess(const std::string& word, const std::stri
 }
 
 void wordle_validate_row(int row, const char* guess_str) {
-    std::string guess = wordle_getword_in_row(curr_row_index);
+    std::string guess = wordle_getword_in_row(wordle_curr_row_index);
     std::transform(guess.begin(), guess.end(), guess.begin(), [](unsigned char c){ return std::tolower(c); });
 
     std::string keyword = wordle_word;
@@ -281,20 +281,20 @@ void wordle_clear() {
 
 void wordle_handle_enter() {
     wordle_allow_enter = false;
-    if (strlen(wordle_getword_in_row(curr_row_index)) == 5) {
-        if (wordle_search_lib(wordle_getword_in_row(curr_row_index), word_library, IM_ARRAYSIZE(word_library))) {
+    if (strlen(wordle_getword_in_row(wordle_curr_row_index)) == 5) {
+        if (wordle_search_lib(wordle_getword_in_row(wordle_curr_row_index), word_library, IM_ARRAYSIZE(word_library))) {
             if (strlen(wordle_word) < 5) {
                 wordle_newword();
             }
-            wordle_validate_row(curr_row_index, wordle_getword_in_row(curr_row_index));
+            wordle_validate_row(wordle_curr_row_index, wordle_getword_in_row(wordle_curr_row_index));
         }
         else {
-            std::thread wordle_shake_thr(wordle_shake_row,curr_row_index);
+            std::thread wordle_shake_thr(wordle_shake_row,wordle_curr_row_index);
             wordle_shake_thr.detach();
         }
     }
     else {
-        std::thread wordle_shake_thr(wordle_shake_row,curr_row_index);
+        std::thread wordle_shake_thr(wordle_shake_row,wordle_curr_row_index);
         wordle_shake_thr.detach();
     }
 }
@@ -303,7 +303,7 @@ void wordle_newgame() {
     wordle_game_end_state = 0;
     std::thread wordle_clear_thr(wordle_clear);
     wordle_clear_thr.detach();
-    curr_row_index = 0;
+    wordle_curr_row_index = 0;
     wordle_word = " ";
     is_during_game = true;
     wordle_keyinput_enabled = true;
@@ -390,7 +390,7 @@ void wordle_main() {
 
         ImGui::SeparatorText("");
         if (wordle_game_end_state == 2) {
-            const int guessesvar = curr_row_index + 1;
+            const int guessesvar = wordle_curr_row_index + 1;
             std::string result = std::string("You got it in ") + std::to_string(guessesvar) + std::string(" Guesses!");
             TextCentered(result.c_str());
         }
@@ -422,7 +422,7 @@ void wordle_main() {
 
     if (wordle_keyinput_enabled) {
         if (ImGui::IsKeyPressed(ImGuiKey_Backspace))
-            wordle_backspace(curr_row_index);
+            wordle_backspace(wordle_curr_row_index);
 
         if (ImGui::IsKeyPressed(ImGuiKey_Enter, false)) {
             if (wordle_allow_enter) {
@@ -433,7 +433,7 @@ void wordle_main() {
         const char* letters[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
         for (int i = 0; i < 26; i++) {
             if (ImGui::IsKeyPressed(static_cast<ImGuiKey>(ImGuiKey_A + i))) {
-                wordle_insert_letter(letters[i], curr_row_index);
+                wordle_insert_letter(letters[i], wordle_curr_row_index);
                 break;
             }
         }
