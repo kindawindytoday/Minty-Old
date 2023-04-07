@@ -2468,13 +2468,13 @@ const char* cammovesffr1instantiate = R"MY_DELIMITER(
 	end
  
 	local Newcam = CS.UnityEngine.GameObject.Instantiate(OldCam)
-	Newcam.name = "FreeCamera"
+	Newcam.name = "MainCamera(Clone)"
 	OldCam.gameObject:SetActive(false)
---	Newcam.transform:SetParent(EyeParent.transform)
---	Newcam:GetComponent("Camera").fieldOfView = 110
---	Newcam:GetComponent("Camera").nearClipPlane = 0.01
---	Newcam.transform.localPosition = PosByAvatarSize()
---	Newcam.transform.localRotation = CS.UnityEngine.Quaternion.Euler(0.0279, 253.018, 359.2727)
+	Newcam.transform:SetParent(EntityRootBase.transform)
+	Newcam:GetComponent("Camera").fieldOfView = 110
+	Newcam:GetComponent("Camera").nearClipPlane = 0.01
+	Newcam.transform.localPosition = PosByAvatarSize()
+	Newcam.transform.localRotation = CS.UnityEngine.Quaternion.Euler(0.0279, 253.018, 359.2727)
 )MY_DELIMITER";
 
 
