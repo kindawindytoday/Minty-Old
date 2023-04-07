@@ -2455,6 +2455,27 @@ end
 xpcall(start, onError)
 )MY_DELIMITER";
 
+const char* cammovesffr1instantiate = R"MY_DELIMITER(
+	local EntityRootBase = CS.UnityEngine.GameObject.Find("/EntityRoot")
+	local OldCam = EntityRootBase.transform:Find("MainCamera(Clone)")
+	OldCam.gameObject:SetActive(true)
+ 
+--	local EyeParent = CS.UnityEngine.GameObject.Find(FindOffsetDummy() .. "/Bip001/Bip001 Pelvis/Bip001 Spine/Bip001 Spine1/Bip001 Spine2/Bip001 Neck/Bip001 Head/+EyeBone R A01")
+ 
+	if CS.UnityEngine.GameObject.Find("/FreeCamera") ~= nil then
+	   CS.UnityEngine.Object.Destroy(CS.UnityEngine.GameObject.Find("/FreeCamera"))
+	   CS.MoleMole.ActorUtils.ShowMessage("Duplicate camera found and destroyed")
+	end
+ 
+	local Newcam = CS.UnityEngine.GameObject.Instantiate(OldCam)
+	Newcam.name = "FreeCamera"
+	OldCam.gameObject:SetActive(false)
+--	Newcam.transform:SetParent(EyeParent.transform)
+--	Newcam:GetComponent("Camera").fieldOfView = 110
+--	Newcam:GetComponent("Camera").nearClipPlane = 0.01
+--	Newcam.transform.localPosition = PosByAvatarSize()
+--	Newcam.transform.localRotation = CS.UnityEngine.Quaternion.Euler(0.0279, 253.018, 359.2727)
+)MY_DELIMITER";
 
 
 void luahookfunc(const char* charLuaScript) {

@@ -139,7 +139,7 @@ int main()
         if (settings_file.is_open()) {
             // Write the executable path to the settings file
             cfg["exec_path"] = exe_path;
-            settings_file << cfg.dump(4) << std::endl;
+            settings_file << cfg.dump() << std::endl;
             settings_file.close();
         }
         else {

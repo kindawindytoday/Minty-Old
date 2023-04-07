@@ -327,6 +327,59 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 		
 				}
 
+				static bool isfreecam = false;
+				if (ImGui::Checkbox("Free camera", &isfreecam)) {
+					luahookfunc(cammovesffr1instantiate);
+				}
+				if (isfreecam) {
+					if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_RightArrow)))
+					{
+						util::log(2, "pressed right");
+						luahookfunc("CS.UnityEngine.GameObject.Find(\"/FreeCamera\").transform:Translate(CS.UnityEngine.Vector3.right * CS.UnityEngine.Time.deltaTime * 10)");
+					}
+
+					if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_LeftArrow)))
+					{
+						util::log(2, "pressed left");
+						luahookfunc("CS.UnityEngine.GameObject.Find(\"/FreeCamera\").transform:Translate(CS.UnityEngine.Vector3.left * CS.UnityEngine.Time.deltaTime * 10)");
+					}
+
+					if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_UpArrow)))
+					{
+						util::log(2, "pressed up");
+						luahookfunc("CS.UnityEngine.GameObject.Find(\"/FreeCamera\").transform:Translate(CS.UnityEngine.Vector3.forward * CS.UnityEngine.Time.deltaTime * 10)");
+					}
+
+					if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_DownArrow)))
+					{
+						util::log(2, "pressed down");
+						luahookfunc("CS.UnityEngine.GameObject.Find(\"/FreeCamera\").transform:Translate(CS.UnityEngine.Vector3.back * CS.UnityEngine.Time.deltaTime * 10)");
+					}
+
+					if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_PageUp)))
+					{
+						util::log(2, "pressed down");
+						luahookfunc("CS.UnityEngine.GameObject.Find(\"/FreeCamera\").transform:Rotate(CS.UnityEngine.Vector3.up * CS.UnityEngine.Time.deltaTime * 50.0)");
+					}
+
+					if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_PageDown)))
+					{
+						util::log(2, "pressed down");
+						luahookfunc("CS.UnityEngine.GameObject.Find(\"/FreeCamera\").transform:Rotate(-CS.UnityEngine.Vector3.up * CS.UnityEngine.Time.deltaTime * 50.0)");
+					}
+
+					if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_Z)))
+					{
+						util::log(2, "pressed down");
+						luahookfunc("CS.UnityEngine.GameObject.Find(\"/FreeCamera\").transform:Rotate(-CS.UnityEngine.Vector3.right * CS.UnityEngine.Time.deltaTime * 50.0)");
+					}
+
+					if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_X)))
+					{
+						util::log(2, "pressed down");
+						luahookfunc("CS.UnityEngine.GameObject.Find(\"/FreeCamera\").transform:Rotate(CS.UnityEngine.Vector3.right * CS.UnityEngine.Time.deltaTime * 50.0)");
+					}
+				}
 
 				ImGui::SeparatorText("World");
 				static bool browser_is_enabled = false;
@@ -393,6 +446,100 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 
 				ImGui::SeparatorText("Misc");
 
+				/*if (ImGui::Button("123"))
+				{
+					luahookfunc("a = \"booba\"");
+					lua_getglobal(gi_L, "a");
+					if (lua_isstring(gi_L, -1)) {
+						const char* result = lua_tostring(gi_L, -1);
+						util::log(2, "value is %s", result);
+					}
+					else {
+						util::log(2, "global variable 'a' is not defined");
+					}
+				}*/
+
+				int first_number = 0;
+				int second_number = 0;
+				int third_number = 0;
+				string numbers;
+				static bool show_input_window = false;
+				std::vector<std::pair<std::string, std::string>> dropdown_items;
+				static char inputposFilePath[256] = "";
+
+				if (ImGui::Button("Save pos"))
+				{
+					luahookfunc("pospospos = tostring(CS.MoleMole.ActorUtils.GetAvatarPos())");
+					lua_getglobal(gi_L, "pospospos");
+					if (lua_isstring(gi_L, -1)) {
+
+						const char* result = lua_tostring(gi_L, -1);
+
+						// Find the position of the opening and closing brackets
+						int open_bracket_pos = string(result).find('(');
+						int close_bracket_pos = string(result).find(')');
+
+						// Extract the substring between the brackets and assign it to a new string variable
+						string extracted_string = string(result).substr(open_bracket_pos + 1, close_bracket_pos - open_bracket_pos - 1);
+
+						util::log(2, "value is %s", extracted_string);
+						numbers = extracted_string;
+					}
+					else {
+						util::log(2, "global variable 'pospospos' is not defined");
+					}
+					ImGui::OpenPopup("New TP position");
+				}
+
+				// Create a dropdown list
+				static int selected_item = -1;
+				if (ImGui::BeginCombo("Select an item", (selected_item >= 0 && selected_item < dropdown_items.size()) ? dropdown_items[selected_item].first.c_str() : "Select..."))
+				{
+					for (int i = 0; i < dropdown_items.size(); i++)
+					{
+						bool is_selected = (selected_item == i);
+						if (ImGui::Selectable(dropdown_items[i].first.c_str(), is_selected))
+						{
+							selected_item = i;
+							//string result = "CS.MoleMole.ActorUtils.SetAvatarPos(" + to_string(std::get<0>(dropdown_items[i].second)) + "," + to_string(std::get<1>(dropdown_items[i].second)) + "," + to_string(std::get<2>(dropdown_items[i].second)) + ")";
+							string result = "CS.MoleMole.ActorUtils.SetAvatarPos(" + numbers + ")";
+							
+						}
+						if (is_selected)
+						{
+							ImGui::SetItemDefaultFocus();
+						}
+					}
+					ImGui::EndCombo();
+				}
+
+				// Show a window to input a label and save the data to the dropdown when the button is pressed
+				//if (show_input_window)
+				//{
+				//	ImGui::SetNextWindowSize(ImVec2(400, 150));
+				//	ImGui::Begin("Input label", &show_input_window);
+				//	ImGui::InputText("Label", &inputposFilePath, sizeof(inputposFilePath));
+				//	if (ImGui::Button("Save"))
+				//	{
+				//		// Save the label and the three numbers to the dropdown list
+				//		dropdown_items.push_back(std::make_pair(to_string(inputposFilePath), std::make_tuple(first_number, second_number, third_number)));
+				//		show_input_window = false;
+				//		selected_item = -1;
+				//	}
+				//	ImGui::End();
+				//}
+
+				if (ImGui::BeginPopup("New TP position")) {
+					ImGui::InputText("Name", inputposFilePath, 256);
+					if (ImGui::Button("Create")) {
+						//dropdown_items.emplace_back(string(inputposFilePath), numbers);
+						dropdown_items.push_back(std::make_pair(string(inputposFilePath), numbers));
+						memset(inputposFilePath, 0, sizeof(inputposFilePath));
+						ImGui::CloseCurrentPopup();
+					}
+					ImGui::EndPopup();
+				}
+
 				static bool unlockfps = false;
 				static float targetfps = 60;
 				ImGui::Checkbox("Unlock FPS", &unlockfps);
@@ -433,7 +580,7 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				ImGui::SameLine();
 				HelpMarker("Hides that floating damage numbers.");
 
-				/*static bool turnoffdithering = false;  -------- may not wok
+				/*static bool turnoffdithering = false;  -------- nevermind this shit wont work MHY FUCK U
 
 				if (ImGui::Checkbox("Enable peeking", &turnoffdithering)) {
 					if (turnoffdithering) {
@@ -444,7 +591,7 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 					}
 				}*/
 
-				/*static bool changefov = false; --------- no wok too
+				/*static bool changefov = false; --------- SAME
 				static float targetfov = 60;
 				ImGui::Checkbox("Change camera FOV", &changefov);
 				ImGui::SameLine();
