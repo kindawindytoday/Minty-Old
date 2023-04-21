@@ -272,6 +272,15 @@
     <ClInclude Include="games\minesweeper.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="json\jsoncfg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="kiero\minhook\dll_resources\MinHook.def">
@@ -282,5 +291,13 @@
     <Font Include="res\fonts\mpc.otf" />
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="Resource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\Users\Chak\Downloads\gato.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

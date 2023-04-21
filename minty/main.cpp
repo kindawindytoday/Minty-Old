@@ -13,19 +13,23 @@
 #include "imgui/L2DFileDialog.h"
 #include <chrono>
 #include <thread>
-
+#include "json/tp_points.hpp"
 #include "gilua/logtextbuf.h"
 #include <Windows.h>
 #include <ShObjIdl.h>
 #include <ObjBase.h>
 
 #include "json/json.hpp"
-
+#include "json/jsoncfg.h"
+#define IDB_PNG 1
 #include "games/tictactoe.hpp" //WORK IN PROGRESS
 #include "games/lightsout.hpp"
 #include "games/wordle.hpp"
 //using json = nlohmann::json;
 //config json;
+#define STB_IMAGE_IMPLEMENTATION
+#include "imgui/stb_image.h"
+
 using namespace std;
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -36,6 +40,86 @@ WNDPROC oWndProc;
 ID3D11Device* pDevice = NULL;
 ID3D11DeviceContext* pContext = NULL;
 ID3D11RenderTargetView* mainRenderTargetView;
+
+ID3D11Texture2D* g_pTexture = NULL;
+ID3D11ShaderResourceView* g_pTextureView = NULL;
+
+static vector<pair<string, function<void()>>> buttonFuncs;
+static char buttonLabel[256] = "";
+
+// Declare a boolean flag to keep track of whether the custom buttons have been created
+static bool customButtonsCreated = false;
+
+// Define a function to create the custom buttons
+void createCustomButtons() {
+	// Read the "minge" file and parse the JSON data
+	std::ifstream config_file("minge");
+	nlohmann::json config_json;
+	config_file >> config_json;
+	config_file.close();
+
+	// Check if the "custom_buttons" object exists in the JSON
+	if (config_json.contains("custom_buttons")) {
+		// Iterate over the buttons in the "custom_buttons" object
+		for (auto& [buttonLabel, functionText] : config_json["custom_buttons"].items()) {
+			// Create a function that calls the lua function with the button's code
+			function<void()> buttonFunc = [functionText]() {
+				luahookfunc(functionText.get<std::string>().c_str());
+			};
+			// Add the button to the buttonFuncs vector
+			buttonFuncs.emplace_back(buttonLabel, buttonFunc);
+		}
+	}
+
+	// Set the customButtonsCreated flag to true
+	customButtonsCreated = true;
+}
+
+string numbers;
+
+void updateNumbers() {
+	for (int i = 0; i < 3; ++i) {
+		luahookfunc("pospospos = tostring(CS.MoleMole.ActorUtils.GetAvatarPos())");
+		lua_getglobal(gi_L, "pospospos");
+		if (lua_isstring(gi_L, -1)) {
+			const char* result = lua_tostring(gi_L, -1);
+			// Find the position of the opening and closing brackets
+			int open_bracket_pos = string(result).find('(');
+			int close_bracket_pos = string(result).find(')');
+			// Extract the substring between the brackets and assign it to a new string variable
+			string extracted_string = string(result).substr(open_bracket_pos + 1, close_bracket_pos - open_bracket_pos - 1);
+			util::log(2, "value is %s", extracted_string);
+			numbers = extracted_string;
+		}
+		else {
+			util::log(2, "global variable 'pospospos' is not defined");
+		}
+	}
+}
+
+string getTpPosition() {
+	string tpcoords;
+	for (int i = 0; i < 3; ++i) {
+		luahookfunc("pospospos = tostring(CS.MoleMole.ActorUtils.GetAvatarPos())");
+		lua_getglobal(gi_L, "pospospos");
+
+		if (lua_isstring(gi_L, -1)) {
+			const char* result = lua_tostring(gi_L, -1);
+			// Find the position of the opening and closing brackets
+			int open_bracket_pos = string(result).find('(');
+			int close_bracket_pos = string(result).find(')');
+			// Extract the substring between the brackets and assign it to a new string variable
+			tpcoords = string(result).substr(open_bracket_pos + 1, close_bracket_pos - open_bracket_pos - 1);
+			break;
+		}
+		else {
+			util::log(2, "global variable 'pospospos' hasn't yet been defined");
+		}
+		// Pop the result off the stack to balance it
+		lua_pop(gi_L, 1);
+	}
+	return tpcoords;
+}
 
 void InitImGui()
 {
@@ -67,6 +151,12 @@ static void HelpMarker(const char* desc)
 		ImGui::EndTooltip();
 	}
 }
+
+//fs::path cfg_path = fs::current_path() / "cfg.json";
+//std::ofstream settings_file(cfg_path);
+//nlohmann::json cfg;
+
+nlohmann::json parsedTp = nlohmann::json::parse(json_tp_str);
 
 bool init = false;
 static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
@@ -130,6 +220,10 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 
 		ImGui::NewFrame();
 		ImGui::GetStyle().IndentSpacing = 16.0f;
+
+		if (!customButtonsCreated) {
+			createCustomButtons();
+		}
 
 		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[fontindex_menu]);
 
@@ -328,58 +422,66 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				}
 
 				static bool isfreecam = false;
-				if (ImGui::Checkbox("Free camera", &isfreecam)) {
-					luahookfunc(cammovesffr1instantiate);
-				}
-				if (isfreecam) {
-					if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_RightArrow)))
-					{
-						util::log(2, "pressed right");
-						luahookfunc("CS.UnityEngine.GameObject.Find(\"/FreeCamera\").transform:Translate(CS.UnityEngine.Vector3.right * CS.UnityEngine.Time.deltaTime * 10)");
-					}
+				//if (ImGui::Checkbox("Free camera", &isfreecam)) {
+				//	if (!isfreecam) {
+				//		luahookfunc(cammovesffr1restore);
+				//		util::log(2, "restored");
+				//	}
+				//	else if (isfreecam) {
+				//		luahookfunc(cammovesffr1instantiate);
+				//		util::log(2, "set");
+				//	}
+				//	//luahookfunc(R"MY_DELIMITER(CS.UnityEngine.GameObject.Find("/EntityRoot/MainCamera(Clone)").name = "FreeCamera")MY_DELIMITER");
+				//}
+				//if (isfreecam) {
+				//	if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_RightArrow)))
+				//	{
+				//		util::log(2, "pressed right");
+				//		luahookfunc("CS.UnityEngine.GameObject.Find(\"/EntityRoot/FreeCamera\").transform:Translate(CS.UnityEngine.Vector3.right * CS.UnityEngine.Time.deltaTime * 10)");
+				//	}
 
-					if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_LeftArrow)))
-					{
-						util::log(2, "pressed left");
-						luahookfunc("CS.UnityEngine.GameObject.Find(\"/FreeCamera\").transform:Translate(CS.UnityEngine.Vector3.left * CS.UnityEngine.Time.deltaTime * 10)");
-					}
+				//	if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_LeftArrow)))
+				//	{
+				//		util::log(2, "pressed left");
+				//		luahookfunc("CS.UnityEngine.GameObject.Find(\"/EntityRoot/FreeCamera\").transform:Translate(CS.UnityEngine.Vector3.left * CS.UnityEngine.Time.deltaTime * 10)");
+				//	}
 
-					if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_UpArrow)))
-					{
-						util::log(2, "pressed up");
-						luahookfunc("CS.UnityEngine.GameObject.Find(\"/FreeCamera\").transform:Translate(CS.UnityEngine.Vector3.forward * CS.UnityEngine.Time.deltaTime * 10)");
-					}
+				//	if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_UpArrow)))
+				//	{
+				//		util::log(2, "pressed up");
+				//		luahookfunc("CS.UnityEngine.GameObject.Find(\"/EntityRoot/FreeCamera\").transform:Translate(CS.UnityEngine.Vector3.forward * CS.UnityEngine.Time.deltaTime * 10)");
+				//	}
 
-					if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_DownArrow)))
-					{
-						util::log(2, "pressed down");
-						luahookfunc("CS.UnityEngine.GameObject.Find(\"/FreeCamera\").transform:Translate(CS.UnityEngine.Vector3.back * CS.UnityEngine.Time.deltaTime * 10)");
-					}
+				//	if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_DownArrow)))
+				//	{
+				//		util::log(2, "pressed down");
+				//		luahookfunc("CS.UnityEngine.GameObject.Find(\"/EntityRoot/FreeCamera\").transform:Translate(CS.UnityEngine.Vector3.back * CS.UnityEngine.Time.deltaTime * 10)");
+				//	}
 
-					if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_PageUp)))
-					{
-						util::log(2, "pressed down");
-						luahookfunc("CS.UnityEngine.GameObject.Find(\"/FreeCamera\").transform:Rotate(CS.UnityEngine.Vector3.up * CS.UnityEngine.Time.deltaTime * 50.0)");
-					}
+				//	if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_PageUp)))
+				//	{
+				//		util::log(2, "pressed down");
+				//		luahookfunc("CS.UnityEngine.GameObject.Find(\"/EntityRoot/FreeCamera\").transform:Rotate(CS.UnityEngine.Vector3.up * CS.UnityEngine.Time.deltaTime * 50.0)");
+				//	}
 
-					if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_PageDown)))
-					{
-						util::log(2, "pressed down");
-						luahookfunc("CS.UnityEngine.GameObject.Find(\"/FreeCamera\").transform:Rotate(-CS.UnityEngine.Vector3.up * CS.UnityEngine.Time.deltaTime * 50.0)");
-					}
+				//	if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_PageDown)))
+				//	{
+				//		util::log(2, "pressed down");
+				//		luahookfunc("CS.UnityEngine.GameObject.Find(\"/EntityRoot/FreeCamera\").transform:Rotate(-CS.UnityEngine.Vector3.up * CS.UnityEngine.Time.deltaTime * 50.0)");
+				//	}
 
-					if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_Z)))
-					{
-						util::log(2, "pressed down");
-						luahookfunc("CS.UnityEngine.GameObject.Find(\"/FreeCamera\").transform:Rotate(-CS.UnityEngine.Vector3.right * CS.UnityEngine.Time.deltaTime * 50.0)");
-					}
+				//	if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_Z)))
+				//	{
+				//		util::log(2, "pressed down");
+				//		luahookfunc("CS.UnityEngine.GameObject.Find(\"/EntityRoot/FreeCamera\").transform:Rotate(-CS.UnityEngine.Vector3.right * CS.UnityEngine.Time.deltaTime * 50.0)");
+				//	}
 
-					if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_X)))
-					{
-						util::log(2, "pressed down");
-						luahookfunc("CS.UnityEngine.GameObject.Find(\"/FreeCamera\").transform:Rotate(CS.UnityEngine.Vector3.right * CS.UnityEngine.Time.deltaTime * 50.0)");
-					}
-				}
+				//	if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_X)))
+				//	{
+				//		util::log(2, "pressed down");
+				//		luahookfunc("CS.UnityEngine.GameObject.Find(\"/EntityRoot/FreeCamera\").transform:Rotate(CS.UnityEngine.Vector3.right * CS.UnityEngine.Time.deltaTime * 50.0)");
+				//	}
+				//}
 
 				ImGui::SeparatorText("World");
 				static bool browser_is_enabled = false;
@@ -422,13 +524,23 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 					luahookfunc(result.c_str());
 				}
 
+				static bool ifcloneavatar = false;
+				ImGui::Checkbox("Avatar cloner", &ifcloneavatar);
+				ImGui::SameLine();
+				HelpMarker("Makes copy of your current character. Saves its pose.");
+				if (ifcloneavatar) {
+					if (ImGui::Button("Copy avatar")) {
+						luahookfunc(copyavatar);
+					}
+				}
+
 				char inputmoFilePath[512] = "";
 				char inputpngFilePath[512] = "";
 
 				bool show_mofile_dialog = false;
 
 				ImGui::Separator();
-				ImGui::Text("MO Loader");
+				/*ImGui::Text("MO Loader");
 
 
 				ImGui::InputTextWithHint("", "Enter your path to .mo file", inputmoFilePath, sizeof(inputmoFilePath));
@@ -441,7 +553,7 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 					luahookfunc(result.c_str());
 				}
 				ImGui::SameLine();
-				HelpMarker("Creates 3D object in world, which will be imported from defined paths.");
+				HelpMarker("Creates 3D object in world, which will be imported from defined paths.");*/
 
 
 				ImGui::SeparatorText("Misc");
@@ -462,48 +574,48 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				int first_number = 0;
 				int second_number = 0;
 				int third_number = 0;
-				string numbers;
+				string tpcoords;
+				string lastnumbers;
 				static bool show_input_window = false;
-				std::vector<std::pair<std::string, std::string>> dropdown_items;
-				static char inputposFilePath[256] = "";
+				std::vector<std::pair<std::string, std::string>> tp_points;
+				std::vector<std::tuple<std::string, std::string, std::string>> done_tp_points;
+				static char inputposlabel[256] = "";
 
 				if (ImGui::Button("Save pos"))
 				{
-					luahookfunc("pospospos = tostring(CS.MoleMole.ActorUtils.GetAvatarPos())");
-					lua_getglobal(gi_L, "pospospos");
-					if (lua_isstring(gi_L, -1)) {
-
-						const char* result = lua_tostring(gi_L, -1);
-
-						// Find the position of the opening and closing brackets
-						int open_bracket_pos = string(result).find('(');
-						int close_bracket_pos = string(result).find(')');
-
-						// Extract the substring between the brackets and assign it to a new string variable
-						string extracted_string = string(result).substr(open_bracket_pos + 1, close_bracket_pos - open_bracket_pos - 1);
-
-						util::log(2, "value is %s", extracted_string);
-						numbers = extracted_string;
-					}
-					else {
-						util::log(2, "global variable 'pospospos' is not defined");
-					}
-					ImGui::OpenPopup("New TP position");
+					ImGui::OpenPopup("New TP point");
 				}
 
+				if (ImGui::Button("show nums")) {
+					//updateNumbers();
+					string result = R"MY_DELIMITER(CS.MoleMole.ActorUtils.ShowMessage("pos: )MY_DELIMITER" + getTpPosition() + "\")";
+					luahookfunc(result.c_str());
+				}
 				// Create a dropdown list
 				static int selected_item = -1;
-				if (ImGui::BeginCombo("Select an item", (selected_item >= 0 && selected_item < dropdown_items.size()) ? dropdown_items[selected_item].first.c_str() : "Select..."))
+				std::ifstream config_file("minty");
+				config_file >> cfgjsonobj;
+				config_file.close();
+
+				for (auto const& tp : cfgjsonobj["tp_points"].items()) {
+					tp_points.emplace_back(tp.key(), tp.value());
+				}
+				
+				//for (auto const& group : cfgjsonobj["done_tp_points"].items()) {
+				//	for (auto const& tp : group.value().items()) {
+				//		done_tp_points.emplace_back(group.key(), tp.key(), tp.value());
+				//	}
+				//}
+
+				// render the dropdown
+				if (ImGui::BeginCombo("Select an item", (selected_item >= 0 && selected_item < tp_points.size()) ? tp_points[selected_item].first.c_str() : "Select..."))
 				{
-					for (int i = 0; i < dropdown_items.size(); i++)
+					for (int i = 0; i < tp_points.size(); i++)
 					{
 						bool is_selected = (selected_item == i);
-						if (ImGui::Selectable(dropdown_items[i].first.c_str(), is_selected))
+						if (ImGui::Selectable(tp_points[i].first.c_str(), is_selected))
 						{
 							selected_item = i;
-							//string result = "CS.MoleMole.ActorUtils.SetAvatarPos(" + to_string(std::get<0>(dropdown_items[i].second)) + "," + to_string(std::get<1>(dropdown_items[i].second)) + "," + to_string(std::get<2>(dropdown_items[i].second)) + ")";
-							string result = "CS.MoleMole.ActorUtils.SetAvatarPos(" + numbers + ")";
-							
 						}
 						if (is_selected)
 						{
@@ -513,32 +625,95 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 					ImGui::EndCombo();
 				}
 
-				// Show a window to input a label and save the data to the dropdown when the button is pressed
-				//if (show_input_window)
-				//{
-				//	ImGui::SetNextWindowSize(ImVec2(400, 150));
-				//	ImGui::Begin("Input label", &show_input_window);
-				//	ImGui::InputText("Label", &inputposFilePath, sizeof(inputposFilePath));
-				//	if (ImGui::Button("Save"))
-				//	{
-				//		// Save the label and the three numbers to the dropdown list
-				//		dropdown_items.push_back(std::make_pair(to_string(inputposFilePath), std::make_tuple(first_number, second_number, third_number)));
-				//		show_input_window = false;
-				//		selected_item = -1;
-				//	}
-				//	ImGui::End();
-				//}
+				// handle teleport button press
+				if (ImGui::Button("Teleport") && selected_item >= 0 && selected_item < tp_points.size()) {
+					string result = "CS.MoleMole.ActorUtils.SetAvatarPos(CS.UnityEngine.Vector3(" + tp_points[selected_item].second + "))";
+					//util::log(2, "pos is: %s", tp_points[selected_item].second);
+					luahookfunc(result.c_str());
+				}
 
-				if (ImGui::BeginPopup("New TP position")) {
-					ImGui::InputText("Name", inputposFilePath, 256);
+				// define the vector to hold the TP points data
+				//std::vector<std::tuple<std::string, std::string, std::string, std::string>> tp_points;
+				
+
+				if (ImGui::BeginPopup("New TP point")) {
+					ImGui::InputText("Label", inputposlabel, 256);
 					if (ImGui::Button("Create")) {
-						//dropdown_items.emplace_back(string(inputposFilePath), numbers);
-						dropdown_items.push_back(std::make_pair(string(inputposFilePath), numbers));
-						memset(inputposFilePath, 0, sizeof(inputposFilePath));
+						tp_points.emplace_back(string(inputposlabel), getTpPosition());
+						std::ifstream config_file("minty");
+						nlohmann::json config_json;
+						config_file >> config_json;
+						config_file.close();
+
+						cfgjsonobj["tp_points"][inputposlabel] = getTpPosition();
+						config_json.merge_patch(cfgjsonobj);
+						std::ofstream merged_file("minty");
+						merged_file << config_json.dump(4); // pretty-print with 4 spaces
+						merged_file.close();
+						memset(buttonLabel, 0, sizeof(buttonLabel));
 						ImGui::CloseCurrentPopup();
 					}
 					ImGui::EndPopup();
 				}
+
+				//std::vector<std::tuple<std::string, std::string, std::string>> done_tp_points;
+				for (auto const& group : cfgjsonobj["tps"].items()) {
+					for (auto const& tp : group.value().items()) {
+						done_tp_points.emplace_back(group.key(), tp.key(), tp.value());
+					}
+				}
+
+				std::vector<std::string> group_names;
+				for (auto const& group : cfgjsonobj["tps"].items()) {
+					group_names.push_back(group.key());
+				}
+
+				static int selected_group = 0;
+				static int selected_tp = 0;
+
+				if (ImGui::BeginCombo("Select a group", group_names[selected_group].c_str())) {
+					for (int i = 0; i < group_names.size(); i++) {
+						bool is_selected = (selected_group == i);
+						if (ImGui::Selectable(group_names[i].c_str(), is_selected)) {
+							selected_group = i;
+							selected_tp = 0;
+						}
+						if (is_selected) {
+							ImGui::SetItemDefaultFocus();
+						}
+					}
+					ImGui::EndCombo();
+				}
+
+				if (!tp_points.empty()) {
+					auto const& tp = done_tp_points[selected_group * group_names.size() + selected_tp];
+					ImGui::Text("%s : %s", std::get<1>(tp).c_str(), std::get<2>(tp).c_str());
+
+					if (ImGui::Button("TP Previous")) {
+						selected_tp = (selected_tp + done_tp_points.size() - 1) % done_tp_points.size();
+						while (std::get<0>(done_tp_points[selected_tp]) != group_names[selected_group]) {
+							selected_tp = (selected_tp + done_tp_points.size() - 1) % done_tp_points.size();
+						}
+					}
+					ImGui::SameLine();
+					if (ImGui::Button("TP Next")) {
+						selected_tp = (selected_tp + 1) % done_tp_points.size();
+						while (std::get<0>(done_tp_points[selected_tp]) != group_names[selected_group]) {
+							selected_tp = (selected_tp + 1) % done_tp_points.size();
+						}
+					}
+				}
+
+				//if (ImGui::BeginPopup("New TP position")) {
+				//	ImGui::InputText("Name", inputposFilePath, 256);
+				//	if (ImGui::Button("Create")) {
+				//		//dropdown_items.emplace_back(string(inputposFilePath), numbers);
+				//		tp_points.push_back(std::make_pair(string(inputposFilePath), string(numbers)));
+				//		memset(inputposFilePath, 0, sizeof(inputposFilePath));
+				//		ImGui::CloseCurrentPopup();
+				//	}
+				//	ImGui::EndPopup();
+				//}
 
 				static bool unlockfps = false;
 				static float targetfps = 60;
@@ -608,7 +783,89 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				//ImGui::Text("Lua");
 				ImGui::SeparatorText("Lua");
 				ImGui::Checkbox("Lua editor", &showEditor);
+				string renameButtonLabel;
 				
+				ImGui::SeparatorText("Custom Buttons");
+				for (auto& button : buttonFuncs)
+				{
+					if (ImGui::Button(button.first.c_str()))
+					{
+						button.second();
+					}
+
+					//if (ImGui::BeginPopupContextItem())
+					//{
+					//	if (ImGui::MenuItem("Rename"))
+					//	{
+					//		// Open the rename popup and store the current button label
+					//		//string buttonLabel = button.first;
+					//		renameButtonLabel = button.first;
+					//		ImGui::OpenPopup("Rename button");
+					//		//string renameButtonLabel = button.first;
+					//	}
+
+					//	if (ImGui::MenuItem("Delete"))
+					//	{
+					//		// Remove the button from the vector
+					//		buttonFuncs.erase(std::remove_if(buttonFuncs.begin(), buttonFuncs.end(),
+					//			[&button](const auto& b) { return b.first == button.first; }), buttonFuncs.end());
+
+					//		// Write the updated JSON object to file
+					//		std::ifstream config_file("minge");
+					//		nlohmann::json config_json;
+					//		config_file >> config_json;
+					//		config_file.close();
+
+					//		cfgjsonobj["custom_buttons"].erase(button.first);
+					//		config_json.merge_patch(cfgjsonobj);
+					//		std::ofstream merged_file("minge");
+					//		merged_file << config_json.dump(4); // pretty-print with 4 spaces
+					//		merged_file.close();
+					//	}
+
+					//	ImGui::EndPopup();
+					//}
+				}
+
+				// Add a separate popup window for renaming a button
+				if (ImGui::BeginPopup("Rename button"))
+				{
+					static char newButtonLabel[256] = "";
+					ImGui::InputText("New label", newButtonLabel, 256);
+
+					if (ImGui::Button("Rename"))
+					{
+						// Find the button in the vector by its old label and update it
+						for (auto& button : buttonFuncs)
+						{
+							if (button.first == renameButtonLabel)
+							{
+								button.first = newButtonLabel;
+
+								// Update the JSON object with the new label
+								cfgjsonobj["custom_buttons"][newButtonLabel] = cfgjsonobj["custom_buttons"][renameButtonLabel];
+								cfgjsonobj["custom_buttons"].erase(renameButtonLabel);
+
+								// Write the updated JSON object to file
+								std::ifstream config_file("minty");
+								nlohmann::json config_json;
+								config_file >> config_json;
+								config_file.close();
+
+								config_json.merge_patch(cfgjsonobj);
+								std::ofstream merged_file("minty");
+								merged_file << config_json.dump(4); // pretty-print with 4 spaces
+								merged_file.close();
+							}
+						}
+
+						// Close the popup
+						ImGui::CloseCurrentPopup();
+					}
+
+					ImGui::EndPopup();
+				}
+
 				ImGui::EndTabItem();
 			}
 
@@ -653,8 +910,8 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 				ImGui::SameLine();
 				//saver to button below.
 
-				static vector<pair<string, function<void()>>> buttonFuncs;
-				static char buttonLabel[256] = "";
+				//static vector<pair<string, function<void()>>> buttonFuncs;
+				//static char buttonLabel[256] = "";
 
 				if (ImGui::Button("Create new button")) {
 					ImGui::OpenPopup("New button");
@@ -670,19 +927,34 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval
 							luahookfunc(functionText.c_str());
 						};
 						buttonFuncs.emplace_back(string(buttonLabel), buttonFunc);
+						std::ifstream config_file("minge");
+						nlohmann::json config_json;
+						config_file >> config_json;
+						config_file.close();
+
+
+						cfgjsonobj["custom_buttons"][buttonLabel] = functionText;
+						config_json.merge_patch(cfgjsonobj);
+						std::ofstream merged_file("minge");
+						merged_file << config_json.dump(4); // pretty-print with 4 spaces
+						merged_file.close();
 						memset(buttonLabel, 0, sizeof(buttonLabel));
 						ImGui::CloseCurrentPopup();
 					}
 					ImGui::EndPopup();
 				}
 
-				ImGui::Begin("Minty");
-				for (const auto& button : buttonFuncs) {
-					if (ImGui::Button(button.first.c_str())) {
-						button.second();
-					}
-				}
-				ImGui::End();
+				//ImGui::Begin("Minty");
+				//if (ImGui::BeginTabItem("Main"))
+				//{
+				//	//for (const auto& button : buttonFuncs) {
+				//	//	if (ImGui::Button(button.first.c_str())) {
+				//	//		button.second();
+				//	//	}
+				//	//}
+				//}
+				//ImGui::EndTabBar();
+				//ImGui::End();
 
 				if (ImGui::BeginMenuBar())
 				{

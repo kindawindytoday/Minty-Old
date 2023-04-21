@@ -223,9 +223,11 @@
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="imgui\L2DFileDialog.h" />
+    <ClInclude Include="imgui\stb_image.h" />
     <ClInclude Include="imgui\TextEditor.h" />
     <ClInclude Include="includes.h" />
     <ClInclude Include="json\json.hpp" />
+    <ClInclude Include="json\jsoncfg.h" />
     <ClInclude Include="kiero\kiero.h" />
     <ClInclude Include="kiero\minhook\dll_resources\resource.h" />
     <ClInclude Include="kiero\minhook\include\MinHook.h" />
@@ -239,6 +241,7 @@
     <ClInclude Include="gilua\pe.h" />
     <ClInclude Include="gilua\scanner.h" />
     <ClInclude Include="lua\funcs.hpp" />
+    <ClInclude Include="resource1.h" />
     <ClInclude Include="res\fonts\font.h" />
     <ClInclude Include="themes.h" />
   </ItemGroup>
@@ -246,6 +249,10 @@
     <Font Include="res\fonts\mpc.otf" />
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\Users\Chak\Downloads\gato.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
